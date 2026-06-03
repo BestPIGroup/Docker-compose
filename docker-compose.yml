@@ -1,0 +1,38 @@
+services:
+
+  mysql:
+    build:
+      context: ./mysql
+    container_name: mysql-container
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    networks:
+      - argos-net
+    volumes:
+      - mysql-volume:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 'Argos#2026'
+      MYSQL_DATABASE: 'projeto_Argos'
+      MYSQL_USER: argos
+      MYSQL_PASSWORD: 'Argos#2026'
+
+  site:
+    build:
+      context: ./site
+    container_name: argos-site-container
+    restart: unless-stopped
+    network_mode: "host"
+    expose:
+      - "3334"
+    env_file:
+      - ./site/.env.dev
+    depends_on:
+      - mysql
+
+volumes:
+  mysql-volume:
+
+networks:
+  argos-net:
+    driver: bridge

@@ -1,0 +1,251 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@100..800&display=swap');
+
+body{
+  background-color: #01163d;
+  color: white;
+  height: 130vh;
+}
+
+.login{
+    flex-direction: row;
+    display: flex;
+    height: 100%;
+} 
+.cadastro{
+    display: flex;
+    width: 50%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.container-unidade-indicador {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+}
+
+.imagem-indicador img {
+    width: 20%;
+    
+}
+.imagem-indicador {
+    display: flex;
+align-items: center;
+    justify-content: center;
+}
+
+.cadastroUni{
+    display: flex;
+    width: 50%;
+    align-items: center;
+    flex-direction: column;
+}
+
+.cadastro a{
+    display: none;
+    justify-self: center;
+    font-family: 'Sora', sans-serif;
+    font-weight: 600;
+    font-size: 18px;
+    text-decoration: none;
+    color: white;
+    transition: all 0.8s ease;
+}
+
+.formulario{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 80%;
+    flex-direction: column;
+    height: 90%;
+    gap: 10px;
+}
+
+h2{
+    align-self: center;
+    font-weight: bold;
+    font-family: 'poppins', sans-serif;
+    font-size: 30px;
+    margin: 0;
+    margin-top: 12px
+}
+
+.campo{
+    display: flex;
+    font-weight: 500;
+    font-size: 18px;
+    font-family: 'Manrope', sans-serif;
+    white-space: pre-line;
+    width: 80%;
+    justify-content: center;
+    flex-direction: column;
+}
+
+#cardErroUni {
+    display: flex;
+    position: absolute;
+    justify-content: start;
+    align-items: center; 
+    z-index: 30;
+    background-color: rgba(0, 0, 0, 0.563);
+    height: 130vh;
+    width: 100%;
+}
+
+#cardErroUniCaixa {
+    display: flex;
+    flex-direction: column;
+    margin-top: 50px;
+    padding: 0px 40px 40px; 
+    height: fit-content;
+    width: 600px;
+    background-color: white;
+}
+
+#cardErroUniCaixa h1 {
+    display: flex;
+    color: black;
+    font-family: 'Poppins';
+}
+
+#caixaErroHeader {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0;
+}
+
+input{
+    width: 100%;
+    border-radius: 10px;
+    border: #4c6977, solid, 1px;
+    background-color: #1C2C46;
+    line-height: 20px;
+    font-size: 20px;
+    color: white;
+    height: 35px;
+    transition: all 0.5s ease;
+}
+
+.formulario .campo input:disabled {
+    background-color: #0b121d88;
+}
+
+.formulario .campo input:focus, .formulario .campo input:hover {
+    outline: none;
+    background-color: #34518188;
+    transform: scale(1.02);
+}
+
+.formulario .campo input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.botao{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+    width: 50%;
+    height: 50px;
+    border-radius: 15px;
+    background-color: #EAEAEA;
+    font-size: 20px;
+    font-weight: 500;
+    font-family: 'Work Sans', sans-serif;
+    cursor: pointer;
+    transition:0.3s ;
+}
+.formulario button:hover{
+    background-color: rgb(3, 0, 37);
+    color: #ffff;
+    transition: 0.3s;
+  box-shadow: 0 4px 6px rgba(175, 216, 218, 0.275);
+}
+.effect-text{
+    display: flex;
+    background-image: url(../assets/img_cadastro_3.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    width: 50%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.effect-text h2{
+    justify-self: center;
+    font-size: 40px;
+    font-family: 'poppins', sans-serif;
+}
+
+.effect-text .logo{
+    display: flex;
+    justify-self: center;
+    height: 250px;
+    width: 50%;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.logo img{
+    width: 100%;
+}
+
+.effect-text p{
+    justify-self: center;
+    font-size: 32px;
+    font-weight: 700;
+    font-family: 'Poppins', sans-serif;
+    margin: 0px;
+}
+
+.effect-text a{
+    display: flex;
+    justify-self: center;
+    font-family: 'Sora', sans-serif;
+    font-weight: 600;
+    font-size: 18px;
+    text-decoration: none;
+    color: white;
+    transition: all 0.8s ease;
+    margin-top: 3%;
+}
+
+.effect-text a:hover {
+    transform: scale(1.1);
+    text-decoration: underline;
+}
+
+@media screen and (max-width: 800px){
+.login{
+    margin: 0;
+}
+.cadastro{
+    width: 100%;
+}
+.cadastroUni{
+    width: 100%;
+}
+.cadastro a{
+    display: flex;
+}
+.cadastro button{
+    height: 100px;
+    font-size: 16px;
+}
+.effect-text{
+    display: none;
+}
+.cadastro .botao{
+    height: 50px;
+}
+
+}

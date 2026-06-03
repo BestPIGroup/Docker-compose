@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Argos | Dashboards</title>
+    <script src="./js/sessao.js"></script>
+    <link rel="stylesheet" href="./css/gestor_servidores.css">
+    <link rel="icon" href="./assets/LogoArgos.png">
+</head>
+
+<body>
+    <header class="sidebar">
+
+        <div class="logo" href="index.html">
+            <img src="./assets/LogoArgosIcon.png">
+        </div>
+
+        <ul class="listaOpcoes">
+            <li>
+                <a href="./gestor_servidores.html">
+                    <div class="item">
+                        <img src="./assets/server2.png" alt="Servidores">
+                        <p>Servidores</p>
+                    </div>
+                </a>
+            </li>
+
+            <li>
+                <a href="./relatorios.html">
+                    <div class="item">
+                        <img src="./assets/file.png" alt="Servidores">
+                        <p>Relatórios</p>
+                    </div>
+                </a>
+            </li>
+
+            <li>
+                <a href="./funcionarios.html">
+                    <div class="item">
+                        <img src="./assets/team.png" alt="Servidores">
+                        <p>Funcionários</p>
+                    </div>
+                </a>
+            </li>
+
+        </ul>
+        <div class="saida">
+            <div class="item">
+                <a href="./perfil.html" id="perfil_botao">
+                    <img src="./assets/user3.png" alt="Perfil">
+                    <p>Gestor</p>
+                    <p id="nome_usuario">Perfil</p>
+                </a>
+            </div>
+            <a href="index.html">
+                <div class="item">
+                    <img src="./assets/saida.png" alt="Sair" onclick="logout()">
+                    <p>Sair</p>
+                </div>
+            </a>
+        </div>
+    </header>
+    
+    <div class="conteudo">
+        <div class="box">
+            <div class="kpis">
+                <div class="kpi card-erro">
+                    <img src="./assets/warningRed.png" alt="">
+                    Servidores Críticos<h2 id="crit">1</h2>
+                </div>
+                <div class="kpi card-atencao">
+                    <img src="./assets/warningOrange.png" alt="">
+                    Servidores em Atenção<h2 id="atencao">1</h2>
+                </div>
+                <div class="kpi">
+                    <img src="./assets/hardwareWhite.png" alt="">
+                    Alertas de Hardware<h2 id="alert">3</h2>
+                </div>
+                <div class="kpi">
+                    <img src="./assets/unlockWhite.png" alt="">
+                    Ciberameaças<h2 id="threats">7</h2>
+                </div>
+                
+                <div class="kpi kpi-alerta-sino" id="card-alerta-sino">
+                    <button class="btn-fechar-alerta"
+                    onclick="document.getElementById('card-alerta-sino').style.display='none'">✕</button>
+                    <img src="./assets/bellWhite.png" alt="">
+                    Alerta novo!<h2 id="kpi-sino">Servidor 2</h2>
+                </div>
+            </div>
+            <div class="retangulo">
+                <p>Servidores</p>
+                <button class="btn-adicionar" onclick="window.location.href='cadastro_servidor.html'">
+                    Adicionar Servidor
+                </button>
+            </div>
+        </div>
+        <div class="campo">
+            <div class="card">
+                <div class="card-top">
+        
+                    <div class="div-esquerda">
+                        <img src="./assets/server2.png" class="img-main-server" alt="Server">
+                    </div>
+        
+                    <div class="div-direita">
+                        <div class="header-row">
+                            <span class="server-title"><span class="dot-critico">●</span> Servidor 2</span>
+                            <span class="badge-critico">CRÍTICO</span>
+                        </div>
+        
+                        <ul class="info-list">
+                            <li>
+                                <img src="./assets/hardwareWhite.png" class="mini-icon" alt="Hardware">
+                                Alertas de Hardware: 3  
+                            </li>
+                            <li>
+                                <img src="./assets/shield.png" class="mini-icon" alt="Cyber">
+                                Ciberataques Detectados: 5
+                            </li>
+                            <li>
+                                <img src="./assets/lock.png" class="mini-icon" alt="Security">
+                                Segurança: <span class="status-alert">Comprometida</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+        
+                <div class="div-inferior">
+                    
+                    <a href="./assets/relatorio_hardware.pdf" target="_blank">
+                        <button class="btn btn-left">
+                            <img src="./assets/pdf.png" class="btn-icon" alt="Download">
+                            Download de Relatório
+                        </button>
+                    </a>
+                    <button class="btn btn-right" onclick="abrirModalEditar('Servidor 2', 'CRÍTICO')">
+                        <img src="./assets/edit.png" class="btn-icon" alt="Edit">
+                        Editar Servidor
+                    </button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-top">
+
+                    <div class="div-esquerda">
+                        <img src="./assets/server2.png" class="img-main-server" alt="Server">
+                    </div>
+
+                    <div class="div-direita">
+                        <div class="header-row">
+                            <span class="server-title"><span class="dot">●</span> Servidor 3</span>
+                            <span class="badge">ATENÇÃO</span>
+                        </div>
+
+                        <ul class="info-list">
+                            <li>
+                                <img src="./assets/hardwareWhite.png" class="mini-icon" alt="Hardware">
+                                Alertas de Hardware: 0
+                            </li>
+                            <li>
+                                <img src="./assets/shield.png" class="mini-icon" alt="Cyber">
+                                Ciberataques Detectados: 2
+                            </li>
+                            <li>
+                                <img src="./assets/lock.png" class="mini-icon" alt="Security">
+                                Segurança: <span class="status-alert">Comprometida</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="div-inferior">
+                    <a href="./assets/relatorio_hardware.pdf" target="_blank">    
+                        <button class="btn btn-left">
+                            <img src="./assets/pdf.png" class="btn-icon" alt="Download">
+                            Download de Relatório
+                        </button>
+                    </a>
+                    <button class="btn btn-right" onclick="abrirModalEditar('Servidor 3', 'ATENÇÃO')">
+                        <img src="./assets/edit.png" class="btn-icon" alt="Edit">
+                        Editar Servidor
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-top">
+
+                    <div class="div-esquerda">
+                        <img src="./assets/server2.png" class="img-main-server" alt="Server">
+                    </div>
+
+                    <div class="div-direita">
+                        <div class="header-row">
+                            <span class="server-title"><span class="dot-normal">●</span> Servidor 1</span>
+                            <span class="badge-normal">NORMAL</span>
+                        </div>
+
+                        <ul class="info-list">
+                            <li>
+                                <img src="./assets/hardwareWhite.png" class="mini-icon" alt="Hardware">
+                                Alertas de Hardware: 0
+                            </li>
+                            <li>
+                                <img src="./assets/shield.png" class="mini-icon" alt="Cyber">
+                                Ciberataques Detectados: 0
+                            </li>
+                            <li>
+                                <img src="./assets/lock.png" class="mini-icon" alt="Security">
+                                Segurança: <span class="status-normal">Íntegro</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="div-inferior">
+                    <a href="./assets/relatorio_hardware.pdf" target="_blank">
+                        <button class="btn btn-left">
+                            <img src="./assets/pdf.png" class="btn-icon" alt="Download">
+                            Download de Relatório
+                        </button>
+                    </a> 
+                    <button class="btn btn-right" onclick="abrirModalEditar('Servidor 1', 'NORMAL')">
+                        <img src="./assets/edit.png" class="btn-icon" alt="Edit">
+                        Editar Servidor
+                    </button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-top">
+
+                    <div class="div-esquerda">
+                        <img src="./assets/server2.png" class="img-main-server" alt="Server">
+                    </div>
+
+                    <div class="div-direita">
+                        <div class="header-row">
+                            <span class="server-title"><span class="dot-normal">●</span> Servidor 4</span>
+                            <span class="badge-normal">NORMAL</span>
+                        </div>
+
+                        <ul class="info-list">
+                            <li>
+                                <img src="./assets/hardwareWhite.png" class="mini-icon" alt="Hardware">
+                                Alertas de Hardware: 0
+                            </li>
+                            <li>
+                                <img src="./assets/shield.png" class="mini-icon" alt="Cyber">
+                                Ciberataques Detectados: 0
+                            </li>
+                            <li>
+                                <img src="./assets/lock.png" class="mini-icon" alt="Security">
+                                Segurança: <span class="status-normal">Íntegro</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="div-inferior">
+                    <a href="./assets/relatorio_hardware.pdf" target="_blank">
+                        <button class="btn btn-left">
+                            <img src="./assets/pdf.png" class="btn-icon" alt="Download">
+                            Download de Relatório
+                        </button>
+                    </a> 
+                    <button class="btn btn-right" onclick="abrirModalEditar('Servidor 4', 'NORMAL')">
+                        <img src="./assets/edit.png" class="btn-icon" alt="Edit">
+                        Editar Servidor
+                    </button>
+                </div>
+            </div>
+
+            
+
+
+        </div>
+
+
+    </div>
+
+    <div class="modal-overlay" id="modal-editar" onclick="fecharModalEditar(event)">
+        <div class="modal-editar-conteudo">
+
+            <div class="modal-editar-header">
+                <div class="modal-editar-titulo-grupo">
+                    <img src="./assets/server2.png" class="modal-server-icon" alt="Server">
+                    <div>
+                        <h2 id="modal-server-nome">Servidor</h2>
+                        <span class="modal-server-badge" id="modal-server-badge"></span>
+                    </div>
+                </div>
+                <button class="modal-fechar-btn" onclick="fecharModalEditar()">✕</button>
+            </div>
+
+            <div class="modal-editar-body">
+
+                <p class="modal-secao-titulo">Componentes Monitorados</p>
+                <p class="modal-secao-sub">Ative ou desative os componentes que serão monitorados neste servidor.</p>
+
+                <div class="modal-componentes">
+                    <div class="comp-item">
+                        <div class="comp-info">
+                            <img src="./assets/hardwareWhite.png" class="comp-icon" alt="">
+                            <div>
+                                <p class="comp-nome">CPU</p>
+                                <p class="comp-desc">Porcentagem de uso</p>
+                            </div>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="comp-item">
+                        <div class="comp-info">
+                            <img src="./assets/hardwareWhite.png" class="comp-icon" alt="">
+                            <div>
+                                <p class="comp-nome">Processos</p>
+                                <p class="comp-desc">Número de processos em execução</p>
+                            </div>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="comp-item">
+                        <div class="comp-info">
+                            <img src="./assets/hardwareWhite.png" class="comp-icon" alt="">
+                            <div>
+                                <p class="comp-nome">Memória RAM</p>
+                                <p class="comp-desc">Porcentagem de uso</p>
+                            </div>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="comp-item">
+                        <div class="comp-info">
+                            <img src="./assets/hardwareWhite.png" class="comp-icon" alt="">
+                            <div>
+                                <p class="comp-nome">Disco</p>
+                                <p class="comp-desc">Uso de armazenamento em porcentagem</p>
+                            </div>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="comp-item">
+                        <div class="comp-info">
+                            <img src="./assets/hardwareWhite.png" class="comp-icon" alt="">
+                            <div>
+                                <p class="comp-nome">Rede</p>
+                                <p class="comp-desc">Tráfego de entrada e saída</p>
+                            </div>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                <div class="modal-limiar-secao">
+                    <p class="modal-secao-titulo">Limiar de Alerta</p>
+                    <p class="modal-secao-sub">Defina a partir de qual percentual cada componente dispara um alerta.</p>
+                    <div class="modal-limiares">
+                        <div class="limiar-item">
+                            <label>CPU <span class="limiar-valor" id="val-cpu">70%</span></label>
+                            <input type="range" min="10" max="100" value="70" class="limiar-range" oninput="document.getElementById('val-cpu').textContent=this.value+'%'">
+                        </div>
+                        <div class="limiar-item">
+                            <label>Processos <span class="limiar-valor" id="val-processos">1000</span></label>
+                            <input type="range" min="10" max="3000" value="1000" class="limiar-range" oninput="document.getElementById('val-processos').textContent=this.value">
+                        </div>
+                        <div class="limiar-item">
+                            <label>RAM <span class="limiar-valor" id="val-ram">70%</span></label>
+                            <input type="range" min="10" max="100" value="70" class="limiar-range" oninput="document.getElementById('val-ram').textContent=this.value+'%'">
+                        </div>
+                        <div class="limiar-item">
+                            <label>Disco <span class="limiar-valor" id="val-disco">80%</span></label>
+                            <input type="range" min="10" max="100" value="80" class="limiar-range" oninput="document.getElementById('val-disco').textContent=this.value+'%'">
+                        </div>
+                        <div class="limiar-item">
+                            <label>Rede <span class="limiar-valor" id="val-rede">300Mbps</span></label>
+                            <input type="range" min="10" max="4000" value="300" class="limiar-range" oninput="document.getElementById('val-rede').textContent=this.value+'Mbps'">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="modal-editar-footer">
+                <button class="btn-modal-cancelar" onclick="fecharModalEditar()">Cancelar</button>
+                <button class="btn-modal-salvar" onclick="salvarConfiguracoes()">Salvar Configurações</button>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>
+<script>
+
+    nome_usuario.innerHTML = `${sessionStorage.NOME_USUARIO}`
+
+    function abrirModalEditar(nome, badge) {
+        document.getElementById('modal-server-nome').textContent = nome;
+        var badgeEl = document.getElementById('modal-server-badge');
+        badgeEl.textContent = badge;
+        badgeEl.className = 'modal-server-badge';
+        if (badge === 'CRÍTICO') badgeEl.classList.add('modal-badge-critico');
+        else if (badge === 'ATENÇÃO') badgeEl.classList.add('modal-badge-atencao');
+        else badgeEl.classList.add('modal-badge-normal');
+        document.getElementById('modal-editar').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function fecharModalEditar(event) {
+        if (event && event.target !== document.getElementById('modal-editar')) return;
+        document.getElementById('modal-editar').style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
+    function salvarConfiguracoes() {
+        var btn = document.querySelector('.btn-modal-salvar');
+        btn.textContent = '✓ Salvo!';
+        btn.style.backgroundColor = '#12921c';
+        setTimeout(function() {
+            btn.textContent = 'Salvar Configurações';
+            btn.style.backgroundColor = '';
+            document.getElementById('modal-editar').style.display = 'none';
+            document.body.style.overflow = '';
+        }, 1500);
+    }
+</script>

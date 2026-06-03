@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Argos | Cadastro</title>
+
+  <script src="./js/sessao.js"></script>
+  <link rel="stylesheet" href="./css/estilo.css" />
+  <link rel="stylesheet" href="./css/cadastro.css" />
+  <link rel="icon" href="./assets/LogoArgos.png">
+  <link rel="preconnect" href="https://fonts.gstatic.com" />
+</head>
+
+<body>
+
+  <div id="cardErroUni" style="display: none; text-align: center;" class="campo">
+    <div id="cardErroUniCaixa">
+      <div id="caixaErroHeader">
+        <h1>Erro no Cadastro</h1>
+        <p style="color: black; font-size: 26px; cursor: pointer;" onclick="sumirMensagem()">X</p>
+      </div>
+        <hr style="display: flex; flex-direction: row; width: 100%; min-height: 0px; margin-bottom: 20px;">
+        <span style="color: black; font-size: 22px;" id="mensagem_erroUni"></span>
+    </div>
+  </div>
+
+  <header style="display: none;" id="navLogada">
+    <div class="nav-desktop">
+      <a href="#home" style="font-weight: bold;">Home</a>
+      <a href="./cadastro_unidade.html">Cadastro de Unidade</a>
+    </div>
+    <div class="nav2">
+      <p> Olá,
+      <p id="nomeUsuario"></p>
+      </p>
+      <p>|</p>
+      <a href="perfil.html">Perfil</a>
+    </div>
+  </header>
+  <header style="display: flex;" id="navDeslogada">
+    <div class="nav-desktop">
+      <a href="index.html" style="font-weight: bold;">Home</a>
+      <a href="index.html#pilares">Nossos Pilares</a>
+      <a href="./sobrenos.html">Conheça a Argos</a>
+    </div>
+    <div class="nav-mobile">
+      <a href="./index.html" style="font-weight: bold;">Home</a>
+      <a href="./index.html#pilares">Pilares</a>
+      <a href="./sobrenos.html">Argos</a>
+    </div>
+    <div class="nav2">
+      <a href="cadastro.html">Cadastro</a>
+      <p>|</p>
+      <a href="login.html">Login</a>
+    </div>
+  </header>
+
+  <div class="login">
+
+    <div class="cadastro" id="div_cadastro" style="display: none;">
+      <h2>CADASTRO</h2>
+      <div class="imagem-indicador"><img src="./assets/Indicador2.png" alt=""></div>
+      <div class="formulario">
+
+        <div class="campo">
+          <span>Nome Completo <span style="color: red;">*</span></span>
+          <input id="nome_input" type="text" value="Ana Lima"/>
+        </div>
+        <div class="campo">
+          <span>Email<span style="color: red;">*</span></span>
+          <input id="email_input" type="text" value="ana.lima@email.com"/>
+        </div>
+        <div class="campo">
+          <span>Telefone<span style="color: red;">*</span></span>
+          <input id="telefone_input" type="text" maxlength="15" oninput="validarTelefone()" value="(11)98765-4320"/>
+        </div>
+        <div class="campo">
+          <span>Função<span style="color: red;">*</span></span>
+          <input id="funcao_input" type="text" value="Gestor"/>
+        </div>
+        <div class="campo">
+          <span>Identificador<span style="color: red;">*</span></span>
+          <input id="matricula_input" type="text" value="9010"/>
+        </div>
+        <div class="campo">
+          <span>Senha<span style="color: red;">*</span></span>
+          <input id="senha_input" type="password" value="senha123"/>
+        </div>
+        <div class="campo">
+          <span>Confirmar Senha<span style="color: red;">*</span></span>
+          <input id="confirmacao_senha_input" type="password" value="senha123"/>
+        </div>
+        <div id="cardErro" style="display: none; color: red; text-align: center;" class="campo">
+          <span id="mensagem_erro"></span>
+        </div>
+        <button class="botao" onclick="cadastrar()">Realizar Cadastro</button>
+        <a href="./login.html">Já possui cadastro? Logue Aqui!</a>
+      </div>
+    </div>
+
+    <div class="cadastroUni" id="div_telaUni">
+      <div class="container-unidade-indicador">
+        <h2>UNIDADE</h2>
+        <div class="imagem-indicador"><img src="./assets/indicador1.png" alt=""></div>
+      </div>
+      <div class="formulario">
+
+        <div class="campo">
+          <span>Código da Unidade <span style="color: red;">*</span></span>
+          <input id="codigo_input" type="number" />
+        </div>
+        <div class="campo">
+          <span>CEP<span style="color: red;">*</span></span>
+          <input id="cep_input" type="text" oninput="mascaraCEP(this)" maxlength="9" />
+        </div>
+        <div class="campo">
+          <span>Rua<span style="color: red;">*</span></span>
+          <input id="rua_input" type="text" />
+        </div>
+        <div class="campo">
+          <span>Bairro<span style="color: red;">*</span></span>
+          <input id="bairro_input" type="text" />
+        </div>
+        <div class="campo">
+          <span>Cidade<span style="color: red;">*</span></span>
+          <input id="cidade_input" type="text" />
+        </div>
+        <div class="campo">
+          <span>Estado<span style="color: red;">*</span></span>
+          <input id="estado_input" type="text" />
+        </div>
+        <button class="botao" onclick="cadastrarUnidade()">Realizar Cadastro</button>
+      </div>
+    </div>
+
+    <div class="effect-text">
+      <h2>SEJA BEM-VINDO</h2>
+
+      <div class="logo">
+        <img src="./assets/LogoArgosW.png" alt="logo">
+      </div>
+
+      <p>Comece a proteger sua</p>
+      <p>infraestrutura hoje mesmo.</p>
+
+      <a href="./login.html">Já possui cadastro? Logue Aqui!</a>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer">
+      <img src="./assets/LogoArgosW.png" alt="Logo">
+      <p>2026 Argos. Todos os direitos reservados.</p>
+    </div>
+    <hr>
+    <div class="sociais">
+      <p>Entre em contato conosco: <br>argos@argos.com.br</p>
+      <div class="sociais-img">
+        <img src="./assets/instagram.png" alt="Instagram">
+        <img src="./assets/whatsapp.png" alt="WhatsApp">
+        <img src="./assets/linkedin.png" alt="Linkedin">
+      </div>
+    </div>
+  </footer>
+</body>
+
+</html>
+<script>
+  window.onload = verificarLogin();
+
+  // Máscara Global - Cep números (pra enviar pro Banco de Dados)
+  let valorCampoNumeros = "";
+
+  // ____________________________________________________
+  // ====================================================
+  // ----------------------------------------------------
+
+  // ============================
+  // Função de máscara para o CEP
+  function mascaraCEP(inputCEP) {
+    let valorCampo = inputCEP.value;
+    valorCampoNumeros = "";
+    let valorCampoMascarado = "";
+
+
+    // Aqui irá pegar apenas números e ignorar caracteres
+    for (let i = 0; i < valorCampo.length; i++) {
+      let letraAtual = valorCampo[i];
+
+      if (letraAtual >= '0' && letraAtual <= '9') {
+        valorCampoNumeros += letraAtual;
+      }
+    }
+
+    // Aqui irá tratar pra atualizar o valor no Input
+    for (let i = 0; i < valorCampoNumeros.length; i++) {
+      let letraAtual = valorCampoNumeros[i];
+
+      // Coloca o traço antes do 6º dígito (índice 5)
+      if (i === 5) {
+        valorCampoMascarado += "-";
+      }
+      valorCampoMascarado += letraAtual;
+    }
+
+    // Pega o valor tratado e atualiza no campo
+    inputCEP.value = valorCampoMascarado;
+
+    // Abaixo irá verificar se o CEP está completo para então, chamar a API
+    // e assim, preencher os campos automaticamente
+    // Se o CEP estiver completo (9 caracteres com o traço)
+    if (valorCampoMascarado.length === 9) {
+      console.log("Chamando a API do ViaCEP")
+      // Passnado apenas os números para a API (8 dígitos)
+      buscarEnderecoViaCEP(valorCampoNumeros);
+    } else {
+      // Se o usuário apagar um número, limpa e desbloqueia os Campos de:
+      // Rua, Bairro, Cidade e Estado
+      limparEDesbloquearCampos();
+    }
+  }
+
+  // ==========================================
+  // Integrando a API Pública - ViaCEP
+  // ==========================================
+  // =======================
+  // Função Assíncrona para buscar na API (Assincrona - só envia quando termina de recolher os dados da API)
+
+  async function buscarEnderecoViaCEP(cep) {
+
+    // URL da API do ViaCEP com a url + nosso CEP que enviamos ali encima
+    // O valor em parenteses nessa função coleta os dados do valor CEP Numeros sem tratamento
+
+
+    const url = `https://viacep.com.br/ws/${cep}/json/`;
+
+    // Vai mostrar no console a url que está indo pesquisar na API
+    // Ele vai ir tentar executar o código caso não de nenhum erro.
+    // No caso, ele vai tentar buscar os dados da API
+
+    console.log(url)
+
+    try {
+      // Faz a requisição na Internet/Web
+      const resposta = await fetch(url); // Essa é a respota, verificando se irá coletar (response)
+      const dadosCEP = await resposta.json(); // Transforma a resposta coletada em JSON, pegando os dadosCEP.json da resposta 
+
+      // O ViaCEP retorna "erro: true" se o CEP não existir
+      if (dadosCEP.erro) {
+        alert("CEP deu erro!");
+        limparEDesbloquearCampos(); // Função pra limpar os campos que estarão bloqueados
+        return; // Termina essa função
+      }
+
+      // Pega os inputs do HTML (rua, Bairro, Estado e Cidade)
+      let iptEstado = document.getElementById('estado_input');
+      let iptBairro = document.getElementById('bairro_input');
+      let iptRua = document.getElementById('rua_input');
+      let iptCidade = document.getElementById('cidade_input');
+
+      // Atualiza os valores dos Input de Endereço
+      iptEstado.value = dadosCEP.uf; // O ViaCEP chama estado de 'uf', colocando o valor do json viacep ali
+      iptBairro.value = dadosCEP.bairro;
+      iptRua.value = dadosCEP.logradouro; // O ViaCEP chama rua de 'logradouro'
+      iptCidade.value = dadosCEP.localidade // O ViaCEP chama cidade de 'localidade', colocando o valor do json viacep ali
+
+      // Bloqueia os inputs para o usuário não conseguir digitar
+      iptEstado.disabled = true;
+      iptBairro.disabled = true;
+      iptRua.disabled = true;
+      iptCidade.disabled = true
+
+      // Se der erro na busca de DadosCEP da API, ele manda pro erro
+    } catch (erro) {
+      // Se der erro de internet, cai aqui
+      console.log("Erro ao buscar o CEP: ", erro);
+      alert("Erro ao buscar o endereço. Verifique sua conexão.");
+    }
+  }
+
+  // =======================
+  // Função que irá resetar os campos caso CEP ficar incompleto
+  function limparEDesbloquearCampos() {
+    let iptEstado = document.getElementById('estado_input');
+    let iptBairro = document.getElementById('bairro_input');
+    let iptRua = document.getElementById('rua_input');
+    let iptCidade = document.getElementById('cidade_input');
+
+    // Aqui limpa os valores (só tirar de comentado pra limpar)
+    // iptEstado.value = "";
+    // iptBairro.value = "";
+    // iptRua.value = "";
+    // iptCidade.value = "";
+
+    // Desbloqueia os inputs
+    iptEstado.disabled = false;
+    iptBairro.disabled = false;
+    iptRua.disabled = false;
+    iptCidade.disabled = false;
+  }
+
+  // ____________________________________________________
+  // ====================================================
+  // ----------------------------------------------------
+
+  function verificarLogin() {
+    if (sessionStorage.NOME_USUARIO != null) {
+      navLogada.style.display = 'flex'
+      navDeslogada.style.display = 'none'
+      nomeUsuario.innerHTML = sessionStorage.NOME_USUARIO
+    }
+  }
+
+  function exibirTelaUsu() {
+    div_cadastro.style.display = "flex"
+    div_telaUni.style.display = "none"
+  }
+
+  function deslogar() {
+    sessionStorage.clear()
+  }
+
+  // Array para armazenar empresas cadastradas para validação de código de ativação 
+  //let listaEmpresasCadastradas = [];
+
+  function validarTelefone() {
+    var telefone = telefone_input.value;
+    var tamanho = telefone.length
+    var telFormatado = ''
+    for (var i = 1; i <= tamanho; i++) {
+      if (i == 1 && telefone[i - 1] != '(') {
+        telFormatado += '('
+      } else if (i == 4 && telefone[i - 1] != ')') {
+        telFormatado += ')'
+      } else if (i == 5 && telefone[i - 1] != ' ') {
+        telFormatado += ' '
+      } else if (i == 11 && telefone[i - 1] != '-') {
+        telFormatado += '-'
+      }
+      telFormatado += telefone[i - 1]
+    }
+    telefone_input.value = telFormatado
+  }
+
+  // Verificando se o código de ativação é de alguma empresa cadastrada
+  /* for (let i = 0; i < listaEmpresasCadastradas.length; i++) {
+    if (listaEmpresasCadastradas[i].codigo_ativacao == codigoVar) {
+      idEmpresaVincular = listaEmpresasCadastradas[i].id
+      console.log("Código de ativação válido.");
+      break;
+    } else {
+      cardErro.style.display = "block";
+      mensagem_erro.innerHTML = "(Mensagem de erro para código inválido)";
+      finalizarAguardar();
+    }
+  } */
+
+  function cadastrar() {
+
+  nome_input.value = "Ana Lima"
+  email_input.value = "ana.lima@email.com"
+  telefone_input.value = "(11) 98765-4320"
+  funcao_input.value =  "Gestor"
+  matricula_input.value = 9005
+  senha_input.value =  "senha123"
+  confirmacao_senha_input.value = "senha123"
+
+    // aguardar();
+    //Recupere o valor da nova input pelo nome do id
+    // Agora vá para o método fetch logo abaixo
+    var nome = nome_input.value;
+    var email = email_input.value;
+    var telefone = telefone_input.value;
+    var funcao = funcao_input.value; // Função deveria ser um formulario por select
+    var matricula = matricula_input.value;
+    var senha = senha_input.value;
+    var confirmacaoSenha = confirmacao_senha_input.value;
+
+
+    // Verificando se há algum campo em branco
+    if (
+      nome == "" ||
+      email == "" ||
+      telefone == "" ||
+      matricula == "" ||
+      funcao == "" ||
+      senha == "" ||
+      confirmacaoSenha == ""
+    ) {
+      cardErro.style.display = "flex";
+      mensagem_erro.innerHTML = "Preencha todos os campos!";
+      setInterval(sumirMensagem, 4000);
+      return false;
+    } else if (!email.includes('@', '.')) {
+      cardErro.style.display = "flex";
+      mensagem_erro.innerHTML = "O email precisa conter '@' e '.'";
+      setInterval(sumirMensagem, 4000);
+      return false;
+    } else if (funcao.includes(1, 2, 3, 4, 5, 6, 7, 8, 9, 0)) {
+      cardErro.style.display = "flex";
+      mensagem_erro.innerHTML = "A função não pode conter números";
+      setInterval(sumirMensagem, 4000);
+      return false;
+    } else if (senha.length < 6) {
+      cardErro.style.display = "flex";
+      mensagem_erro.innerHTML = "A senha precisa ter no minimo 6 digitos";
+      setInterval(sumirMensagem, 4000);
+      return false;
+    } else if (senha != confirmacaoSenha) {
+      cardErro.style.display = "flex";
+      mensagem_erro.innerHTML = "As senhas não são correspondentes";
+      setInterval(sumirMensagem, 4000);
+      return false;
+    }
+    // Enviando o valor da nova input
+    fetch("/usuarios/cadastrar", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        // crie um atributo que recebe o valor recuperado aqui
+        // Agora vá para o arquivo routes/usuario.js
+        nomeServer: nome,
+        emailServer: email,
+        senhaServer: senha,
+        telefoneServer: telefone,
+        funcaoServer: funcao,
+        matriculaServer: matricula,
+        fk_unidadeServer: sessionStorage.getItem("ID_UNIDADE")
+
+      }),
+    })
+      .then(function (resposta) {
+        console.log("resposta: ", resposta);
+
+        if (resposta.ok) {
+          cardErro.style.display = "flex";
+          mensagem_erro.innerHTML = "Cadastro realizado com sucesso! Redirecionando para tela de Login...";
+          setTimeout(() => {
+            window.location = "login.html";
+          }, "2000");
+        } else {
+          cardErro.style.display = "flex";
+          mensagem_erro.innerHTML = "Houve um erro ao tentar realizar o cadastro!";
+          throw "Houve um erro ao tentar realizar o cadastro!";
+        }
+      })
+      .catch(function (resposta) {
+        console.log(`#ERRO: ${resposta}`);
+
+      });
+
+    return false;
+  }
+
+  function sumirMensagem() {
+    cardErroUni.style.display = "none";
+  }
+
+  function cadastrarUnidade() {
+    var codigo = codigo_input.value
+    var cep = valorCampoNumeros
+    var rua = rua_input.value
+    var bairro = bairro_input.value
+    var cidade = cidade_input.value
+    var estado = estado_input.value
+
+    if (codigo == "" ||
+      cep == "" ||
+      cidade == "" ||
+      rua == "" ||
+      bairro == "" ||
+      estado == ""
+    ) {
+      cardErroUni.style.display = "flex";
+      mensagem_erroUni.innerHTML = "Preencha todos os campos!";
+      setInterval(sumirMensagem, 4000);
+      return false;
+    } else {
+      fetch("unidade/verificar_unidade", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        }, body: JSON.stringify({
+          codigoServer: codigo,
+          cepServer: cep,
+          cidadeServer: cidade,
+          ruaServer: rua,
+          bairroServer: bairro,
+          estadoServer: estado
+        })
+      }).then(function (resposta) {
+        console.log("Resposta: ", resposta);
+
+        if (resposta.ok) {
+          console.log("entrei no cadastro unidade")
+
+          fetch("unidade/cadastrar_unidade", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            }, body: JSON.stringify({
+              codigoServer: codigo,
+              cepServer: cep,
+              cidadeServer: cidade,
+              ruaServer: rua,
+              bairroServer: bairro,
+              estadoServer: estado
+            })
+          }).then(function (resposta) {
+            console.log("resposta: ", resposta);
+
+            if (resposta.ok) {
+
+              resposta.json().then(function (json) {
+
+                var idUnidade = json.insertId;
+
+                console.log("ID da unidade:", idUnidade);
+
+                sessionStorage.setItem("ID_UNIDADE", idUnidade)
+                exibirTelaUsu();
+                const mensagemSuporte = "Unidade Cadastrada com Sucesso!";
+              });
+
+            }
+
+          });
+        } else {
+          console.log("Houve um erro ao tentar realizar o cadastro da unidade!");
+
+          console.log("não entrei")
+          resposta.text().then(texto => {
+            console.error(texto);
+          });
+        }
+      })
+
+    }
+
+  }
+
+
+
+</script>

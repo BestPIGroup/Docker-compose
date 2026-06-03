@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+    coloque o endereço mac da maquina aqui:<input type="text" id="mac">
+    coloque quantas linhas de csv vc quer pegar: <input type="number" id="linhas">
+    <button onclick="buscar()">Procurar</button>
+
+    <div id="div_resposta">
+
+
+    </div>
+
+</body>
+</html>
+
+<script>
+
+    function buscar(){
+
+        var mac = document.getElementById("mac").value;
+        var linhas = document.getElementById("linhas").value;
+
+        fetch("conexaoS3/buscar_registros", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                }, body: JSON.stringify({
+                    MacServer : mac,
+                    QtdLinhas : linhas
+                })
+            }).then(function (resposta){
+
+                return resposta.json();
+                
+            }).then(function(dados){
+                
+                div = document.getElementById("div_resposta");
+                div.innerHTML = dados;
+
+            })
+        
+    }
+
+</script>

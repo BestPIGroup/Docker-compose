@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Argos | Cadastrar Funcionário</title>
+    <link rel="stylesheet" href="./css/cadastro_func.css">
+    <link rel="icon" href="./assets/LogoArgos.png">
+</head>
+
+<body>
+ 
+    <header>
+        <div class="nav-desktop">
+            <a href="./funcionarios.html" style="font-weight: bold;">Voltar</a>
+        </div>
+        <div class="nav-mobile">
+            <a href="./funcionarios.html" style="font-weight: bold;">Voltar</a>
+        </div>
+        <div class="nav2">
+            <p> Olá, <span id="nome_usuario"></span>!</p>
+            <p>|</p>
+            <a href="./perfil.html">Perfil</a>
+        </div>
+    </header>
+ 
+    <div class="login">
+        <div class="modal">
+            <div class="modal-info">
+                <h2>CADASTRO DE FUNCIONÁRIOS</h2>
+                <div class="modal-card">
+                    <img src="./assets/management.png" alt="">
+                    <h2>Gestão da equipe</h2>
+                    <p>Adicione novos administradores para monitorar sua infraestrutura.</p>
+                </div>
+                <div class="modal-card">
+                    <img src="./assets/control-center.png" alt="">
+                    <h2>Controle de acesso</h2>
+                    <p>Cadastre quem terá permissão para visualizar os alertas de hardware.</p>
+                </div>
+                <div class="modal-card">
+                    <img src="./assets/monitoring.png" alt="">
+                    <h2>Novo monitor</h2>
+                    <p>Registre um técnico para gerenciar os servidores da sua unidade.</p>
+                </div>
+            </div>
+            <div class="modal-inputs">
+                <div class="modal-form1">
+                    <p>Nome Completo</p>
+                    <input type="text" id="nome_input">
+                    <p>Email</p>
+                    <input type="text" id="email_input">
+                    <p>Telefone</p>
+                    <input id="telefone_input" type="text" maxlength="15" oninput="validarTelefone()">
+                    <p>Função</p>
+                    <input type="text" id="funcao_input">
+                    <p>Identificador</p>
+                    <input type="number" id="matricula_input">
+                    <p>Senha</p>
+                    <input type="password" id="senha_input">
+                    <p>Confirmar Senha</p>
+                    <input type="password" id="confirmarSenha_input">
+                </div>
+                <div id="cardErro" style="display: none; color: white; text-align: center;" class="campo-erro">
+                    <span id="mensagem_erro"></span>
+                </div>
+                <button onclick="cadastrar()">Realizar Cadastro</button>
+            </div>
+        </div>
+        <div class="fundo">
+            <div class="effect-text"></div>
+        </div>
+    </div>
+ 
+</body>
+ 
+</html>
+ 
+
+<script>
+    nome_usuario.innerHTML = `${sessionStorage.NOME_USUARIO}`
+
+    function mostrarModal(titulo, mensagem) {
+        modal_titulo.innerHTML = titulo;
+        modal_mensagem.innerHTML = mensagem;
+        modal_container.style.display = "flex";
+    }
+
+    function fecharModal() {
+        modal_container.style.display = "none";
+    }
+
+    function validarTelefone() {
+    var telefone = telefone_input.value;
+    var tamanho = telefone.length
+    var telFormatado = ''
+    for (var i = 1; i <= tamanho; i++) {
+      if (i == 1 && telefone[i - 1] != '(') {
+        telFormatado += '('
+      } else if (i == 4 && telefone[i - 1] != ')') {
+        telFormatado += ')'
+      } else if (i == 5 && telefone[i - 1] != ' ') {
+        telFormatado += ' '
+      } else if (i == 11 && telefone[i - 1] != '-') {
+        telFormatado += '-'
+      }
+      telFormatado += telefone[i - 1]
+    }
+    telefone_input.value = telFormatado
+  }
+
+    function cadastrar() {
+        var nome = nome_input.value
+        var email = email_input.value
+        var telefone = telefone_input.value
+        var funcao = funcao_input.value
+        var matricula = matricula_input.value
+        var senha = senha_input.value
+        var confirmacaoSenha = confirmarSenha_input.value
+
+        if (
+            nome == "" ||
+            email == "" ||
+            telefone == "" ||
+            matricula == "" ||
+            funcao == "" ||
+            senha == "" ||
+            confirmacaoSenha == ""
+        ) {
+            cardErro.style.display = "flex";
+            mensagem_erro.innerHTML = "Preencha todos os campos!";
+            setInterval(sumirMensagem, 4000);
+            return false;
+        } else if (!email.includes('@', '.')) {
+            cardErro.style.display = "flex";
+            mensagem_erro.innerHTML = "O email precisa conter '@' e '.'";
+            setInterval(sumirMensagem, 4000);
+            return false;
+        }else if(funcao.includes(1, 2, 3, 4, 5, 6, 7, 8, 9, 0)){
+            cardErro.style.display = "flex";
+            mensagem_erro.innerHTML = "A função não pode conter números";
+            setInterval(sumirMensagem, 4000);
+            return false; 
+        }else if (senha.length < 6) {
+            cardErro.style.display = "flex";
+            mensagem_erro.innerHTML = "A senha precisa ter no minimo 6 digitos";
+            setInterval(sumirMensagem, 4000);
+            return false;
+        } else if (senha != confirmacaoSenha) {
+            cardErro.style.display = "flex";
+            mensagem_erro.innerHTML = "As senhas não são correspondentes";
+            setInterval(sumirMensagem, 4000);
+            return false;
+        } else {
+            fetch("/usuarios/cadastrar_Func", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                }, body: JSON.stringify({
+                    nomeServer: nome,
+                    emailServer: email,
+                    telefoneServer: telefone,
+                    funcaoServer: funcao,
+                    matriculaServer: matricula,
+                    senhaServer: senha,
+                    fk_unidadeServer: sessionStorage.getItem("ID_UNIDADE"),
+                    fk_responsavelServer: sessionStorage.getItem("ID_USUARIO")
+                })
+            }).then(function (resposta) {
+                console.log("Resposta: ", resposta);
+
+                if (resposta.ok) {
+                    cardErro.style.display = "flex";
+                    mensagem_erro.innerHTML = "Cadastro de Funcionario realizado com sucesso! Redirecionando para tela de Funcionarios.";
+
+                    const mensagemSuporte = "Funcionario cadastrado com sucesso!";
+
+                    setTimeout(() => {
+                        window.location = "perfil.html";
+                    }, "2000");
+                }
+            })
+        }
+    }
+
+    function sumirMensagem() {
+        cardErro.style.display = "none";
+    }
+</script>

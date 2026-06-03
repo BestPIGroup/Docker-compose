@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Argos | Cadastrar Servidor</title>
+    <link rel="stylesheet" href="./css/cadastro_server.css">
+    <link rel="icon" href="./assets/LogoArgos.png">
+</head>
+
+<body>
+
+    <header>
+        <div class="nav-desktop">
+            <a href="./gestor_servidores.html" style="font-weight: bold;">Voltar</a>
+        </div>
+        <div class="nav-mobile">
+            <a href="./gestor_servidores.html" style="font-weight: bold;">Voltar</a>
+        </div>
+        <div class="nav2">
+            <p> Olá, <span id="nome_usuario"></span>!</p>
+            <p>|</p>
+            <a href="./perfil.html">Perfil</a>
+        </div>
+    </header>
+
+    <div class="login">
+        <div class="modal">
+            <div class="modal-info">
+                <h2>CADASTRO DE SERVIDORES</h2>
+                <div class="modal-card">
+                    <img src="./assets/admin-panel.png" alt="">
+                    <h2>Mantenha o controle total</h2>
+                    <p>Cadastre seus servidores agora e antecipe falhas antes que elas aconteçam.</p>
+                </div>
+                <div class="modal-card">
+                    <img src="./assets/view.png" alt="">
+                    <h2>Visibilidade em tempo real</h2>
+                    <p>Adicione suas máquinas e monitore CPU, Memória e Disco em um só lugar.</p>
+                </div>
+                <div class="modal-card">
+                    <img src="./assets/surprise-box.png" alt="">
+                    <h2>Não seja pego de surpresa</h2>
+                    <p>Registre seus servidores e receba alertas automáticos de performance.</p>
+                </div>
+            </div>
+            <div class="modal-inputs">
+                <div class="modal-form1">
+                    <p>Alias</p>
+                    <input type="text" id="Alias_input">
+                    <p>Codigo Mac</p>
+                    <input type="text" id="Mac_input">
+                    <p>Selecione uma opção:</p>
+                    <select id="status_select">
+                        <option value="a">Ativo</option>
+                        <option value="i">Inativo</option>
+                        <option value="m">Manutenção</option>
+                    </select>
+                </div>
+                <div id="cardErro" style="display: none; color: white; text-align: center;" class="campo-erro">
+                    <span id="mensagem_erro"></span>
+                </div>
+                <button onclick="cadastrar()">Realizar Cadastro</button>
+            </div>
+        </div>
+        <div class="fundo">
+            <div class="effect-text"></div>
+        </div>
+    </div>
+</body>
+
+</html>
+
+<script>
+    nome_usuario.innerHTML = `${sessionStorage.NOME_USUARIO}`
+    function mostrarModal(titulo, mensagem) {
+        modal_titulo.innerHTML = titulo;
+        modal_mensagem.innerHTML = mensagem;
+        modal_container.style.display = "flex";
+    }
+
+    function verificarMac(mac) {
+
+    const regex = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/;
+    return regex.test(mac);
+    
+    }
+
+
+    function fecharModal() {
+        modal_container.style.display = "none";
+    }
+
+    function cadastrar() {
+
+        var Mac = Mac_input.value;
+        var status = status_select.value;
+        var alias = Alias_input.value;
+
+        if(status == "a"){
+            status = "Ativo"
+        }else if(status == "i"){
+            status = "Inativo"
+        }else if(status == "m"){
+            status = "Manutenção"
+        }
+
+        if (Mac == "" ||
+            status == "" ||
+            alias == ""
+        ) {
+            cardErro.style.display = "flex";
+            mensagem_erro.innerHTML = "Preencha todos os campos!";
+            setInterval(sumirMensagem, 4000);
+            return false;
+        }else if(!verificarMac(Mac)){
+
+            cardErro.style.display = "flex";
+            mensagem_erro.innerHTML = "Codigo Mac inválido";
+            setInterval(sumirMensagem, 4000);
+            return false;
+
+        } else {
+
+            fetch("servidores/cadastrar_servidor", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                }, body: JSON.stringify({
+                    MacServer: Mac,
+                    statusServer: status,
+                    aliasServer: alias,
+                    fk_unidadeServer: sessionStorage.getItem("ID_UNIDADE")
+                })
+            }).then(function (resposta) {
+                console.log("resposta: ", resposta);
+
+                if (resposta.ok) {
+                    cardErro.style.display = "flex";
+                    mensagem_erro.innerHTML = '<p>Cadastro do Servidor realizado com sucesso! Redirecionando para tela de servidores.</p><img src="/assets/tube-spinner.svg" alt="" style = "height: 40px; width: 40px">';
+
+                    const mensagemSuporte = "Servidor Cadastrado com Sucesso!";
+
+                    setTimeout(() => {
+                        window.location = "gestor_servidores.html";
+                    }, "4000");
+
+                } else {
+                    throw "Houve um erro ao tentar realizar o cadastro!";
+                }
+            })
+                .catch(function (resposta) {
+
+                    cardErro.style.display = "flex";
+                    mensagem_erro.innerHTML = "Um Servidor com essas informações já existe";
+                    setInterval(sumirMensagem, 4000);
+                    finalizarAguardar();
+                });
+        }
+    }
+
+    function sumirMensagem() {
+        cardErro.style.display = "none";
+    }
+</script>

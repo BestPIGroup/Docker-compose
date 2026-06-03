@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Argos | Funcionários</title>
+    <script src="./js/sessao.js"></script>
+    <link rel="stylesheet" href="./css/funcionarios.css">
+    <link rel="icon" href="./assets/LogoArgos.png">
+</head>
+
+<body>
+    <header class="sidebar">
+        <div class="logo">
+            <a href="index.html">
+                <img src="./assets/LogoArgosIcon.png" >
+            </a>
+        </div>
+        <header class="sidebar">
+
+        <div class="logo" href="index.html">
+            <img src="./assets/LogoArgosIcon.png">
+        </div>
+
+        <ul class="listaOpcoes">
+            <li>
+                <a href="./gestor_servidores.html">
+                    <div class="item">
+                        <img src="./assets/server2.png" alt="Servidores">
+                        <p>Servidores</p>
+                    </div>
+                </a>
+            </li>
+
+            <li>
+                <a href="relatorios.html">
+                    <div class="item">
+                        <img src="./assets/file.png" alt="Servidores">
+                        <p>Relatórios</p>
+                    </div>
+                </a>
+            </li>
+
+            <li>
+                <a href="./funcionarios.html">
+                    <div class="item">
+                        <img src="./assets/team.png" alt="Servidores">
+                        <p>Funcionários</p>
+                    </div>
+                </a>
+            </li>
+
+        </ul>
+        <div class="saida">
+            <div class="item">
+                <a href="./perfil.html" id="perfil_botao">
+                    <img src="./assets/user3.png" alt="Perfil">
+                    <p >Gestor</p>
+                    <p id="nome_usuario">Perfil</p>
+                </a>
+            </div>
+            <a href="index.html">
+                <div class="item">
+                    <img src="./assets/saida.png" alt="Sair" onclick="logout()">
+                    <p>Sair</p>
+                </div>
+            </a>
+        </div>
+    </header>
+    </header>
+
+    <div class="conteudo">
+        <div class="box">
+            <div class="retangulo">
+                <p>Funcionários Cadastrados</p>
+                <button class="btn-adicionar" onclick="window.location.href='cadastro_func.html'">
+                    Adicionar Funcionário
+                </button>
+            </div>
+        </div>
+
+        <div class="container-lista">
+            <table class="tabela-funcionarios">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>E-mail</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Luã Ramalho</td>
+                        <td>lua.ramalho@argos.com</td>
+                        <td><span class="status-ativo">Ativo</span></td>
+                        <td><button class="btn-editar">Editar</button></td>
+                    </tr>
+                    <tr>
+                        <td>Flavia Silva</td>
+                        <td>flavia.silva@argos.com</td>
+                        <td><span class="status-ativo">Ativo</span></td>
+                        <td><button class="btn-editar">Editar</button></td>
+                    </tr>
+                    <tr>
+                        <td>Guilherme Souza</td>
+                        <td>guilherme.souza@argos.com</td>
+                        <td><span class="status-inativo">Inativo</span></td>
+                        <td><button class="btn-editar">Editar</button></td>
+                    </tr>
+                    <tr>
+                        <td>Bianca Oliveira</td>
+                        <td>b.oliveira@argos.com</td>
+                        <td><span class="status-ativo">Ativo</span></td>
+                        <td><button class="btn-editar">Editar</button></td>
+                    </tr>
+                    <tr>
+                        <td>Murilo Costa</td>
+                        <td>m.costa@argos.com</td>
+                        <td><span class="status-ativo">Ativo</span></td>
+                        <td><button class="btn-editar">Editar</button></td>
+                    </tr>
+                    <tr>
+                        <td>Arthur Vinícius</td>
+                        <td>a.vinicius@argos.com</td>
+                        <td><span class="status-inativo">Inativo</span></td>
+                        <td><button class="btn-editar">Editar</button></td>
+                    </tr>
+                    <tr>
+                        <td>Andreia Lima</td>
+                        <td>a.lima@argos.com</td>
+                        <td><span class="status-ativo">Ativo</span></td>
+                        <td><button class="btn-editar">Editar</button></td>
+                    </tr>
+                    <tr>
+                        <td>Victor Mendes</td>
+                        <td>v.mendes@argos.com</td>
+                        <td><span class="status-ativo">Ativo</span></td>
+                        <td><button class="btn-editar">Editar</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>
+
+<script>
+
+    nome_usuario.innerHTML = `${sessionStorage.NOME_USUARIO}`
+
+</script>

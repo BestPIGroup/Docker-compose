@@ -1,0 +1,1004 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Montagu+Slab:opsz,wght@16..144,100..700&family=MonteCarlo&family=Pixelify+Sans:wght@400..700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
+
+html{
+  scroll-behavior: smooth;
+}
+
+body{
+  display: flex;
+  overflow-x: hidden;
+  margin: 0;
+  width: 100%;
+  max-height: 700vh;
+  flex-direction: column;
+  text-align: justify;
+}
+
+header{
+  display: flex;
+  width: 100%;
+  min-height: 80px;
+  height: 1%;
+  background-color: #00375D;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+  font-size: 18px;
+  font-weight: lighter;
+}
+.nav-desktop {
+  display: flex;
+  margin-left: 3%;
+  width: 50%;
+  justify-content: space-evenly;
+}
+
+.nav-mobile {
+  display: none;
+}
+.nav2{
+  display: flex;
+  margin-right: 5%;
+  width: 30%;
+  justify-content: space-around;
+  align-items: center;
+}
+header a{
+  color: white;
+  text-decoration: none;
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+}
+
+header a:hover{
+  font-size: 18px;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+footer{
+  display: flex;
+  width: 100%;
+  min-height: 180px;
+  background-color: #00375D;
+  color: white;
+  font-size: 18px;
+  font-weight: lighter;
+  align-items: center;
+  font-family: "Poppins", sans-serif;
+}
+.footer{
+  display: flex;
+  width: 50%;
+  justify-content: space-around;
+  align-items: center;
+}
+.footer img{
+  width: 10%;
+}
+hr{
+  min-height: 130px;
+}
+.sociais{
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  height: 80%;
+  justify-content: space-around;
+  align-items: center;
+  text-align: center;
+}
+.sociais-img{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 30%;
+}
+.sociais img{
+  width: 20%;
+  cursor: pointer;
+}
+
+p  {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+}
+
+/*
+  Aqui começa a home
+*/
+
+.banner{
+  width: 100%;
+  height: 100vh; 
+  background-image: linear-gradient(rgba(2, 34, 70, 0.7), rgba(2, 34, 70, 0.7)),
+  url('../assets/imagem-banner-home.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;    
+  justify-content: flex-start; 
+}
+
+.banner-text {
+  font-family: "Poppins", sans-serif;
+  color: #ffff;
+  font-size: 40px;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin: 20px;
+}
+
+
+ .banner-button {
+  background-color: #ffff;
+  color: black;
+  font-family: "Poppins", sans-serif;
+  border: none;
+  padding: 20px;
+  width: 100%;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 20px;
+  text-align: center;
+  text-decoration: none;
+  transition: 0.3s;
+
+}
+
+.banner-button a{
+  color: black;
+}
+
+.banner-button:hover{ 
+  background-color: #001e32;
+  color: white;
+  transition: 0.3s;
+  box-shadow: 0 4px 6px rgba(175, 216, 218, 0.275);
+  font-size: 19px;
+
+}
+
+
+.banner img{
+  display: flex;
+  width: 300px;
+}
+
+.container-banner {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  justify-content: center;
+  align-items: center; 
+  padding-left: 10%;
+}
+
+
+#funcionalidades {
+  background-color: #062243;
+  height: 9%;
+}
+
+.container-funcionalidades{ 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 2%;
+}
+
+.container-funcionalidades h2 {
+  color: #ffff;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 36px;
+}
+.card {
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  overflow: hidden;
+  transition: 0.3s;
+  font-family: 'Poppins', sans-serif;
+  margin-top: 5%;
+  width: 33%;
+}
+
+.card:hover{
+  box-shadow: 0 6px 5px rgba(132, 151, 164, 0.536);
+  transition: 0.3s;
+  width:  34%;
+  padding: 2px;  
+}
+.card .icon{
+  font-size: 20px;
+}
+.container-cards {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 50px;
+  align-items: flex-start;
+  width: 100%;
+}
+
+summary {
+  padding: 20px;
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  color: #022036;
+
+}
+
+.content {
+  padding: 0 20px 20px 20px;
+  color: #555;
+  line-height: 1.6;
+  border-top: 1px solid #eee;
+  text-align: justify;
+  height: 140px;
+  transition: grid-template-rows 0.6s ease;
+}
+
+.chamada{
+  display: flex;
+  height: 50vh;
+  justify-content: end;
+  align-items: center;
+  background-image: linear-gradient(to right, rgba(2, 34, 70, 0.7) 70%, rgba(2, 34, 70, 0.7) 100%), url(../assets/img-Chamada.jpg);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: white;
+  font-family: 'Poppins', sans-serif;
+  text-align: center;
+  font-size: 25px;
+  font-weight: 200;
+}
+.container-chamada{
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+}
+.container-chamada span{
+  font-weight: 500;
+}
+.container-chamada button{
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  padding: 6px;
+  background-color: white;
+  width: 25%;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
+
+}
+.container-chamada button:hover{ 
+  background-color: #031929;
+  color: #ffff;
+  transition: 0.2s;
+  box-shadow: 0 4px 6px rgba(175, 216, 218, 0.275);
+
+}
+#pilares{
+  display: flex;
+  background-color: #081F3A;
+  width: 100%;
+  height: 100vh;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Poppins', sans-serif;
+  font-size: 20px;
+  color: white;
+}
+.pilares-texto{
+  font-size: 32px;
+  text-align: center;
+  height: 20%;
+}
+#pilares span{
+  color: #C4F4FF;
+  font-weight: 600;
+}
+.pilares-card{
+  display: flex;
+  width: 80%;
+  height: 40%;
+}
+.pilares-card1{
+  border: 4px solid white;
+  border-radius: 10px;
+  margin: 20px;
+  padding: 10px;
+  text-align: center;
+  width: 50%;
+  height: 70%;
+  transition: 0.5s;
+}
+.pilares-card2{
+  border: 4px solid #4594B5;
+  border-radius: 10px;
+  margin: 20px;
+  padding: 10px;
+  text-align: center;
+  width: 50%;
+  height: 70%;
+  transition: 0.5s;
+}
+
+.pilares-card1:hover{
+  margin-top: 10px;
+  transition: 0.5s;
+  box-shadow: 0 4px 6px rgba(192, 223, 224, 0.563);
+}
+
+.pilares-card2:hover{
+  margin-top: 10px;
+  transition: 0.5s;
+  box-shadow: 0 4px 6px rgba(192, 223, 224, 0.563);
+}
+.chamada2{
+  display: flex;
+  height: 50vh;
+  justify-content: start;
+  align-items: center;
+  background-image: linear-gradient(to right, rgba(2, 34, 70, 0.7) 70%, rgba(2, 34, 70, 0.7) 100%), url(../assets/img-chamada2.jpg);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: white;
+  font-family: 'Poppins', sans-serif;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 200;
+}
+.container-chamada2{
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+}
+.container-chamada2 span{
+  font-weight: 500;
+  font-size: 26px;
+}
+.container-chamada2 button{
+  font-family: 'Poppins', sans-serif;
+  font-size: 18px;
+  background-color: white;
+  width: 40%;
+  height: 50px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+}
+.container-chamada2 button:hover{ 
+  background-color: #031929;
+  color: #ffff;
+  transition: 0.2s;
+  box-shadow: 0 4px 6px rgba(175, 216, 218, 0.275);
+}
+/*
+  Aqui começa a pagina sobre nós
+*/
+
+.container{
+  padding: 20px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  background-color: #132542;
+  color: white;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 26px;
+}
+
+#imagem-div{
+  background-image: url(https://img.freepik.com/vetores-premium/tecnologia-abstrata-com-rede-mundial-global-e-telecomunicacoes-em-dados-digitais-terrestres_258787-666.jpg);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: white;
+  padding: 7%;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 26px;
+}
+
+.texto-meio{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 300;
+  font-size: 20px;
+  width: 65%;
+  text-align: justify;
+}
+
+.texto-meio span{
+  color: #C4F4FF;
+  font-weight: 600;
+}
+
+.container-servicos{
+  padding: 80px 20px;
+  text-align: center;
+  background-color: #0f1c33;
+  color: white;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 26px;
+}
+
+.box-mae{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.alinhamento-box, .alinhamento-box2{
+  display: flex;
+  gap: 60px;
+  justify-content: center;
+  font-family: 'Poppins', sans-serif;
+}
+
+.mini-box{
+  width: 35%;
+  background-color: #132542;
+  padding: 35px 25px;
+  border-radius: 16px;
+  text-align: center;
+  transition: 0.5s;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 200;
+  font-size: 15px;
+}
+
+.mini-box:hover {
+  padding: 38px 28px;
+  transition: 0.5s;
+  box-shadow: 0 2px 6px rgba(192, 223, 224, 0.175);
+}
+
+img{
+  width: 34%;
+}
+
+.banner-button:hover {
+color: #ffff;
+}
+#imagem-div2{
+  background-image: url(https://img.freepik.com/fotos-premium/close-up-de-hacker-em-oculos-olhando-para-a-tela_380164-224342.jpg?semt=ais_user_personalization&w=740&q=80);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: white;
+  padding: 7%;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 26px;
+}
+
+@media (max-width: 768px){
+
+  /* Header */
+  header {
+    display: flex;
+    max-width: 100%;
+    height: 70px;
+    flex-direction: row;
+    /* justify-content: space-between; */
+    justify-content: center;
+    font-size: 12px;
+    padding: 0;
+  }
+
+  header .nav-desktop,
+  header .nav2 {
+    text-align: center;
+    align-items: center;
+    margin: 0;
+  }
+
+  header .nav-mobile {
+    display: flex;
+    width: 50%;
+    flex-direction: row;
+    justify-content: space-around;
+  }
+
+  header .nav2 {
+    display: flex;
+    width: 50%;
+    margin-right: 10px;
+  }
+
+  .nav-desktop {
+    display: none;
+  }
+
+  /* _______________________________ */
+  /* =============================== */
+  /* Banner */
+
+  .banner {
+    display: flex;
+    justify-content: center;
+    height: 800px;
+  }
+
+  .container-banner {
+    max-height: 100%;
+    margin: 0px;
+    padding: 0px;
+    max-width: 80%;
+    text-align: center;
+  }
+
+  /* _______________________________ */
+  /* =============================== */
+  /* Funcionalidades */
+
+  .container-funcionalidades {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .container-cards {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 20px;
+  }
+
+  .card {
+    max-width: 90%;
+    width: 100%;
+  }
+
+  .card:hover {
+    box-shadow: 0 6px 5px rgba(132, 151, 164, 0.536);
+    transition: 0.3s;
+    width:  100%;
+    padding: 2px;  
+  }
+
+  /* _______________________________ */
+  /* =============================== */
+  /* Chamada */
+
+  .chamada {
+    padding: 0px;
+    max-width: 100%;
+    justify-content: center;
+    font-size: 32px;
+    height: 100%;
+  }
+
+  .container-chamada {
+    height: 100%;
+    width: 90%;
+    padding-bottom: 40px;
+  }
+
+  .container-chamada a {
+    width: 100%;
+  }
+
+  .container-chamada a button {
+    width: 90%;
+    height: 50px;
+    font-weight: 700;
+  }
+
+  /* ________________________________ */
+  /* ================================ */
+  /* Pilares */
+
+  #pilares {
+    max-height: 100%;
+    height: 100%;
+    padding-bottom: 10px;
+  }
+
+  .pilares-texto {
+    font-size: 25px;
+  }
+
+  .pilares-card {
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+  }
+
+  .pilares-card h4 {
+    font-size: 18px;
+  }
+
+  .pilares-card p {
+    font-size: 16px;
+  }
+
+  .pilares-card1, .pilares-card2 {
+    min-height: 250px;
+    min-width: 70%;
+    margin: 10px;
+  }
+
+  /* _______________________________ */
+  /* =============================== */
+  /* Chamada */
+
+  .chamada2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding-bottom: 30px;
+    padding-top: 30px;
+  }
+
+  .container-chamada2 {
+    width: 90%;
+    gap: 10px;
+  }
+
+  /* _______________________________ */
+  /* =============================== */
+  /* Footer */
+
+  footer {
+    display: flex;
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  .footer {
+    order: 3;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 40px;
+  }
+
+  .footer p {
+    max-width: 50%;
+  }
+
+  .footer img {
+    width: 20%;
+  }
+
+  footer hr {
+    order: 2;
+    min-height: 0px;
+    width: 90%;
+    margin: 20px;
+  }
+
+  .sociais {
+    order: 1;
+    width: 80%;
+  }
+
+  .sociais-img {
+    width: 40%;
+  }
+
+  /* Tela sobre-nós */
+  .container{
+    flex-direction: column;
+  }
+
+  .texto-meio{
+    min-width: 90%;
+  }
+
+  .container-servicos{
+    height: 225vh;
+    padding: 20px 20px;
+  }
+
+  .container-servicos h2{
+    margin: 15px;
+    height: 6%;
+  }
+
+  .box-mae{
+    height: 90%;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .alinhamento-box,.alinhamento-box2{
+    max-height: 600px;
+    padding: 5px;
+    gap: 10px;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .mini-box{
+    font-size: 12px;
+    min-width: 300px;
+  }
+
+  #imagem-div2{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #imagem-div2 .banner-button{
+    justify-content: center;
+    min-width: 60%;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px){
+  
+  /* Header */
+  header {
+    display: flex;
+    max-width: 100%;
+    height: 70px;
+    flex-direction: row;
+    justify-content: center;
+    gap: 80px;
+    font-size: 16px;
+    min-height: auto;
+  }
+
+  header .nav-desktop,
+  header .nav2 {
+    text-align: center;
+    align-items: center;
+    margin: 0;
+  }
+
+  header .nav-desktop {
+    display: flex;
+    max-width: 80%;
+    flex-direction: row;
+    justify-content: space-around;
+    gap: 40px;
+    margin: 0px;
+  }
+
+  .nav-mobile {
+    display: none;
+  }
+
+  header .nav2 {
+    width: 40%;
+    margin-right: 10px;
+  }
+  /* _______________________________ */
+  /* =============================== */
+  /* Banner */
+
+  .banner {
+    display: flex;
+    justify-content: center;
+    height: 800px;
+  }
+
+  .container-banner {
+    max-height: 100%;
+    margin: 0px;
+    padding: 0px;
+    max-width: 80%;
+    text-align: center;
+  }
+
+  /* _______________________________ */
+  /* =============================== */
+  /* Funcionalidades */
+
+  .container-funcionalidades {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .container-cards {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 20px;
+  }
+
+  .card {
+    max-width: 90%;
+    width: 100%;
+  }
+
+  .card:hover {
+    box-shadow: 0 6px 5px rgba(132, 151, 164, 0.536);
+    transition: 0.3s;
+    width:  100%;
+    padding: 2px;  
+  }
+
+  /* _______________________________ */
+  /* =============================== */
+  /* Chamada */
+
+  .chamada {
+    padding: 0px;
+    max-width: 100%;
+    justify-content: center;
+    font-size: 32px;
+    height: 100%;
+  }
+
+  .container-chamada {
+    height: 100%;
+    width: 90%;
+    padding-bottom: 40px;
+  }
+
+  .container-chamada a {
+    width: 100%;
+  }
+
+  .container-chamada a button {
+    width: 90%;
+    height: 50px;
+    font-weight: 700;
+  }
+
+  /* ________________________________ */
+  /* ================================ */
+  /* Pilares */
+
+  #pilares {
+    max-height: 100%;
+    height: 100%;
+    padding-bottom: 10px;
+  }
+
+  .pilares-texto {
+    font-size: 25px;
+  }
+
+  .pilares-card {
+    width: 100%;
+  }
+
+  .pilares-card h4 {
+    font-size: 18px;
+  }
+
+  .pilares-card p {
+    font-size: 16px;
+  }
+
+  .pilares-card1, .pilares-card2 {
+    min-height: 250px;
+    margin: 10px;
+  }
+
+  /* _______________________________ */
+  /* =============================== */
+  /* Chamada */
+
+  .chamada2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding-bottom: 30px;
+    padding-top: 30px;
+  }
+
+  .container-chamada2 {
+    width: 90%;
+    gap: 10px;
+  }
+
+  /* _______________________________ */
+  /* =============================== */
+  /* Footer */
+
+  footer {
+    display: flex;
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  .footer {
+    order: 3;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 40px;
+  }
+
+  .footer p {
+    max-width: 50%;
+  }
+
+  .footer img {
+    width: 12%;
+  }
+
+  footer hr {
+    order: 2;
+    min-height: 0px;
+    width: 90%;
+    margin: 20px;
+  }
+
+  .sociais {
+    order: 1;
+    width: 80%;
+  }
+
+  .sociais-img {
+    width: 30%;
+  }
+
+   /* Tela sobre-nós */
+  .container{
+    flex-direction: column;
+  }
+
+  .texto-meio{
+    min-width: 90%;
+  }
+
+  .container-servicos{
+    height: 170vh;
+    padding: 20px 20px;
+  }
+
+  .container-servicos h2{
+    margin: 15px;
+    height: 6%;
+  }
+
+  .box-mae{
+    height: 90%;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .alinhamento-box,.alinhamento-box2{
+    max-height: 600px;
+    padding: 5px;
+    gap: 10px;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .mini-box{
+    font-size: 15px;
+    min-width: 300px;
+    min-height: 400px;
+  }
+
+  #imagem-div2{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #imagem-div2 .banner-button{
+    justify-content: center;
+    min-width: 60%;
+  }
+}

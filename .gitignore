@@ -1,0 +1,5 @@
+mysql/projeto_argos.sql
+
+site/node_modules/
+site/.env
+site/.env.dev

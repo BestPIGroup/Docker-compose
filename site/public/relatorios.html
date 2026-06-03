@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Argos | Funcionários</title>
+    <script src="./js/sessao.js"></script>
+    <link rel="stylesheet" href="./css/relatorios.css">
+    <link rel="icon" href="./assets/LogoArgos.png">
+</head>
+
+<body>
+    <header class="sidebar">
+
+        <div class="logo" href="index.html">
+            <img src="./assets/LogoArgosIcon.png">
+        </div>
+
+        <ul class="listaOpcoes">
+            <li>
+                <a href="./gestor_servidores.html">
+                    <div class="item">
+                        <img src="./assets/server2.png" alt="Servidores">
+                        <p>Servidores</p>
+                    </div>
+                </a>
+            </li>
+
+            <li>
+                <a href="relatorios.html">
+                    <div class="item">
+                        <img src="./assets/file.png" alt="Servidores">
+                        <p>Relatórios</p>
+                    </div>
+                </a>
+            </li>
+
+            <li>
+                <a href="./funcionarios.html">
+                    <div class="item">
+                        <img src="./assets/team.png" alt="Servidores">
+                        <p>Funcionários</p>
+                    </div>
+                </a>
+            </li>
+
+        </ul>
+        <div class="saida">
+            <div class="item">
+                <a href="./perfil.html" id="perfil_botao">
+                    <img src="./assets/user3.png" alt="Perfil">
+                    <p >Gestor</p>
+                    <p id="nome_usuario">Perfil</p>
+                </a>
+            </div>
+            <a href="index.html">
+                <div class="item">
+                    <img src="./assets/saida.png" alt="Sair" onclick="logout()">
+                    <p>Sair</p>
+                </div>
+            </a>
+        </div>
+    </header>
+    </header>
+
+    <div class="conteudo">
+        <div class="box">
+            <div class="retangulo">
+                <p>Relatórios</p>
+                <button class="btn-adicionar">
+                    Baixar Relatório geral
+                </button>
+            </div>
+        </div>
+
+        <div class="container-lista">
+            <table class="tabela-funcionarios">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Tipo</th>
+                        <th>Download</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>30/04/2026</td>
+                        <td>Geral</td>
+                        <td><button class="btn-editar">Baixar</button></td>
+                    </tr>
+                    <tr>
+                        <td>29/04/2026</td>
+                        <td>Servidor 2</td>
+                        <td><button class="btn-editar">Baixar</button></td>
+                    </tr>
+                    <tr>
+                        <td>22/04/2026</td>
+                        <td>Servidor 1</td>
+                        <td><button class="btn-editar">Baixar</button></td>
+                    </tr>
+                    <tr>
+                        <td>21/04/2026</td>
+                        <td>Geral</td>
+                        <td><button class="btn-editar">Baixar</button></td>
+                    </tr>
+                    <tr>
+                        <td>27/03/2026</td>
+                        <td>Servidor 3</td>
+                        <td><button class="btn-editar">Baixar</button></td>
+                    </tr>
+                    <tr>
+                        <td>23/03/2026</td>
+                        <td>Geral</td>
+                        <td><button class="btn-editar">Baixar</button></td>
+                    </tr>
+                    <tr>
+                        <td>22/03/2026</td>
+                        <td>Servidor 4</td>
+                        <td><button class="btn-editar">Baixar</button></td>
+                    </tr>
+                    <tr>
+                        <td>19/03/2026</td>
+                        <td>Servidor 1</td>
+                        <td><button class="btn-editar">Baixar</button></td>
+                    </tr>
+                    <tr>
+                        <td>18/03/2026</td>
+                        <td>Geral</td>
+                        <td><button class="btn-editar">Baixar</button></td>
+                    </tr>
+                    <tr>
+                        <td>16/03/2026</td>
+                        <td>Servidor 2</td>
+                        <td><button class="btn-editar">Baixar</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>

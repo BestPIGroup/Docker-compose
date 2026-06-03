@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Argos | Servidores</title>
+    <script src="./js/sessao.js"></script>
+    <link rel="stylesheet" href="./css/servidores.css">
+    <link rel="icon" href="./assets/LogoArgos.png">
+</head>
+
+<body>
+    <header class="sidebar">
+
+        <div class="logo" href="index.html">
+            <img src="./assets/LogoArgosIcon.png">
+        </div>
+
+        <ul class="listaOpcoes">
+            <li>
+                <a href="servidores.html">
+                    <div class="item">
+                        <img src="./assets/server2.png" alt="Servidores">
+                        <p>Servidores</p>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href="https://app.slack.com/client/T0AQPJR7JUU/C0AUV58TYET">
+                    <div class="item">
+                        <img src="./assets/slack.png" alt="Servidores">
+                        <p>Slack</p>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href="https://sptech-argos-support.atlassian.net/jira/software/projects/KAN/list?jql=project%20%3D%20KAN%20AND%20status%20%3D%20%22A%20fazer%22%20ORDER%20BY%20cf%5B10019%5D%20ASC">
+                    <div class="item">
+                        <img src="./assets/jira.png" alt="Servidores">
+                        <p>Jira</p>
+                    </div>
+                </a>
+            </li>
+        </ul>
+        <div class="saida">
+            <div class="item">
+                <img src="./assets/user3.png" alt="Perfil">
+                <p>Analista</p>
+                <p>Perfil</p>
+            </div>
+            <a href="index.html">
+                <div class="item">
+                    <img src="./assets/saida.png" alt="Sair" onclick="logout()">
+                    <p>Sair</p>
+                </div>
+            </a>
+        </div>
+    </header>
+    
+    <div class="conteudo">
+        
+        <div class="box">
+            <div class="kpis">
+                <div class="kpi card-erro">
+                    <img src="./assets/warningRed.png" alt="">
+                    Servidores Críticos<h2 id="crit">1</h2>
+                </div>
+                <div class="kpi card-atencao">
+                    <img src="./assets/warningOrange.png" alt="">
+                    Servidores em Atenção<h2 id="atencao">1</h2>
+                </div>
+                <div class="kpi">
+                    <img src="./assets/hardwareWhite.png" alt="">
+                    Alertas de Hardware<h2 id="alert">3</h2>
+                </div>
+                <div class="kpi">
+                    <img src="./assets/unlockWhite.png" alt="">
+                    Ciberameaças<h2 id="threats">7</h2>
+                </div>
+                <div class="kpi kpi-alerta-sino" id="card-alerta-sino" onclick="window.location.href='dash_componentes.html'" style=" cursor: pointer;">
+                    <button class="btn-fechar-alerta" onclick="document.getElementById('card-alerta-sino').style.display='none'">✕</button>
+                    <img src="./assets/bellWhite.png" alt="">
+                    Alerta novo!<h2 id="kpi-sino">Servidor 2</h2>
+                </div>
+            </div>
+            <div class="retangulo">
+                <p>Servidores</p>
+            </div>
+        </div>
+        
+
+        <div class="grid" id="servers"></div>
+
+        </div>
+    </div>
+</body>
+
+</html>
+<script>
+
+    const data = [
+        { nome: "Servidor 1", link: "./dash_componentes.html", status: "ok", cpu: 45, ram: 68, disk: 72, net: 120, processos: 128, alertas: 0, seguranca: "ok", ameacas: 0 },
+        { nome: "Servidor 2", link: "./dash_componentes.html", status: "crit", cpu: 90, ram: 85, disk: 95, net: 320, processos: 342, alertas: 3, seguranca: "bad", ameacas: 5 },
+        { nome: "Servidor 3", link: "./dash_componentes.html", status: "atencao", cpu: 60, ram: 70, disk: 65, net: 180, processos: 215, alertas: 1, seguranca: "bad", ameacas: 2 },
+        { nome: "Servidor 4", link: "./dash_componentes.html", status: "ok", cpu: 35, ram: 50, disk: 40, net: 90, processos: 98, alertas: 0, seguranca: "ok", ameacas: 0 }
+    ];      
+
+    const ordem = { crit: 0, atencao: 1, ok: 2 };
+    data.sort((a, b) => ordem[a.status] - ordem[b.status]);
+
+    let ok = 0, atencao = 0, crit = 0, alert = 0, threats = 0;
+
+    data.forEach(s => {
+        if (s.status === "ok") ok++;
+        if (s.status === "atencao") atencao++;
+        if (s.status === "crit") crit++;
+        alert += s.alertas;
+        threats += s.ameacas;
+        
+        const link = document.createElement("a");
+        link.href = s.link;
+
+        const card = document.createElement("div");
+
+        if (s.status == "crit") {
+            card.className = "card card-erro";
+        } else if (s.status == "atencao") {
+            card.className = "card card-atencao";
+        } else {
+            card.className = "card card-estavel";
+        }
+        
+        card.onclick = () =>{  sessionStorage.setItem("servidor", JSON.stringify(s)); window.location.href = s.link;}
+
+        card.innerHTML = `
+        <div class="header">
+            <strong>${s.nome}</strong>
+            <span class="${s.status}">
+                ${s.status === "ok" ? "● Normal" : s.status === "atencao" ? "● Atenção" : "● Crítico"}
+                </span>
+                </div>
+                
+                <div class="metric">CPU ${s.cpu}%<div class="bar"><div class="fill cpu" style="width:${s.cpu}%"></div></div></div>
+                <div class="metric">RAM ${s.ram}%<div class="bar"><div class="fill ram" style="width:${s.ram}%"></div></div></div>
+                <div class="metric">Disco ${s.disk}%<div class="bar"><div class="fill disk" style="width:${s.disk}%"></div></div></div>
+    <div class="metric">Rede ${s.net} Mbps<div class="bar"><div class="fill net" style="width:${Math.min(s.net / 4, 100)}%"></div></div></div>
+    
+    <div class="process">Processos: ${s.processos}</div>
+    
+    <div class="process">
+        <img src="./assets/unlockWhite.png" alt=""> Segurança:
+        <span class="${s.seguranca === "ok" ? "sec-ok" : "sec-bad"}">
+            ${s.seguranca === "ok" ? "Íntegra" : "Comprometida"}
+        </span>
+    </div>
+            
+    <div class="process">
+        <img src="./assets/bellWhite.png" alt=""> Ameaças: ${s.ameacas}
+    </div>`;
+                
+                document.getElementById("servers").appendChild(card);
+                link.appendChild(card);
+                document.getElementById("servers").appendChild(link);
+    });
+
+    document.getElementById("total").innerText = data.length;
+    document.getElementById("ok").innerText = ok;
+    document.getElementById("atencao").innerText = atencao;
+    document.getElementById("crit").innerText = crit;
+    document.getElementById("alert").innerText = alert;
+    document.getElementById("threats").innerText = threats;
+
+</script>

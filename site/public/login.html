@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Argos | Login</title>
+
+    <script src="./js/sessao.js"></script>
+
+    <link rel="stylesheet" href="./css/estilo.css">
+    <link rel="stylesheet" href="./css/login.css">
+    <link rel="icon" href="./assets/LogoArgos.png">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+</head>
+
+<body>
+<!-- ================================================= -->
+<!-- Card de Erro abaixo (Estilizado) -->
+  <div id="cardVazio" style="display: none; text-align: center;" class="campo">
+    <div id="cardErroCaixa">
+      <div id="caixaErroHeader">
+        <h1></h1>
+        <p style="color: black; font-size: 26px; cursor: pointer;" onclick="sumirMensagem()">X</p>
+      </div>
+        <hr style="display: flex; flex-direction: row; width: 100%; min-height: 0px; margin-bottom: 20px;">
+        <span style="color: black; font-size: 22px;" id="mensagem_erro"></span>
+    </div>
+  </div>
+  <!-- ================================================= -->
+    <header style="display: none;" id="navLogada">
+    <div class="nav-desktop">
+      <a href="#home" style="font-weight: bold;">Home</a>
+      <a href="./cadastro_unidade.html">Cadastro de Unidade</a>
+      <a href="./index_usuario.html">Cadastro de Servidor</a>
+    </div>
+    <div class="nav2">
+      <p> Olá, <p id="nomeUsuario"></p></p>
+      <p>|</p>
+      <a href="perfil.html">Perfil</a>
+    </div>
+  </header>
+  <header style="display: flex;" id="navDeslogada">
+    <div class="nav-desktop">
+      <a href="index.html" style="font-weight: bold;">Home</a>
+      <a href="index.html#pilares">Nossos Pilares</a>
+      <a href="./sobrenos.html">Conheça a Argos</a>
+    </div>
+    <div class="nav-mobile">
+      <a href="./index.html" style="font-weight: bold;">Home</a>
+      <a href="./index.html#pilares">Pilares</a>
+      <a href="./sobrenos.html">Argos</a>
+    </div>
+    <div class="nav2">
+      <a href="cadastro.html">Cadastro</a>
+      <p>|</p>
+      <a href="login.html">Login</a>
+    </div>
+  </header>
+    <div class="login">
+        <div class="containers">
+            <div class="cardsLogin card-login1">
+                <h2>LOGIN</h2>
+                <div class="formulario">
+                    <div class="campo">
+                        <span>E-mail <b style="color: red;">*</b></span> <br>
+                        <input id="email_input" type="email" placeholder="example@gmail.com">
+                    </div>
+                    <div class="campo">
+                        <span>Senha <b style="color: red;">*</b></span> <br>
+                        <input id="senha_input" type="password" placeholder="******">
+                    </div>
+                    <div class="campo">
+                        <span>Código de matricula<b style="color: red;">*</b></span> <br>
+                        <input id="codigo_input" type="text" placeholder="Digite o seu código de matricula">
+                    </div>
+                    <button class="botao" onclick="entrar()">Logar</button>
+                    <a href="cadastro.html">Ainda não possui uma conta? Cadastre aqui</a>
+                </div>
+
+            </div>
+            <div class="cardsLogin card-login2">
+                <h2>BEM-VINDO DE VOLTA</h2>
+                <img style="width: 40%;" src="./assets/LogoArgosW.png" alt="">
+                <p>Entre para garantir a estabilidade do seu sistema.</p>
+                <a href="cadastro.html">Ainda não possui uma conta? Cadastre aqui</a>
+            </div>
+        </div>
+    </div>
+    <footer>
+    <div class="footer">
+      <img src="./assets/LogoArgosW.png" alt="Logo">
+      <p>2026 Argos. Todos os direitos reservados.</p>
+    </div>
+    <hr>
+    <div class="sociais">
+      <p>Entre em contato conosco: <br>argos@argos.com.br</p>
+      <div class="sociais-img">
+        <img src="./assets/instagram.png" alt="Instagram">
+        <img src="./assets/whatsapp.png" alt="WhatsApp">
+        <img src="./assets/linkedin.png" alt="Linkedin">
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
+<script>
+  window.onload = verificarLogin();
+
+    function verificarLogin() {
+        if (sessionStorage.NOME_USUARIO != null) {
+            navLogada.style.display = 'flex'
+            navDeslogada.style.display = 'none'
+            nomeUsuario.innerHTML = sessionStorage.NOME_USUARIO
+        }
+    }
+
+    function deslogar() {
+        sessionStorage.clear()
+    }
+
+    function entrar() {
+
+        // Recolhe os valores dos campos
+        var emailVar = email_input.value;
+        var senhaVar = senha_input.value;
+        var matricula = codigo_input.value;
+        // Se um dos campos estiver vazio, ativa
+        if (emailVar == "" || senhaVar == "" || matricula == "") {
+            cardVazio.style.display = "flex"
+            mensagem_erro.innerHTML = "Preencha todos os campos corretamente!"
+            return false;
+            // Termina função aguardar e retorna valor falso dessa função
+        }
+
+        // Mostra o Login e Senha no terminal
+        console.log("FORM LOGIN: ", emailVar);
+        console.log("FORM SENHA: ", senhaVar);
+        console.log("FORM SENHA: ", matricula);
+
+        // Faz uma requisição HTTP via JS
+        // Método POST (enviar/criar dados)
+        fetch("/usuarios/autenticar", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                // Defini no server as variáveis email e senha
+                emailServer: emailVar,
+                senhaServer: senhaVar,
+                matriculaServer: matricula
+            })
+        }).then(function (resposta) {
+            // Então, após isso, executa a função com resposta
+            console.log("ESTOU NO THEN DO entrar()!")
+            console.log("Status:", resposta.status);
+            // Se estiver tudo bem, executa no console.log a resposta
+            if (resposta.ok) {
+                console.log(resposta);
+
+                resposta.json().then(json => {
+                    console.log(json);
+                    console.log(JSON.stringify(json));
+                    sessionStorage.EMAIL_USUARIO = json.email;
+                    sessionStorage.NOME_USUARIO = json.nome;
+                    sessionStorage.ID_USUARIO = json.id_usuario;
+                    sessionStorage.ID_UNIDADE = json.fk_unidade;
+                    sessionStorage.FK_RESPONSAVEL = json.fk_responsavel;
+                    redirect = json.fk_responsavel;
+                    console.log(redirect)
+
+                    cardVazio.style.display = "flex";
+                    mensagem_erro.innerHTML = "Login realizado com sucesso! Redirecionando para tela de Perfil...";
+
+                    setTimeout(function () {
+                        
+                        redirecionar(redirect);
+
+                    }, 1000); // apenas para exibir o loading
+
+                });
+
+            } else {
+                cardVazio.style.display = "flex"
+                mensagem_erro.innerHTML = "Dados inválidos! Tente novamente"
+                console.log("Houve um erro ao tentar realizar o login!");
+
+                resposta.text().then(texto => {
+                    console.error(texto);
+                });
+            }
+
+        }).catch(function (erro) {
+            console.log(erro);
+        })
+
+        return false;
+    }
+
+    function sumirMensagem() {
+        cardVazio.style.display = "none"
+    }
+
+    function redirecionar(funcao){
+
+        if(redirect === "Gestor"){
+
+            window.location = "./gestor_servidores.html";
+            console.log("indo pra tela do gestor")
+                        
+        }else if (redirect === "Analista"){
+
+            window.location = "./servidores.html"
+            console.log("indo pra tela do analista")
+
+            }
+
+    }
+
+</script>

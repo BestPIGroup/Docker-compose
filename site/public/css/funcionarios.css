@@ -1,0 +1,265 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-style: none;
+    text-decoration: none !important;
+}
+
+body {
+    background-color: #0f1b2d;
+    font-family: Arial, Helvetica, sans-serif;
+    color: white;
+}
+
+.sidebar {
+    background: linear-gradient(180deg, #0b2553, #0b1e34);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    height: 100vh;
+    width: var(--sidebar-width);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    box-shadow: 0px 0px 25px 9px rgba(0, 0, 0, 0.239);
+    transition: width 300ms ease;
+    overflow: hidden;
+}
+
+.sidebar:hover {
+    width: var(--sidebar-width-hover);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.sidebar:hover .item p {
+    opacity: 1;
+    transition: opacity 400ms ease;
+}
+
+.logo {
+    display: flex;
+    padding-top: 20px;
+    padding-bottom: 30px;
+    flex-shrink: 0;
+}
+
+.logo img {
+    width: 45px;
+    height: auto;
+}
+
+.item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    border-radius: 12px;
+    cursor: pointer;
+    gap: 6px;
+    color: rgb(247, 250, 255);
+    transition: 100ms;
+    white-space: nowrap;
+}
+
+.item p {
+    opacity: 0;
+    transition: opacity 700ms ease;
+    font-size: 11px;
+}
+
+.item a#perfil_botao {
+    text-decoration: none;
+    color: rgb(255, 255, 255);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.item a#perfil_botao p {
+    opacity: 0;
+    transition: opacity 700ms ease;
+    font-size: 11px;
+}
+
+.sidebar:hover .item a#perfil_botao p {
+    opacity: 1;
+}
+
+.listaOpcoes {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    justify-content: center;
+    list-style: none;
+    gap: 4vh;
+    transform: translateY(-40px);
+}
+
+.listaOpcoes li {
+    width: 100%;
+    height: 72px;
+}
+
+.listaOpcoes li a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    transition: background-color 0.3s;
+}
+
+.listaOpcoes li a:hover {
+    background-color: #0f1b2d;
+}
+
+.listaOpcoes img {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.saida {
+    margin-top: auto;
+    padding-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+}
+
+.saida img {
+    width: 24px;
+    height: 24px;
+}
+
+.listaOpcoes img {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+}
+
+.saida .item {
+    width: 100%;
+    justify-content: center;
+}
+
+.conteudo {
+    padding: 160px 40px 40px 110px;
+}
+
+
+
+.box .retangulo {
+    position: fixed;
+    top: 80px;
+    left: 90px;
+    width: calc(100% - 110px);
+    height: 60px;
+    background-color: #0b2553;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 10;
+}
+
+.box .retangulo p {
+    margin-left: 20px;
+    font-weight: bolder;
+    font-size: 24px;
+}
+
+.btn-adicionar {
+    background-color: #0d800d;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 10px;
+    margin-right: 10px;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-adicionar:hover {
+    background-color: #12921c;
+    transform: scale(1.05);
+}
+
+.container-lista {
+    background-color: #102244;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    overflow-x: auto;
+}
+
+.tabela-funcionarios {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.tabela-funcionarios th {
+    border-bottom: 2px solid #1c2e5a;
+    padding: 15px;
+    color: #86929b;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+.tabela-funcionarios td {
+    padding: 15px;
+    border-bottom: 1px solid #1c2e5a;
+    font-size: 16px;
+}
+
+.status-ativo {
+    color: #3ed64b;
+    font-weight: bold;
+}
+
+.status-inativo {
+    color: #ff3b3b;
+    font-weight: bold;
+}
+
+.btn-editar {
+    background-color: #0d800d;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.btn-editar:hover {
+    background-color: #12921c;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        height: 60px;
+        flex-direction: row;
+        top: auto;
+        bottom: 0;
+    }
+    .listaOpcoes { flex-direction: row; }
+    .conteudo { padding: 120px 20px 80px 20px; }
+    .box .retangulo { left: 20px; width: calc(100% - 40px); }
+}

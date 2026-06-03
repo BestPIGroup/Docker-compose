@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Argos | Componentes</title>
+
+    <script src="./js/sessao.js"></script>
+
+    <link rel="stylesheet" href="./css/dash_ransomware.css">
+    <link rel="icon" href="./assets/LogoArgos.png">
+</head>
+
+<body onload="carregarGraficos()">
+
+    <div class="modal-dash-ransomware">
+
+        <div class="modal">
+
+            <div class="top">
+                <div class="titulo">
+                    <h2>Detecção de RANSOMWARE</h2>
+                </div>
+
+                <div class="top-right">
+                    <div class="atualizacao">
+                        <span>
+                            ÚLTIMA ATUALIZAÇÃO EM:
+                            <span id="ultimaAtualizacao">--/--/---- --:--:--</span>
+                        </span>
+                    </div>
+
+                    <!-- <button class="btn-fechar">✕</button> -->
+                </div>
+            </div>
+
+            <div class="box">
+
+                <div class="kpis">
+
+                    <!-- SERVIDOR -->
+                    <div class="kpi">
+                        <div class="kpi-top">
+
+                            <div class="kpi-icon">
+                                <img src="./assets/server2.png" alt="">
+                            </div>
+
+                            <div class="kpi-info">
+                                <h3 id="titulo-kpi-servidor">SERVIDOR</h3>
+                                <h2 id="kpi-servidor">—</h2>
+                                <span class="badge-critico">CRÍTICO</span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- RISCO -->
+                    <div class="kpi card-risco-alto" id="card-risco">
+                        <div class="kpi-top">
+
+                            <div class="kpi-icon">
+                                <img src="./assets/ransonware/!-red.png" alt="">
+                            </div>
+
+                            <div class="kpi-info">
+                                <h4>RISCO DE RANSOMWARE</h4>
+                                <h1 id="kpi-risco">—</h1>
+                            </div>
+
+                        </div>
+
+                        <div class="kpi-obs">
+                            <p id="obs-risco">
+                                <span>0</span>% acima do normal
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- CPU -->
+                    <div class="kpi">
+                        <div class="kpi-top">
+
+                            <div class="kpi-icon">
+                                <img src="./assets/ransonware/cpu.png" alt="">
+                            </div>
+
+                            <div class="kpi-info">
+                                <h4>Uso de CPU</h4>
+                                <h2 id="kpi_cpu">0%</h2>
+                            </div>
+
+                        </div>
+
+                        <div class="kpi-obs">
+                            <p id="diferenca_cpu">
+                                <span>0</span>% acima do normal
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- RAM -->
+                    <div class="kpi">
+                        <div class="kpi-top">
+
+                            <div class="kpi-icon">
+                                <img src="./assets/ransonware/ram.png" alt="">
+                            </div>
+
+                            <div class="kpi-info">
+                                <h4>Uso de RAM</h4>
+                                <h2 id="kpi_ram">0%</h2>
+                            </div>
+
+                        </div>
+
+                        <div class="kpi-obs">
+                            <p id="diferenca_ram">
+                                <span>0</span>% acima do normal
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- DISCO -->
+                    <div class="kpi">
+                        <div class="kpi-top">
+
+                            <div class="kpi-icon">
+                                <img src="./assets/ransonware/disk.png" alt="">
+                            </div>
+
+                            <div class="kpi-info">
+                                <h4>Taxa de escrita em disco</h4>
+                                <h2 id="kpi_escrita">0 MB/s</h2>
+                            </div>
+
+                        </div>
+
+                        <div class="kpi-obs">
+                            <p id="aumento_escrita">
+                                <span>0</span>% acima do normal
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- PROCESSOS -->
+                    <div class="kpi">
+                        <div class="kpi-top">
+
+                            <div class="kpi-icon">
+                                <img src="./assets/ransonware/process.png" alt="">
+                            </div>
+
+                            <div class="kpi-info">
+                                <h4>Processos ativos</h4>
+                                <h2 id="kpi_processos">0</h2>
+                            </div>
+
+                        </div>
+
+                        <div class="kpi-obs">
+                            <p id="aumento_processos">
+                                <span>0</span> nos últimos 10 min
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="retangulo">
+
+                    <p>PERÍODO SELECIONADO: </p>
+                    <select id="selectTempo" onchange="carregarGraficos()">
+                        <option value="30">Últimos 30 min</option>
+                        <option value="60">Última 1h</option>
+                        <option value="180">Últimas 3h</option>
+                    </select>
+
+                </div>
+
+            </div>
+
+            <div class="dashboard-layout">
+
+                <div class="campo">
+
+                    <div class="painel-esquerda">
+
+                        <!-- RECOMENDAÇÕES -->
+                        <div class="secao-painel bloco-recomendacoes">
+
+                            <h3 class="titulo-secao">
+                                RECOMENDAÇÕES
+                            </h3>
+
+                            <ul class="lista-recomendacoes" id="listaRecomendacoes"></ul>
+
+                        </div>
+
+                        <!-- PROCESSOS -->
+                        <div class="secao-painel bloco-processos">
+
+                            <h3 class="titulo-secao">
+                                TOP 3 - Processos por escrita em disco
+                            </h3>
+
+                            <div class="tabela-processos">
+
+                                <div class="tabela-header">
+                                    <span class="col-pid">PID</span>
+                                    <span class="col-proc">PROCESSO</span>
+                                    <span class="col-escrita">Escrita (MB)</span>
+                                    <span class="col-handles">Handles</span>
+                                </div>
+
+                                <div class="tabela-body" id="corpoTabelaProcessos"></div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- GRÁFICOS -->
+                    <div class="graficos"></div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+
+</body>
+
+</html>
+
+<script>
+
+    var recomendacoesRansomware = [
+        {
+            status: "critico",
+            img: "./assets/ransonware/!-red.png",
+            titulo: "Isolar o servidor",
+            desc: "Desconectar o servidor da rede"
+        },
+        {
+            status: "aviso",
+            img: "./assets/ransonware/!-yellow.png",
+            titulo: "Verificar e encerrar processos suspeitos",
+            desc: "Analise os processos com alto uso de recursos"
+        },
+        {
+            status: "aviso",
+            img: "./assets/ransonware/!-yellow.png",
+            titulo: "Suspender atividades de escrita intensa",
+            desc: "Interromper backups / sincronizações, se possível"
+        },
+        {
+            status: "info",
+            img: "./assets/ransonware/!-blue.png",
+            titulo: "Iniciar backup de emergência",
+            desc: "Salvar dados críticos para um lugar seguro"
+        },
+        {
+            status: "info",
+            img: "./assets/ransonware/!-blue.png",
+            titulo: "Monitorar continuamente",
+            desc: "Acompanhe os indicadores e eventos do sistema"
+        }
+    ];
+
+    var graficosCriados = [];
+
+    function renderizarRecomendacoes() {
+
+        var lista = document.getElementById("listaRecomendacoes");
+
+        lista.innerHTML = "";
+
+        recomendacoesRansomware.forEach(function (item) {
+
+            lista.innerHTML += `
+                <li class="item-recomendacao">
+                    <div class="rec-icone-wrapper status-${item.status}">
+                        <img src="${item.img}">
+                    </div>
+                    <div class="rec-conteudo">
+                        <span class="rec-titulo">${item.titulo}</span>
+                        <span class="rec-desc">${item.desc}</span>
+                    </div>
+                </li>
+            `;
+        });
+    }
+
+    function carregarGraficos() {
+
+        renderizarRecomendacoes();
+
+        var macServidor = "bc:cd:99:c2:86:34"; //mac_address mockado
+        var qtdLinhas = Number(document.getElementById("selectTempo").value);
+
+        fetch("/ransomware/dados", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ MacServer: macServidor, QtdLinhas: qtdLinhas })
+        })
+        .then(function (resposta) { return resposta.json(); })
+        .then(function (dados) {
+
+            console.log("Dados recebidos:", dados);
+
+            if (!dados || dados.erro) {
+                console.log("Nenhum dado encontrado");
+                return;
+            }
+
+            var historico = dados.historico.slice(-qtdLinhas);
+
+            var servidor = {
+                user:                   dados.usuario,
+                timestamp:              dados.ultima_atualizacao,
+                cpu_percent:            dados.cpu_percent,
+                virtual_memory_usage:   dados.virtual_memory_usage,
+                disk_write_mbps:        dados.disk_write_mbps,
+                disk_read_mbps:         dados.disk_read_mbps,
+                disk_percent:           dados.disk_percent,
+                total_processos:        dados.total_processos,
+                top_3_processos_disco:  dados.top_3_processos_disco,
+                nivel:                  dados.nivel,
+                pct_acima_cpu:          dados.pct_acima_cpu,
+                pct_acima_ram:          dados.pct_acima_ram,
+                pct_acima_escrita:      dados.pct_acima_escrita,
+                limite_cpu:             dados.limites.cpu,
+                limite_ram:             dados.limites.ram,
+                limite_escrita:         dados.limites.escrita_mb,
+                limite_leitura:         dados.limites.leitura_mb
+            };
+
+            atualizarKPIs(servidor);
+            renderizarTabelaProcessos(servidor.top_3_processos_disco);
+            criarGraficos(historico, servidor);
+        })
+        .catch(function (erro) {
+            console.log("Erro ao carregar dashboard:", erro);
+        });
+    }
+
+    function atualizarKPIs(servidor) {
+
+        document.getElementById("kpi-servidor").textContent = servidor.user;
+        document.getElementById("ultimaAtualizacao").textContent = servidor.timestamp;
+
+        document.getElementById("kpi_cpu").textContent =
+            servidor.cpu_percent.toFixed(1) + "%";
+
+        document.getElementById("kpi_ram").textContent =
+            servidor.virtual_memory_usage.toFixed(1) + "%";
+
+        document.getElementById("kpi_escrita").textContent =
+            servidor.disk_write_mbps.toFixed(2) + " MB/s";
+
+        document.getElementById("kpi_processos").textContent =
+            servidor.total_processos;
+
+        document.getElementById("diferenca_cpu").innerHTML =
+            "<span>" + servidor.pct_acima_cpu.toFixed(1) + "</span>% acima do normal";
+
+        document.getElementById("diferenca_ram").innerHTML =
+            "<span>" + servidor.pct_acima_ram.toFixed(1) + "</span>% acima do normal";
+
+        document.getElementById("aumento_escrita").innerHTML =
+            "<span>" + servidor.pct_acima_escrita.toFixed(1) + "</span>% acima do normal";
+
+        document.getElementById("aumento_processos").innerHTML =
+            "<span>" + servidor.total_processos + "</span> nos últimos 10 min";
+
+        document.getElementById("kpi-risco").textContent = servidor.nivel;
+
+        var cardRisco = document.getElementById("card-risco");
+        cardRisco.className = "kpi card-risco-" + servidor.nivel.toLowerCase();
+
+        document.getElementById("obs-risco").innerHTML =
+            "<span>" + servidor.pct_acima_ram.toFixed(1) + "</span>% acima do normal";
+    }
+
+    function renderizarTabelaProcessos(processosTexto) {
+
+        var corpo = document.getElementById("corpoTabelaProcessos");
+        corpo.innerHTML = "";
+
+        if (!processosTexto) return;
+
+        var matches = processosTexto.match(/\[(\d+),\s*'([^']+)',\s*(\d+),?\s*(\d+)?\]/g);
+
+        if (!matches) return;
+
+        matches.slice(0, 3).forEach(function (match) {
+
+            var partes = match.match(/\[(\d+),\s*'([^']+)',\s*(\d+),?\s*(\d+)?\]/);
+
+            var pid     = partes[1];
+            var nome    = partes[2];
+            var bytes   = Number(partes[3]);
+            var handles = partes[4] !== undefined ? Number(partes[4]) : "—";
+            var mb      = (bytes / 1024 / 1024).toFixed(1);
+
+            corpo.innerHTML += `
+                <div class="tabela-row">
+                    <span class="col-pid">${pid}</span>
+                    <span class="col-proc">${nome}</span>
+                    <span class="col-escrita">${mb}</span>
+                    <span class="col-handles">${handles}</span>
+                </div>
+            `;
+        });
+    }
+
+    function criarGraficos(historico, servidor) {
+
+        graficosCriados.forEach(function (g) { g.destroy(); });
+        graficosCriados = [];
+
+        var container = document.querySelector(".graficos");
+        container.innerHTML = "";
+
+        var componentes = [
+            { nome: "CPU (%)",        campo: "cpu_percent",          cor: "#ff3b3b", limite: servidor.limite_cpu     },
+            { nome: "RAM (%)",        campo: "virtual_memory_usage", cor: "#00c853", limite: servidor.limite_ram     },
+            { nome: "Leitura (MB/s)", campo: "disk_read_mbps",       cor: "#00b0ff", limite: servidor.limite_leitura },
+            { nome: "Escrita (MB/s)", campo: "disk_write_mbps",      cor: "#f5a623", limite: servidor.limite_escrita }
+        ];
+
+        componentes.forEach(function (componente, indice) {
+
+            var card = document.createElement("div");
+            card.className = "card-componente";
+            card.innerHTML = `<div class="card-grafico"><canvas id="grafico-${indice}"></canvas></div>`;
+            container.appendChild(card);
+
+            var labels  = [];
+            var valores = [];
+
+            historico.forEach(function (linha) {
+                labels.push(linha.timestamp ? linha.timestamp.slice(11, 16) : "");
+                valores.push(Number(linha[componente.campo]) || 0);
+            });
+
+            var ctx    = document.getElementById("grafico-" + indice).getContext("2d");
+            var limite = componente.limite;
+
+            var anotacoes = {};
+
+            if (limite !== null && limite !== undefined) {
+                anotacoes.limite = {
+                    type: "line",
+                    yMin: limite,
+                    yMax: limite,
+                    borderColor: "#ff0000",
+                    borderWidth: 2,
+                    borderDash: [5, 5]
+                };
+            }
+
+            var grafico = new Chart(ctx, {
+                type: "line",
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: componente.nome,
+                        data: valores,
+                        borderColor: componente.cor,
+                        backgroundColor: "rgba(255,255,255,0.05)",
+                        fill: true,
+                        tension: 0.3,
+                        borderWidth: 2,
+                        pointRadius: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: true },
+                        annotation: { annotations: anotacoes }
+                    },
+                    scales: {
+                        x: { ticks: { color: "#ffffff" } },
+                        y: { ticks: { color: "#ffffff" } }
+                    }
+                }
+            });
+
+            graficosCriados.push(grafico);
+        });
+    }
+
+    setInterval(carregarGraficos, 10000);
+
+</script>

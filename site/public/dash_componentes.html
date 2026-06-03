@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Argos | Componentes</title>
+    <script src="./js/sessao.js"></script>
+    <script src="./js/ransomware.js"></script>
+    <link rel="stylesheet" href="./css/dash_componentes.css">
+    <link rel="icon" href="./assets/LogoArgos.png">
+</head>
+
+<body onload="carregarGraficos()">
+
+    <dialog id="modalGrafico" class="modal-overlay">
+        <div class="modal-conteudo">
+            <span class="btn-fechar" onclick="fecharModal()">✕</span>
+            <iframe id="iframeModal" src=""></iframe>
+        </div>
+    </dialog>
+
+    <header class="sidebar">
+
+        <div class="logo" href="index.html">
+            <img src="./assets/LogoArgosIcon.png">
+        </div>
+
+        <ul class="listaOpcoes">
+            <li>
+                <a href="servidores.html">
+                    <div class="item">
+                        <img src="./assets/server2.png" alt="Servidores">
+                        <p>Servidores</p>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href="https://app.slack.com/client/T0AQPJR7JUU/C0AUV58TYET">
+                    <div class="item">
+                        <img src="./assets/slack.png" alt="Servidores">
+                        <p>Slack</p>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a
+                    href="https://sptech-argos-support.atlassian.net/jira/software/projects/KAN/list?jql=project%20%3D%20KAN%20AND%20status%20%3D%20%22A%20fazer%22%20ORDER%20BY%20cf%5B10019%5D%20ASC">
+                    <div class="item">
+                        <img src="./assets/jira.png" alt="Servidores">
+                        <p>Jira</p>
+                    </div>
+                </a>
+            </li>
+        </ul>
+
+        <div class="saida">
+            <div class="item">
+                <img src="./assets/user3.png" alt="Perfil">
+                <p>Analista</p>
+                <p id="nome_usuario">Perfil</p>
+            </div>
+            <a href="index.html">
+                <div class="item">
+                    <img src="./assets/saida.png" alt="Sair" onclick="logout()">
+                    <p>Sair</p>
+                </div>
+            </a>
+        </div>
+    </header>
+
+
+
+    <div class="conteudo">
+        <div class="box">
+            <div class="kpis">
+                <div class="kpi">
+                    <img src="./assets/server2.png" alt="">
+                    <span id="titulo-kpi-servidor">Servidor</span>
+                    <h2 id="kpi-servidor">—</h2>
+                </div>
+                <div class="kpi card-erro">
+                    <img src="./assets/warningRed.png" alt="">
+                    Estado Crítico<h2 id="kpi-crit">1</h2>
+                </div>
+                <div class="kpi card-atencao">
+                    <img src="./assets/warningOrange.png" alt="">
+                    Estado de Alerta<h2 id="kpi-alerta">1</h2>
+                </div>
+                <div class="kpi kpi-alerta-sino" id="card-alerta-sino">
+                    <button class="btn-fechar-alerta"
+                        onclick="document.getElementById('card-alerta-sino').style.display='none'">✕</button>
+                    <img src="./assets/bellWhite.png" alt="">
+                    Alerta novo!<h2 id="kpi-sino">CPU</h2>
+                </div>
+            </div>
+            <div class="retangulo">
+                <a href="servidores.html">
+                    <img src="./assets/arrow 2.png" class="btn-voltar" alt="Voltar">
+                </a>
+                <p>Componentes</p>
+            </div>
+        </div>
+        <div class="dashboard-layout">
+            <div class="campo"></div>
+            <div class="correlacoes-painel">
+                <div class="correlacoes-titulo">Diagnóstico de Correlação de Componentes</div>
+                <div class="correlacoes-lista" id="correlacoes-lista"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+</body>
+
+</html>
+<script>
+
+    nome_usuario.innerHTML = `${sessionStorage.NOME_USUARIO}`
+
+    var todosDados = {};
+
+    function carregarGraficos() {
+
+        const componentes = [
+            {
+                nome: "CPU",
+                status: "crit",
+                maxEixoY: 100, rotuloY: "Uso de CPU (%)",
+                valorAtencao: 85, valorCritico: 95,
+                minMadrugada: 20, maxMadrugada: 40,
+                minManha: 40, maxManha: 60,
+                minTardeNoite: 70, maxTardeNoite: 98
+            },
+            {
+                nome: "RAM",
+                status: "ok",
+                maxEixoY: 100, rotuloY: "Uso de RAM (%)",
+                valorAtencao: 90, valorCritico: 98,
+                minMadrugada: 55, maxMadrugada: 65,
+                minManha: 65, maxManha: 75,
+                minTardeNoite: 70, maxTardeNoite: 85
+            },
+            {
+                nome: "Disco",
+                status: "atencao",
+                maxEixoY: 100, rotuloY: "Uso de disco (%)",
+                valorAtencao: 85, valorCritico: 92,
+                minMadrugada: 70, maxMadrugada: 65,
+                minManha: 65, maxManha: 68,
+                minTardeNoite: 68, maxTardeNoite: 90
+            },
+            {
+                nome: "Rede",
+                status: "ok",
+                maxEixoY: 2000, rotuloY: "Tráfego de rede (Mbps)",
+                valorAtencao: 1200, valorCritico: 1800,
+                minMadrugada: 300, maxMadrugada: 600,
+                minManha: 100, maxManha: 250,
+                minTardeNoite: 500, maxTardeNoite: 900
+            },
+            {
+                nome: "Processos",
+                status: "ok",
+                maxEixoY: 2100, rotuloY: "Quantidade de processos",
+                valorAtencao: 1500, valorCritico: 2000,
+                minMadrugada: 250, maxMadrugada: 350,
+                minManha: 500, maxManha: 700,
+                minTardeNoite: 800, maxTardeNoite: 1200
+            },
+        ];
+
+        const containerCampo = document.querySelector(".campo");
+        containerCampo.innerHTML = "";
+        todosDados = {};
+
+        const rotuloDeHoras = ["0:00", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"];
+
+        componentes.forEach((componente, indice) => {
+            const medicoes = [];
+            for (var hora = 0; hora < 24; hora++) {
+                var minimo, maximo;
+                if (hora <= 6) { minimo = componente.minMadrugada; maximo = componente.maxMadrugada; }
+                else if (hora <= 12) { minimo = componente.minManha; maximo = componente.maxManha; }
+                else { minimo = componente.minTardeNoite; maximo = componente.maxTardeNoite; }
+                medicoes.push(Math.floor(Math.random() * (Math.max(minimo, maximo) - Math.min(minimo, maximo) + 1)) + Math.min(minimo, maximo));
+            }
+            todosDados[componente.nome] = medicoes;
+
+            const valorAtual = medicoes[medicoes.length - 1];
+            const picoDoDia = Math.max(...medicoes);
+            const horaDoPico = rotuloDeHoras[medicoes.indexOf(picoDoDia)];
+
+            const formatar = valor => componente.maxEixoY === 100
+                ? valor + '%'
+                : Math.round((valor / componente.maxEixoY) * 100) + '%';
+
+            const classeStatus = componente.status === 'crit' ? 'status-crit'
+                : componente.status === 'atencao' ? 'status-atencao'
+                    : 'status-ok';
+
+            const idCanvas = 'canvas-' + indice;
+            const cartao = document.createElement("div");
+            cartao.className = "card-componente";
+
+            if (componente.nome == "Rede") {
+                cartao.innerHTML =
+                    '<div class="card-grafico"><canvas id="' + idCanvas + '"></canvas></div>' +
+                    '<div class="card-painel">' +
+                    '<h2>' + componente.nome + '</h2>' +
+                    '<div class="pct-valor ' + classeStatus + '">' + (valorAtual) + '</div>' +
+                    '<div class="pico-valor" style="margin-top: -12px"><span>Mbps</span></div>' +
+                    '<div class="pico-bloco">' +
+                    '<div class="pico-label">PICO DO DIA:</div>' +
+                    '<div class="pico-valor">' + horaDoPico + ' | ' + (picoDoDia) + '</div>' +
+                    '</div>' +
+                    '</div>';
+            } else if (componente.nome == "Processos") {
+                cartao.innerHTML =
+                    '<div class="card-grafico"><canvas id="' + idCanvas + '"></canvas></div>' +
+                    '<div class="card-painel">' +
+                    '<h2>' + componente.nome + '</h2>' +
+                    '<div class="pct-valor ' + classeStatus + '">' + (valorAtual) + '</div>' +
+                    '<div class="pico-bloco">' +
+                    '<div class="pico-label">PICO DO DIA:</div>' +
+                    '<div class="pico-valor">' + horaDoPico + ' | ' + (picoDoDia) + '</div>' +
+                    '</div>' +
+                    '</div>';
+            } else if (componente.nome == "Disco") {
+                cartao.setAttribute("data-arquivo", "dash_ransomware.html");
+                cartao.setAttribute("role", "button");
+                cartao.setAttribute("tabindex", "0");
+                cartao.style.cursor = "pointer";
+
+                cartao.addEventListener("click", function () {
+                    carregarModal(this);
+                });
+
+                cartao.innerHTML =
+                    '<div class="card-grafico"><canvas id="' + idCanvas + '"></canvas></div>' +
+                    '<div class="card-painel">' +
+                    '<h2>' + componente.nome + '</h2>' +
+                    '<div class="pct-valor ' + classeStatus + '">' + formatar(valorAtual) + '</div>' +
+                    '<div class="pico-bloco">' +
+                    '<div class="pico-label">PICO DO DIA:</div>' +
+                    '<div class="pico-valor">' + horaDoPico + ' | ' + formatar(picoDoDia) + '</div>' +
+                    '</div>' +
+                    '</div>';
+            } else {
+                cartao.innerHTML =
+                    '<div class="card-grafico"><canvas id="' + idCanvas + '"></canvas></div>' +
+                    '<div class="card-painel">' +
+                    '<h2>' + componente.nome + '</h2>' +
+                    '<div class="pct-valor ' + classeStatus + '">' + formatar(valorAtual) + '</div>' +
+                    '<div class="pico-bloco">' +
+                    '<div class="pico-label">PICO DO DIA:</div>' +
+                    '<div class="pico-valor">' + horaDoPico + ' | ' + formatar(picoDoDia) + '</div>' +
+                    '</div>' +
+                    '</div>';
+            }
+            containerCampo.appendChild(cartao);
+
+            const corDaLinha = componente.status === 'crit' ? '#ff3b3b'
+                : componente.status === 'atencao' ? '#f5a623'
+                    : '#12921C';
+
+            const contexto = document.getElementById(idCanvas).getContext('2d');
+            new Chart(contexto, {
+                type: 'line',
+                data: {
+                    labels: rotuloDeHoras,
+                    datasets: [{
+                        data: medicoes,
+                        borderColor: corDaLinha,
+                        backgroundColor: 'rgba(255,255,255,0.05)',
+                        fill: true,
+                        tension: 0.2,
+                        pointRadius: 2,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Histórico: ' + componente.nome,
+                            color: '#fff',
+                            font: { size: 11, weight: '600' }
+                        },
+                        annotation: {
+                            annotations: {
+                                linhaAtencao: {
+                                    type: 'line',
+                                    yMin: componente.valorAtencao, yMax: componente.valorAtencao,
+                                    borderColor: '#f5a623', borderWidth: 1.5, borderDash: [5, 5],
+                                    label: { display: true, content: 'Atenção', padding: 3, position: 'start', xAdjust: 50, backgroundColor: 'rgba(146,112,18,0.85)', color: '#fff', font: { size: 9 } }
+                                },
+                                linhaCritico: {
+                                    type: 'line',
+                                    yMin: componente.valorCritico, yMax: componente.valorCritico,
+                                    borderColor: '#ff3b3b', borderWidth: 1.5, borderDash: [5, 5],
+                                    label: { display: true, content: 'Crítico', padding: 3, position: 'start', backgroundColor: 'rgba(255,59,59,0.85)', color: '#fff', font: { size: 9 } }
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            min: 0, max: componente.maxEixoY,
+                            title: { display: true, text: componente.rotuloY, color: 'rgba(255,255,255,0.4)', font: { size: 8 } },
+                            ticks: { color: '#aaa', font: { size: 9 } },
+                            grid: { color: 'rgba(255,255,255,0.07)' }
+                        },
+                        x: {
+                            ticks: { color: '#aaa', font: { size: 9 }, maxTicksLimit: 8 },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        });
+
+        gerarCorrelacoes(todosDados);
+    }
+
+    function gerarCorrelacoes(dadosComponentes) {
+        const paresCorrelacao = [
+            { eixoX: 'CPU', eixoY: 'Processos', rotuloX: 'CPU Uso (%)', rotuloY: 'Nº Processos', corPonto: '#7ab8f5' },
+            { eixoX: 'CPU', eixoY: 'RAM', rotuloX: 'RAM Uso (%)', rotuloY: 'CPU Uso (%)', corPonto: '#7ab8f5' },
+            { eixoX: 'CPU', eixoY: 'Rede', rotuloX: 'CPU Uso (%)', rotuloY: 'Tráfego Rede (Mbps)', corPonto: '#f5c842' },
+        ];
+
+        const container = document.getElementById('correlacoes-lista');
+        if (!container) return;
+        container.innerHTML = '';
+
+        paresCorrelacao.forEach(function (par, indice) {
+            const valoresX = dadosComponentes[par.eixoX];
+            const valoresY = dadosComponentes[par.eixoY];
+            if (!valoresX || !valoresY) return;
+
+            const maximoY = Math.max.apply(null, valoresY);
+            const valoresYNorm = valoresY.map(function (v) { return Math.round((v / maximoY) * 100); });
+
+            const quantidade = valoresX.length;
+            const mediaX = valoresX.reduce(function (a, b) { return a + b; }, 0) / quantidade;
+            const mediaY = valoresYNorm.reduce(function (a, b) { return a + b; }, 0) / quantidade;
+            const numerador = valoresX.reduce(function (soma, x, i) { return soma + (x - mediaX) * (valoresYNorm[i] - mediaY); }, 0);
+            const denominadorX = Math.sqrt(valoresX.reduce(function (soma, x) { return soma + (x - mediaX) * (x - mediaX); }, 0));
+            const denominadorY = Math.sqrt(valoresYNorm.reduce(function (soma, y) { return soma + (y - mediaY) * (y - mediaY); }, 0));
+            const correlacao = (denominadorX && denominadorY) ? +(numerador / (denominadorX * denominadorY)).toFixed(2) : 0;
+
+            const inclinacao = numerador / (denominadorX * denominadorX || 1);
+            const intercepto = mediaY - inclinacao * mediaX;
+            const xMinimo = Math.min.apply(null, valoresX), xMaximo = Math.max.apply(null, valoresX);
+
+            const idCanvas = 'corr-' + indice;
+
+            var tituloPar = par.eixoY + ' vs. ' + par.eixoX
+
+            if (correlacao >= 0.8) {
+                var tituloPar = par.eixoY + ' vs. ' + par.eixoX + ' (Correlação: Forte | Atenção!)';
+            } else if (correlacao >= 0.6) {
+                var tituloPar = par.eixoY + ' vs. ' + par.eixoX + ' (Correlação: Média | Atenção!)';
+            } else if (correlacao <= -0.8) {
+                var tituloPar = par.eixoY + ' vs. ' + par.eixoX + ' (Correlação: Média | Atenção!)';
+            } else if (correlacao <= -0.6) {
+                var tituloPar = par.eixoY + ' vs. ' + par.eixoX + ' (Correlação: Forte | Atenção!)';
+            } else {
+                var tituloPar = par.eixoY + ' vs. ' + par.eixoX + ' (Correlação: Fraca | Atenção!)';
+            }
+
+            const bloco = document.createElement('div');
+            bloco.className = 'corr-item';
+            bloco.innerHTML =
+                '<div class="corr-titulo">' + tituloPar + '</div>' +
+                '<div class="corr-canvas-wrap"><canvas id="' + idCanvas + '"></canvas></div>';
+            container.appendChild(bloco);
+
+            const pontos = valoresX.map(function (x, i) { return { x: x, y: valoresYNorm[i] }; });
+            const tendencia = [
+                { x: xMinimo, y: +(inclinacao * xMinimo + intercepto).toFixed(1) },
+                { x: xMaximo, y: +(inclinacao * xMaximo + intercepto).toFixed(1) }
+            ];
+
+            const contexto = document.getElementById(idCanvas).getContext('2d');
+            new Chart(contexto, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        { label: 'Dados', data: pontos, backgroundColor: par.corPonto + 'cc', pointRadius: 4, pointHoverRadius: 6 },
+                        { label: 'Tendência', data: tendencia, type: 'line', borderColor: par.corPonto, borderWidth: 2, pointRadius: 0, fill: false, tension: 0 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, title: { display: false } },
+                    scales: {
+                        x: {
+                            title: { display: true, text: par.rotuloX, color: 'rgba(255,255,255,0.5)', font: { size: 9 } },
+                            ticks: { color: '#aaa', font: { size: 9 } },
+                            grid: { color: 'rgba(255,255,255,0.07)' },
+                            min: 0, max: 100
+                        },
+                        y: {
+                            title: { display: true, text: par.rotuloY, color: 'rgba(255,255,255,0.5)', font: { size: 9 } },
+                            ticks: { color: '#aaa', font: { size: 9 } },
+                            grid: { color: 'rgba(255,255,255,0.07)' },
+                            min: 0, max: 100
+                        }
+                    }
+                }
+            });
+        });
+    }
+
+    const servidor = JSON.parse(sessionStorage.getItem("servidor"));
+    if (servidor) {
+        document.getElementById("titulo-kpi-servidor").innerText = servidor.nome;
+        if (servidor.status == "crit") {
+            document.getElementById("kpi-servidor").style.color = "#ff3b3b";
+            document.getElementById("kpi-servidor").innerHTML = "Crítico";
+        } else if (servidor.status == "atencao") {
+            document.getElementById("kpi-servidor").style.color = "#f5a623";
+            document.getElementById("kpi-servidor").innerHTML = "Atenção";
+        } else {
+            document.getElementById("kpi-servidor").style.color = "#12921C";
+            document.getElementById("kpi-servidor").innerHTML = "Normal";
+        }
+
+    }
+    // document.getElementById("nomeUser").innerHTML = sessionStorage.NOME_USUARIO
+
+    function carregarModal(cardClicado) {
+        const arquivo = cardClicado.getAttribute("data-arquivo");
+        document.getElementById('iframeModal').src = arquivo;
+        const modal = document.getElementById('modalGrafico');
+        modal.style.display = "flex";
+        modal.showModal();
+    }
+
+    function fecharModal() {
+        const modal = document.getElementById('modalGrafico');
+        modal.close();
+        modal.style.display = "none";
+        document.getElementById('iframeModal').src = "";
+    }
+
+</script>
