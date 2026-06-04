@@ -22,8 +22,6 @@ var servidorRouter = require("./src/routes/servidores");
 var conexaoS3Router = require("./src/routes/conexaoS3");
 var ransomwareRouter  = require("./src/routes/ransomware");
 
-const s3 = new S3Client({ region: process.env.AWS_REGION });
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
