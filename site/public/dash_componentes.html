@@ -7,7 +7,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title> Argos | Componentes</title>
     <script src="./js/sessao.js"></script>
-    <script src="./js/ransomware.js"></script>
     <link rel="stylesheet" href="./css/dash_componentes.css">
     <link rel="icon" href="./assets/LogoArgos.png">
 </head>
@@ -207,6 +206,15 @@
             cartao.className = "card-componente";
 
             if (componente.nome == "Rede") {
+                cartao.setAttribute("data-arquivo", "dash_ransomware.html"); // <--------- COLOCAR .html do Murilo
+                cartao.setAttribute("role", "button");
+                cartao.setAttribute("tabindex", "0");
+                cartao.style.cursor = "pointer";
+
+                cartao.addEventListener("click", function () {
+                    carregarModal(this);
+                });
+
                 cartao.innerHTML =
                     '<div class="card-grafico"><canvas id="' + idCanvas + '"></canvas></div>' +
                     '<div class="card-painel">' +
@@ -219,6 +227,15 @@
                     '</div>' +
                     '</div>';
             } else if (componente.nome == "Processos") {
+                cartao.setAttribute("data-arquivo", "dash_ransomware.html"); // <--------- COLOCAR .html do Luã
+                cartao.setAttribute("role", "button");
+                cartao.setAttribute("tabindex", "0");
+                cartao.style.cursor = "pointer";
+
+                cartao.addEventListener("click", function () {
+                    carregarModal(this);
+                });
+
                 cartao.innerHTML =
                     '<div class="card-grafico"><canvas id="' + idCanvas + '"></canvas></div>' +
                     '<div class="card-painel">' +
@@ -231,6 +248,46 @@
                     '</div>';
             } else if (componente.nome == "Disco") {
                 cartao.setAttribute("data-arquivo", "dash_ransomware.html");
+                cartao.setAttribute("role", "button");
+                cartao.setAttribute("tabindex", "0");
+                cartao.style.cursor = "pointer";
+
+                cartao.addEventListener("click", function () {
+                    carregarModal(this);
+                });
+
+                cartao.innerHTML =
+                    '<div class="card-grafico"><canvas id="' + idCanvas + '"></canvas></div>' +
+                    '<div class="card-painel">' +
+                    '<h2>' + componente.nome + '</h2>' +
+                    '<div class="pct-valor ' + classeStatus + '">' + formatar(valorAtual) + '</div>' +
+                    '<div class="pico-bloco">' +
+                    '<div class="pico-label">PICO DO DIA:</div>' +
+                    '<div class="pico-valor">' + horaDoPico + ' | ' + formatar(picoDoDia) + '</div>' +
+                    '</div>' +
+                    '</div>';
+            } else if (componente.nome == "CPU") {
+                cartao.setAttribute("data-arquivo", "dash_ransomware.html"); // <--------- COLOCAR .html do Victor
+                cartao.setAttribute("role", "button");
+                cartao.setAttribute("tabindex", "0");
+                cartao.style.cursor = "pointer";
+
+                cartao.addEventListener("click", function () {
+                    carregarModal(this);
+                });
+
+                cartao.innerHTML =
+                    '<div class="card-grafico"><canvas id="' + idCanvas + '"></canvas></div>' +
+                    '<div class="card-painel">' +
+                    '<h2>' + componente.nome + '</h2>' +
+                    '<div class="pct-valor ' + classeStatus + '">' + formatar(valorAtual) + '</div>' +
+                    '<div class="pico-bloco">' +
+                    '<div class="pico-label">PICO DO DIA:</div>' +
+                    '<div class="pico-valor">' + horaDoPico + ' | ' + formatar(picoDoDia) + '</div>' +
+                    '</div>' +
+                    '</div>';
+            } else if (componente.nome == "RAM") {
+                cartao.setAttribute("data-arquivo", "dash_ransomware.html"); // <--------- COLOCAR .html da Flávia
                 cartao.setAttribute("role", "button");
                 cartao.setAttribute("tabindex", "0");
                 cartao.style.cursor = "pointer";
