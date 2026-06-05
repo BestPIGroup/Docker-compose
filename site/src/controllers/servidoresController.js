@@ -15,6 +15,9 @@ function cadastrar_servidor(req, res) {
         res.status(400).send("Seu status está undefined!");
     } else {
         servidoresModel.cadastrar_servidor(alias,Mac, status, fk_unidade)
+            .then(function() {
+                return servidoresModel.cadastrar_componentes_servidor(Mac);
+            })    
             .then(
                 function (resultado) {
                     res.json(resultado);
