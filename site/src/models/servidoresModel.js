@@ -24,7 +24,7 @@ function cadastrar_componentes_servidor(Mac){
                                 ((SELECT id_servidor FROM servidor WHERE endereco_mac = '${Mac}'), 20, 85, 'TRUE'),
                                 ((SELECT id_servidor FROM servidor WHERE endereco_mac = '${Mac}'), 21, 85, 'TRUE'),
                                 ((SELECT id_servidor FROM servidor WHERE endereco_mac = '${Mac}'), 22, 85, 'TRUE')                               
-                                ;`;
+                                `;
         console.log("Executando a instrução SQL: \n" + instrucaoSql);
         return database.executar(instrucaoSql);
 }
