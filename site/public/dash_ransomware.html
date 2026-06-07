@@ -309,10 +309,12 @@
 
     function carregarGraficos() {
 
-        renderizarRecomendacoes();
-
         var macServidor = "bc:cd:99:c2:86:34"; //mac_address mockado
         var qtdLinhas = Number(document.getElementById("selectTempo").value);
+
+        renderizarRecomendacoes();
+
+        console.log("Select mudou para:", qtdLinhas);
 
         fetch("/ransomware/dados", {
             method: "POST",
@@ -333,6 +335,9 @@
                     dados.historico,
                     qtdLinhas
                 );
+
+                console.log("Recebidos:", dados.historico.length);
+                console.log("Filtrados:", historico.length);
 
                 var servidor = {
                     user: dados.usuario,
@@ -492,27 +497,42 @@
                         tension: 0.3,
                         borderWidth: 2,
                         pointRadius: 1
+                    },
+                    {
+                        label: "Limite",
+                        data: Array(labels.length).fill(limite),
+                        borderColor: "#ff0000",
+                        borderDash: [5, 5],
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        fill: false
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { display: true },
+                        title: {
+                            display: true,
+                            text: componente.nome,
+                            color: "#ffffff",
+                            font: {
+                                size: 16,
+                                weight: "bold"
+                            }
+                        },
+                        legend: { 
+                            display: true,
+                            position: "top"
+                        },
                         annotation: { annotations: anotacoes }
                     },
                     scales: {
                         x: {
                             ticks: {
-                                autoSkip: false,
                                 color: "#ffffff",
-                                maxRotation: 0,
-                                minRotation: 0
-                                // callback: function (value, index) {
-                                //     return index % 5 === 0
-                                //         ? this.getLabelForValue(value)
-                                //         : "";
-                                // }
+                                maxRotation: 30,
+                                minRotation: 30
                             }
                         },
                         y: {
