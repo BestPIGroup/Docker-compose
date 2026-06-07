@@ -549,12 +549,15 @@
                     scales: {
                         x: {
                             ticks: {
+                                autoSkip: false,
                                 color: "#ffffff",
-                                callback: function (value, index) {
-                                    return index % 5 === 0
-                                        ? this.getLabelForValue(value)
-                                        : "";
-                                }
+                                maxRotation: 0,
+                                minRotation: 0
+                                // callback: function (value, index) {
+                                //     return index % 5 === 0
+                                //         ? this.getLabelForValue(value)
+                                //         : "";
+                                // }
                             }
                         },
                         y: {
