@@ -60,7 +60,7 @@
                         <div class="kpi-top">
 
                             <div class="kpi-icon">
-                                
+
                             </div>
 
                             <div class="kpi-info">
@@ -68,6 +68,28 @@
                                 <h1 id="kpi-risco">—</h1>
                             </div>
 
+                        </div>
+                    </div>
+
+                    <!-- ALERTAS -->
+                    <div class="kpi">
+                        <div class="kpi-top">
+
+                            <div class="kpi-icon">
+                                <img src="./assets/ransonware/ransomware.png" alt="">
+                            </div>
+
+                            <div class="kpi-info">
+                                <h4>Quantidade de alertas</h4>
+                                <h2 id="kpi_alertas">0</h2>
+                            </div>
+
+                        </div>
+
+                        <div class="kpi-obs">
+                            <p id="alertas_select">
+                                <span id="tempo_select">--</span>
+                            </p>
                         </div>
                     </div>
 
@@ -137,28 +159,6 @@
                         </div>
                     </div>
 
-                    <!-- PROCESSOS -->
-                    <div class="kpi">
-                        <div class="kpi-top">
-
-                            <div class="kpi-icon">
-                                <img src="./assets/ransonware/process.png" alt="">
-                            </div>
-
-                            <div class="kpi-info">
-                                <h4>Processos ativos</h4>
-                                <h2 id="kpi_processos">0</h2>
-                            </div>
-
-                        </div>
-
-                        <div class="kpi-obs">
-                            <p id="aumento_processos">
-                                <span>0</span> nos últimos 10 min
-                            </p>
-                        </div>
-                    </div>
-
                 </div>
 
                 <div class="retangulo">
@@ -168,8 +168,8 @@
                         <option value="7">Últimos 30 min</option>
                         <option value="13">Última 1h</option>
                         <option value="37">Últimas 3h</option>
-                        <option value="73">6 Horas</option>
-                        <option value="289">24 Horas</option>
+                        <option value="73">Últimas 6h</option>
+                        <option value="289">Últimas 24h</option>
                     </select>
 
                 </div>
@@ -239,6 +239,11 @@
 
 <script>
 
+    var macServidor = "bc:cd:99:c2:86:34"; //mac_address mockado
+    // var macServidor = sessionStorage.MAC; 
+    var aliasServidor = "miyuki";
+    // var aliasServidor = sessionStorage.ALIAS;
+
     var recomendacoesRansomware = [
         {
             status: "critico",
@@ -303,7 +308,7 @@
         for (var i = 0; i < historico.length; i++) {
             valores.push(Number(historico[i][campo]) || 0);
         }
-        valores.sort(function(a, b) { return a - b; });
+        valores.sort(function (a, b) { return a - b; });
         return valores[Math.floor(valores.length / 2)] || 1;
     }
 
@@ -326,7 +331,7 @@
 
     function carregarGraficos() {
 
-        var macServidor = "bc:cd:99:c2:86:34"; //mac_address mockado
+        // var macServidor = "bc:cd:99:c2:86:34"; //mac_address mockado
         var qtdLinhas = Number(document.getElementById("selectTempo").value);
 
         renderizarRecomendacoes();
@@ -357,14 +362,12 @@
                 console.log("Filtrados:", historico.length);
 
                 var servidor = {
-                    user: dados.usuario,
                     timestamp: dados.ultima_atualizacao,
                     cpu_percent: dados.cpu_percent,
                     virtual_memory_usage: dados.virtual_memory_usage,
                     disk_write_kbps: dados.disk_write_kbps,
                     disk_read_kbps: dados.disk_read_kbps,
                     disk_percent: dados.disk_percent,
-                    total_processos: dados.total_processos,
                     top_3_processos_disco: dados.top_3_processos_disco,
                     nivel: dados.nivel,
                     limite_cpu: dados.limites.cpu,
@@ -388,8 +391,36 @@
         var medianRam = mediana(historico, "virtual_memory_usage");
         var medianEscrita = mediana(historico, "disk_write_kbps");
 
-        document.getElementById("kpi-servidor").textContent = servidor.user;
+        document.getElementById("kpi-servidor").textContent = aliasServidor;
+
+        var badgeStatus = document.getElementById("badge-status");
+
+        if (servidor.nivel == "ALTO") {
+            document.getElementById("badge-status").textContent = "CRÍTICO";
+            badgeStatus.className = "badge-critico"
+        } else if (servidor.nivel == "MEDIO") {
+            document.getElementById("badge-status").textContent = "ATENÇÃO";
+            badgeStatus.className = "badge-atencao"
+        } else {
+            document.getElementById("badge-status").textContent = "NORMAL";
+            badgeStatus.className = "badge-normal"
+        }
+
         document.getElementById("ultimaAtualizacao").textContent = servidor.timestamp;
+
+        document.getElementById("kpi-risco").textContent = servidor.nivel;
+
+        var cardRisco = document.getElementById("card-risco");
+        cardRisco.className = "kpi card-risco-" + servidor.nivel.toLowerCase();
+
+        var totalAlertas = 0;
+        for (var i = 0; i < historico.length; i++) {
+            if (historico[i].nivel === "ALTO" || historico[i].nivel === "MEDIO") {
+                totalAlertas++;
+            }
+        }
+
+        document.getElementById("kpi_alertas").textContent = totalAlertas;
 
         document.getElementById("kpi_cpu").textContent =
             servidor.cpu_percent.toFixed(1) + "%";
@@ -409,30 +440,9 @@
 
         document.getElementById("aumento_escrita").innerHTML = percentEmRelacaoAMediana(servidor.disk_write_kbps, medianEscrita);
 
-        document.getElementById("aumento_processos").innerHTML =
-            "<span>" + servidor.total_processos + "</span> nos últimos 10 min";
+        var textoSelect = document.getElementById("selectTempo").selectedOptions[0].text;
 
-        document.getElementById("kpi-risco").textContent = servidor.nivel;
-
-        var cardRisco = document.getElementById("card-risco");
-        cardRisco.className = "kpi card-risco-" + servidor.nivel.toLowerCase();
-
-        
-        var badgeStatus = document.getElementById("badge-status");
-        
-        if (servidor.nivel.toLowerCase() == "alto") {
-            document.getElementById("badge-status").textContent = "CRÍTICO";
-            badgeStatus.className = "badge-critico" 
-        } else if (servidor.nivel.toLowerCase() == "médio") {
-            document.getElementById("badge-status").textContent = "ATENÇÃO";
-            badgeStatus.className = "badge-atencao" 
-        } else {
-            document.getElementById("badge-status").textContent = "NORMAL";
-            badgeStatus.className = "badge-normal" 
-        }
-
-        
-
+        document.getElementById("tempo_select").textContent = textoSelect;
     }
 
     function renderizarTabelaProcessos(processosTexto) {
