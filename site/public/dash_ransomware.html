@@ -52,7 +52,6 @@
                                 <h2 id="kpi-servidor">—</h2>
                                 <span class="badge-critico">CRÍTICO</span>
                             </div>
-
                         </div>
                     </div>
 
@@ -297,6 +296,30 @@
         });
     }
 
+    function mediana(historico, campo) {
+
+        var valores = [];
+
+        for (var i = 0; i < historico.length; i++) {
+            valores.push(Number(historico[i][campo]) || 0);
+        }
+        valores.sort(function(a, b) { return a - b; });
+        return valores[Math.floor(valores.length / 2)] || 1;
+    }
+
+    function percentEmRelacaoAMediana(valorAtual, median) {
+
+        var diferenca = ((valorAtual - median) / median * 100);
+
+        if (diferenca > 0) {
+            return `Está ${diferenca.toFixed(1)}% acima do normal`;
+        } else if (diferenca == 0) {
+            return `Está normal`
+        } else {
+            return `Está ${Math.abs(diferenca).toFixed(1)}% abaixo do normal`;
+        }
+    }
+
     function filtrarHistorico(historico, quantidade) {
         return historico.slice(-quantidade);
     }
@@ -344,16 +367,13 @@
                     total_processos: dados.total_processos,
                     top_3_processos_disco: dados.top_3_processos_disco,
                     nivel: dados.nivel,
-                    pct_acima_cpu: dados.pct_acima_cpu,
-                    pct_acima_ram: dados.pct_acima_ram,
-                    pct_acima_escrita: dados.pct_acima_escrita,
                     limite_cpu: dados.limites.cpu,
                     limite_ram: dados.limites.ram,
                     limite_escrita: dados.limites.escrita_kb,
                     limite_leitura: dados.limites.leitura_kb
                 };
 
-                atualizarKPIs(servidor);
+                atualizarKPIs(servidor, historico);
                 renderizarTabelaProcessos(servidor.top_3_processos_disco);
                 criarGraficos(historico, servidor);
             })
@@ -362,7 +382,11 @@
             });
     }
 
-    function atualizarKPIs(servidor) {
+    function atualizarKPIs(servidor, historico) {
+
+        var medianCpu = mediana(historico, "cpu_percent");
+        var medianRam = mediana(historico, "virtual_memory_usage");
+        var medianEscrita = mediana(historico, "disk_write_kbps");
 
         document.getElementById("kpi-servidor").textContent = servidor.user;
         document.getElementById("ultimaAtualizacao").textContent = servidor.timestamp;
@@ -379,14 +403,11 @@
         document.getElementById("kpi_processos").textContent =
             servidor.total_processos;
 
-        document.getElementById("diferenca_cpu").innerHTML =
-            "<span>" + servidor.pct_acima_cpu.toFixed(1) + "</span>% acima do normal";
+        document.getElementById("diferenca_cpu").innerHTML = percentEmRelacaoAMediana(servidor.cpu_percent, medianCpu);
 
-        document.getElementById("diferenca_ram").innerHTML =
-            "<span>" + servidor.pct_acima_ram.toFixed(1) + "</span>% acima do normal";
+        document.getElementById("diferenca_ram").innerHTML = percentEmRelacaoAMediana(servidor.virtual_memory_usage, medianRam);
 
-        document.getElementById("aumento_escrita").innerHTML =
-            "<span>" + servidor.pct_acima_escrita.toFixed(1) + "</span>% acima do normal";
+        document.getElementById("aumento_escrita").innerHTML = percentEmRelacaoAMediana(servidor.disk_write_kbps, medianEscrita);
 
         document.getElementById("aumento_processos").innerHTML =
             "<span>" + servidor.total_processos + "</span> nos últimos 10 min";
@@ -513,7 +534,7 @@
                                 weight: "bold"
                             }
                         },
-                        legend: { 
+                        legend: {
                             display: true,
                             position: "top"
                         },
