@@ -431,9 +431,6 @@
         document.getElementById("kpi_escrita").textContent =
             servidor.disk_write_kbps.toFixed(2) + " KB/s";
 
-        document.getElementById("kpi_processos").textContent =
-            servidor.total_processos;
-
         document.getElementById("diferenca_cpu").innerHTML = percentEmRelacaoAMediana(servidor.cpu_percent, medianCpu);
 
         document.getElementById("diferenca_ram").innerHTML = percentEmRelacaoAMediana(servidor.virtual_memory_usage, medianRam);
