@@ -81,7 +81,7 @@
 
                             <div class="kpi-info">
                                 <h4>Quantidade de alertas</h4>
-                                <h2 id="kpi_alertas">0</h2>
+                                <h1 id="kpi_alertas" style="color: #3077d4;">0</h1>
                             </div>
 
                         </div>
@@ -417,19 +417,34 @@
         var nivelMaximo = "BAIXO";
 
         for (var i = 0; i < historico.length; i++) {
-            if (historico[i].nivel === "ALTO" || historico[i].nivel === "MEDIO") {
+            var nivelItem = historico[i].nivel;
+
+            if (nivelItem === "ALTO" || nivelItem === "MEDIO") {
                 totalAlertas++;
             }
-            if (historico[i].nivel === "ALTO") {
+
+            if (nivelItem === "ALTO") {
                 nivelMaximo = "ALTO";
-            } else if (historico[i].nivel === "MEDIO" && nivelMaximo !== "ALTO") {
+            } else if (nivelItem === "MEDIO" && nivelMaximo !== "ALTO") {
                 nivelMaximo = "MEDIO";
             }
         }
 
         document.getElementById("kpi_alertas").textContent = totalAlertas;
+
+        if (nivelMaximo === "ALTO") {
+            document.getElementById("kpi_alertas").style.color = "#990e0e";
+        } else if (nivelMaximo === "MEDIO") {
+            document.getElementById("kpi_alertas").style.color = "#deb12a";
+        } else {
+            document.getElementById("kpi_alertas").style.color = "#3077d4";
+        }
+
         document.getElementById("kpi-risco").textContent = nivelMaximo;
+
         document.getElementById("card-risco").className = "kpi card-risco-" + nivelMaximo.toLowerCase();
+
+        document.getElementById("kpi_alertas").textContent = totalAlertas;
 
         document.getElementById("kpi_cpu").textContent =
             servidor.cpu_percent.toFixed(1) + "%";
