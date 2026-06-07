@@ -32,8 +32,6 @@
                             <span id="ultimaAtualizacao">--/--/---- --:--:--</span>
                         </span>
                     </div>
-
-                    <!-- <button class="btn-fechar">✕</button> -->
                 </div>
             </div>
 
@@ -302,6 +300,58 @@
         });
     }
 
+    function filtrarEAgregarHistorico(historico, minutos) {
+        if (!historico || !historico.length) return [];
+
+        var ultimo = historico[historico.length - 1].timestamp;
+        var partes = ultimo.split(" ");
+        var data = partes[0].split("/");
+        var iso = data[2] + "-" + data[1] + "-" + data[0] + "T" + partes[1];
+        var tsUltimo = new Date(iso).getTime();
+        var corte = tsUltimo - (minutos * 60 * 1000);
+
+        var filtrado = historico.filter(function(h) {
+            var p = h.timestamp.split(" ");
+            var d = p[0].split("/");
+            var i = d[2] + "-" + d[1] + "-" + d[0] + "T" + p[1];
+            return new Date(i).getTime() >= corte;
+        });
+
+        var buckets = {};
+        filtrado.forEach(function(h) {
+            var p = h.timestamp.split(" ");
+            var d = p[0].split("/");
+            var ts = new Date(d[2] + "-" + d[1] + "-" + d[0] + "T" + p[1]).getTime();
+            var bucket = Math.floor(ts / (5 * 60 * 1000)) * (5 * 60 * 1000);
+            if (!buckets[bucket]) {
+                buckets[bucket] = { itens: [], ts: bucket };
+            }
+            buckets[bucket].itens.push(h);
+        });
+
+        var resultado = Object.values(buckets).sort(function(a, b) { return a.ts - b.ts; });
+
+        return resultado.map(function(b) {
+            var itens = b.itens;
+            var media = function(campo) {
+                return itens.reduce(function(s, i) { return s + (Number(i[campo]) || 0); }, 0) / itens.length;
+            };
+            var d = new Date(b.ts);
+            var hh = String(d.getHours()).padStart(2, "0");
+            var mm = String(d.getMinutes()).padStart(2, "0");
+            return {
+                timestamp:            itens[0].timestamp.slice(0, 11) + hh + ":" + mm + ":00",
+                cpu_percent:          media("cpu_percent"),
+                virtual_memory_usage: media("virtual_memory_usage"),
+                disk_write_kbps:      media("disk_write_kbps"),
+                disk_read_kbps:       media("disk_read_kbps"),
+                total_processos:      itens[itens.length - 1].total_processos,
+                score:                media("score"),
+                nivel:                itens[itens.length - 1].nivel
+            };
+        });
+    }
+
     function carregarGraficos() {
 
         renderizarRecomendacoes();
@@ -324,15 +374,15 @@
                 return;
             }
 
-            var historico = dados.historico.slice(-qtdLinhas);
+            var historico = filtrarEAgregarHistorico(dados.historico, qtdLinhas);
 
             var servidor = {
                 user:                   dados.usuario,
                 timestamp:              dados.ultima_atualizacao,
                 cpu_percent:            dados.cpu_percent,
                 virtual_memory_usage:   dados.virtual_memory_usage,
-                disk_write_mbps:        dados.disk_write_mbps,
-                disk_read_mbps:         dados.disk_read_mbps,
+                disk_write_kbps:        dados.disk_write_kbps,
+                disk_read_kbps:         dados.disk_read_kbps,
                 disk_percent:           dados.disk_percent,
                 total_processos:        dados.total_processos,
                 top_3_processos_disco:  dados.top_3_processos_disco,
@@ -342,8 +392,8 @@
                 pct_acima_escrita:      dados.pct_acima_escrita,
                 limite_cpu:             dados.limites.cpu,
                 limite_ram:             dados.limites.ram,
-                limite_escrita:         dados.limites.escrita_mb,
-                limite_leitura:         dados.limites.leitura_mb
+                limite_escrita:         dados.limites.escrita_kb,
+                limite_leitura:         dados.limites.leitura_kb
             };
 
             atualizarKPIs(servidor);
@@ -367,7 +417,7 @@
             servidor.virtual_memory_usage.toFixed(1) + "%";
 
         document.getElementById("kpi_escrita").textContent =
-            servidor.disk_write_mbps.toFixed(2) + " MB/s";
+            servidor.disk_write_kbps.toFixed(2) + " KB/s";
 
         document.getElementById("kpi_processos").textContent =
             servidor.total_processos;
@@ -436,8 +486,8 @@
         var componentes = [
             { nome: "CPU (%)",        campo: "cpu_percent",          cor: "#ff3b3b", limite: servidor.limite_cpu     },
             { nome: "RAM (%)",        campo: "virtual_memory_usage", cor: "#00c853", limite: servidor.limite_ram     },
-            { nome: "Leitura (MB/s)", campo: "disk_read_mbps",       cor: "#00b0ff", limite: servidor.limite_leitura },
-            { nome: "Escrita (MB/s)", campo: "disk_write_mbps",      cor: "#f5a623", limite: servidor.limite_escrita }
+            { nome: "Leitura (KB/s)", campo: "disk_read_kbps",       cor: "#00b0ff", limite: servidor.limite_leitura },
+            { nome: "Escrita (KB/s)", campo: "disk_write_kbps",      cor: "#f5a623", limite: servidor.limite_escrita }
         ];
 
         componentes.forEach(function (componente, indice) {
