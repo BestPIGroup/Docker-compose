@@ -235,7 +235,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.0.1/dist/chartjs-plugin-annotation.min.js"></script>
 
 </body>
 
@@ -310,7 +311,7 @@
         var tsUltimo = new Date(iso).getTime();
         var corte = tsUltimo - (minutos * 60 * 1000);
 
-        var filtrado = historico.filter(function(h) {
+        var filtrado = historico.filter(function (h) {
             var p = h.timestamp.split(" ");
             var d = p[0].split("/");
             var i = d[2] + "-" + d[1] + "-" + d[0] + "T" + p[1];
@@ -318,7 +319,7 @@
         });
 
         var buckets = {};
-        filtrado.forEach(function(h) {
+        filtrado.forEach(function (h) {
             var p = h.timestamp.split(" ");
             var d = p[0].split("/");
             var ts = new Date(d[2] + "-" + d[1] + "-" + d[0] + "T" + p[1]).getTime();
@@ -329,25 +330,25 @@
             buckets[bucket].itens.push(h);
         });
 
-        var resultado = Object.values(buckets).sort(function(a, b) { return a.ts - b.ts; });
+        var resultado = Object.values(buckets).sort(function (a, b) { return a.ts - b.ts; });
 
-        return resultado.map(function(b) {
+        return resultado.map(function (b) {
             var itens = b.itens;
-            var media = function(campo) {
-                return itens.reduce(function(s, i) { return s + (Number(i[campo]) || 0); }, 0) / itens.length;
+            var media = function (campo) {
+                return itens.reduce(function (s, i) { return s + (Number(i[campo]) || 0); }, 0) / itens.length;
             };
             var d = new Date(b.ts);
             var hh = String(d.getHours()).padStart(2, "0");
             var mm = String(d.getMinutes()).padStart(2, "0");
             return {
-                timestamp:            itens[0].timestamp.slice(0, 11) + hh + ":" + mm + ":00",
-                cpu_percent:          media("cpu_percent"),
+                timestamp: itens[0].timestamp.slice(0, 11) + hh + ":" + mm + ":00",
+                cpu_percent: media("cpu_percent"),
                 virtual_memory_usage: media("virtual_memory_usage"),
-                disk_write_kbps:      media("disk_write_kbps"),
-                disk_read_kbps:       media("disk_read_kbps"),
-                total_processos:      itens[itens.length - 1].total_processos,
-                score:                media("score"),
-                nivel:                itens[itens.length - 1].nivel
+                disk_write_kbps: media("disk_write_kbps"),
+                disk_read_kbps: media("disk_read_kbps"),
+                total_processos: itens[itens.length - 1].total_processos,
+                score: media("score"),
+                nivel: itens[itens.length - 1].nivel
             };
         });
     }
@@ -364,47 +365,47 @@
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ MacServer: macServidor, QtdLinhas: qtdLinhas })
         })
-        .then(function (resposta) { return resposta.json(); })
-        .then(function (dados) {
+            .then(function (resposta) { return resposta.json(); })
+            .then(function (dados) {
 
-            console.log("Dados recebidos:", dados);
+                console.log("Dados recebidos:", dados);
 
-            if (!dados || dados.erro) {
-                console.log("Nenhum dado encontrado");
-                return;
-            }
+                if (!dados || dados.erro) {
+                    console.log("Nenhum dado encontrado");
+                    return;
+                }
 
-            // var historico = filtrarEAgregarHistorico(dados.historico, qtdLinhas);
+                // var historico = filtrarEAgregarHistorico(dados.historico, qtdLinhas);
 
-            var historico = dados.historico;
+                var historico = dados.historico;
 
-            var servidor = {
-                user:                   dados.usuario,
-                timestamp:              dados.ultima_atualizacao,
-                cpu_percent:            dados.cpu_percent,
-                virtual_memory_usage:   dados.virtual_memory_usage,
-                disk_write_kbps:        dados.disk_write_kbps,
-                disk_read_kbps:         dados.disk_read_kbps,
-                disk_percent:           dados.disk_percent,
-                total_processos:        dados.total_processos,
-                top_3_processos_disco:  dados.top_3_processos_disco,
-                nivel:                  dados.nivel,
-                pct_acima_cpu:          dados.pct_acima_cpu,
-                pct_acima_ram:          dados.pct_acima_ram,
-                pct_acima_escrita:      dados.pct_acima_escrita,
-                limite_cpu:             dados.limites.cpu,
-                limite_ram:             dados.limites.ram,
-                limite_escrita:         dados.limites.escrita_kb,
-                limite_leitura:         dados.limites.leitura_kb
-            };
+                var servidor = {
+                    user: dados.usuario,
+                    timestamp: dados.ultima_atualizacao,
+                    cpu_percent: dados.cpu_percent,
+                    virtual_memory_usage: dados.virtual_memory_usage,
+                    disk_write_kbps: dados.disk_write_kbps,
+                    disk_read_kbps: dados.disk_read_kbps,
+                    disk_percent: dados.disk_percent,
+                    total_processos: dados.total_processos,
+                    top_3_processos_disco: dados.top_3_processos_disco,
+                    nivel: dados.nivel,
+                    pct_acima_cpu: dados.pct_acima_cpu,
+                    pct_acima_ram: dados.pct_acima_ram,
+                    pct_acima_escrita: dados.pct_acima_escrita,
+                    limite_cpu: dados.limites.cpu,
+                    limite_ram: dados.limites.ram,
+                    limite_escrita: dados.limites.escrita_kb,
+                    limite_leitura: dados.limites.leitura_kb
+                };
 
-            atualizarKPIs(servidor);
-            renderizarTabelaProcessos(servidor.top_3_processos_disco);
-            criarGraficos(historico, servidor);
-        })
-        .catch(function (erro) {
-            console.log("Erro ao carregar dashboard:", erro);
-        });
+                atualizarKPIs(servidor);
+                renderizarTabelaProcessos(servidor.top_3_processos_disco);
+                criarGraficos(historico, servidor);
+            })
+            .catch(function (erro) {
+                console.log("Erro ao carregar dashboard:", erro);
+            });
     }
 
     function atualizarKPIs(servidor) {
@@ -445,28 +446,28 @@
             "<span>" + servidor.pct_acima_ram.toFixed(1) + "</span>% acima do normal";
     }
 
-function renderizarTabelaProcessos(processosTexto) {
+    function renderizarTabelaProcessos(processosTexto) {
 
-    var corpo = document.getElementById("corpoTabelaProcessos");
-    corpo.innerHTML = "";
+        var corpo = document.getElementById("corpoTabelaProcessos");
+        corpo.innerHTML = "";
 
-    if (!processosTexto) return;
+        if (!processosTexto) return;
 
-    var matches = processosTexto.match(/\[(\d+),\s*'([^']+)',\s*(-?\d+),?\s*(-?\d+)?\]/g);
+        var matches = processosTexto.match(/\[(\d+),\s*'([^']+)',\s*(-?\d+),?\s*(-?\d+)?\]/g);
 
-    if (!matches) return;
+        if (!matches) return;
 
-    matches.slice(0, 3).forEach(function (match) {
+        matches.slice(0, 3).forEach(function (match) {
 
-        var partes = match.match(/\[(\d+),\s*'([^']+)',\s*(-?\d+),?\s*(-?\d+)?\]/);
+            var partes = match.match(/\[(\d+),\s*'([^']+)',\s*(-?\d+),?\s*(-?\d+)?\]/);
 
-        var pid          = partes[1];
-        var nome         = partes[2];
-        var writeBytes   = Number(partes[3]);
-        var deltaHandles = partes[4] !== undefined ? Number(partes[4]) : "—";
-        var kb           = (writeBytes / 1024).toFixed(2);
+            var pid = partes[1];
+            var nome = partes[2];
+            var writeBytes = Number(partes[3]);
+            var deltaHandles = partes[4] !== undefined ? Number(partes[4]) : "—";
+            var kb = (writeBytes / 1024).toFixed(2);
 
-        corpo.innerHTML += `
+            corpo.innerHTML += `
             <div class="tabela-row">
                 <span class="col-pid">${pid}</span>
                 <span class="col-proc">${nome}</span>
@@ -474,8 +475,8 @@ function renderizarTabelaProcessos(processosTexto) {
                 <span class="col-handles">${deltaHandles}</span>
             </div>
         `;
-    });
-}
+        });
+    }
 
     function criarGraficos(historico, servidor) {
 
@@ -486,10 +487,10 @@ function renderizarTabelaProcessos(processosTexto) {
         container.innerHTML = "";
 
         var componentes = [
-            { nome: "CPU (%)",        campo: "cpu_percent",          cor: "#ff3b3b", limite: servidor.limite_cpu     },
-            { nome: "RAM (%)",        campo: "virtual_memory_usage", cor: "#00c853", limite: servidor.limite_ram     },
-            { nome: "Leitura (KB/s)", campo: "disk_read_kbps",       cor: "#00b0ff", limite: servidor.limite_leitura },
-            { nome: "Escrita (KB/s)", campo: "disk_write_kbps",      cor: "#f5a623", limite: servidor.limite_escrita }
+            { nome: "CPU (%)", campo: "cpu_percent", cor: "#ff3b3b", limite: servidor.limite_cpu },
+            { nome: "RAM (%)", campo: "virtual_memory_usage", cor: "#00c853", limite: servidor.limite_ram },
+            { nome: "Leitura (KB/s)", campo: "disk_read_kbps", cor: "#00b0ff", limite: servidor.limite_leitura },
+            { nome: "Escrita (KB/s)", campo: "disk_write_kbps", cor: "#f5a623", limite: servidor.limite_escrita }
         ];
 
         componentes.forEach(function (componente, indice) {
@@ -499,7 +500,7 @@ function renderizarTabelaProcessos(processosTexto) {
             card.innerHTML = `<div class="card-grafico"><canvas id="grafico-${indice}"></canvas></div>`;
             container.appendChild(card);
 
-            var labels  = [];
+            var labels = [];
             var valores = [];
 
             historico.forEach(function (linha) {
@@ -507,7 +508,7 @@ function renderizarTabelaProcessos(processosTexto) {
                 valores.push(Number(linha[componente.campo]) || 0);
             });
 
-            var ctx    = document.getElementById("grafico-" + indice).getContext("2d");
+            var ctx = document.getElementById("grafico-" + indice).getContext("2d");
             var limite = componente.limite;
 
             var anotacoes = {};
@@ -546,8 +547,21 @@ function renderizarTabelaProcessos(processosTexto) {
                         annotation: { annotations: anotacoes }
                     },
                     scales: {
-                        x: { ticks: { color: "#ffffff" } },
-                        y: { ticks: { color: "#ffffff" } }
+                        x: {
+                            ticks: {
+                                color: "#ffffff",
+                                callback: function (value, index) {
+                                    return index % 5 === 0
+                                        ? this.getLabelForValue(value)
+                                        : "";
+                                }
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                color: "#ffffff"
+                            }
+                        }
                     }
                 }
             });
