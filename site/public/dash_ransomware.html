@@ -57,11 +57,11 @@
                     </div>
 
                     <!-- RISCO -->
-                    <div class="kpi card-risco-alto" id="card-risco">
+                    <div class="kpi card-risco-baixo" id="card-risco">
                         <div class="kpi-top">
 
                             <div class="kpi-icon">
-                                <img src="./assets/ransonware/!-red.png" alt="">
+                                
                             </div>
 
                             <div class="kpi-info">
@@ -69,12 +69,6 @@
                                 <h1 id="kpi-risco">—</h1>
                             </div>
 
-                        </div>
-
-                        <div class="kpi-obs">
-                            <p id="obs-risco">
-                                <span>0</span>% acima do normal
-                            </p>
                         </div>
                     </div>
 
@@ -402,8 +396,6 @@
         var cardRisco = document.getElementById("card-risco");
         cardRisco.className = "kpi card-risco-" + servidor.nivel.toLowerCase();
 
-        document.getElementById("obs-risco").innerHTML =
-            "<span>" + servidor.pct_acima_ram.toFixed(1) + "</span>% acima do normal";
     }
 
     function renderizarTabelaProcessos(processosTexto) {
@@ -447,7 +439,7 @@
         container.innerHTML = "";
 
         var componentes = [
-            { nome: "CPU (%)", campo: "cpu_percent", cor: "#ff3b3b", limite: servidor.limite_cpu },
+            { nome: "CPU (%)", campo: "cpu_percent", cor: "#7641d2", limite: servidor.limite_cpu },
             { nome: "RAM (%)", campo: "virtual_memory_usage", cor: "#00c853", limite: servidor.limite_ram },
             { nome: "Leitura (KB/s)", campo: "disk_read_kbps", cor: "#00b0ff", limite: servidor.limite_leitura },
             { nome: "Escrita (KB/s)", campo: "disk_write_kbps", cor: "#f5a623", limite: servidor.limite_escrita }
