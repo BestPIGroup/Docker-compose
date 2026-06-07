@@ -443,37 +443,37 @@
             "<span>" + servidor.pct_acima_ram.toFixed(1) + "</span>% acima do normal";
     }
 
-    function renderizarTabelaProcessos(processosTexto) {
+function renderizarTabelaProcessos(processosTexto) {
 
-        var corpo = document.getElementById("corpoTabelaProcessos");
-        corpo.innerHTML = "";
+    var corpo = document.getElementById("corpoTabelaProcessos");
+    corpo.innerHTML = "";
 
-        if (!processosTexto) return;
+    if (!processosTexto) return;
 
-        var matches = processosTexto.match(/\[(\d+),\s*'([^']+)',\s*(\d+),?\s*(\d+)?\]/g);
+    var matches = processosTexto.match(/\[(\d+),\s*'([^']+)',\s*(-?\d+),?\s*(-?\d+)?\]/g);
 
-        if (!matches) return;
+    if (!matches) return;
 
-        matches.slice(0, 3).forEach(function (match) {
+    matches.slice(0, 3).forEach(function (match) {
 
-            var partes = match.match(/\[(\d+),\s*'([^']+)',\s*(\d+),?\s*(\d+)?\]/);
+        var partes = match.match(/\[(\d+),\s*'([^']+)',\s*(-?\d+),?\s*(-?\d+)?\]/);
 
-            var pid     = partes[1];
-            var nome    = partes[2];
-            var bytes   = Number(partes[3]);
-            var handles = partes[4] !== undefined ? Number(partes[4]) : "—";
-            var mb      = (bytes / 1024 / 1024).toFixed(1);
+        var pid          = partes[1];
+        var nome         = partes[2];
+        var writeBytes   = Number(partes[3]);
+        var deltaHandles = partes[4] !== undefined ? Number(partes[4]) : "—";
+        var kb           = (writeBytes / 1024).toFixed(2);
 
-            corpo.innerHTML += `
-                <div class="tabela-row">
-                    <span class="col-pid">${pid}</span>
-                    <span class="col-proc">${nome}</span>
-                    <span class="col-escrita">${kb}</span>
-                    <span class="col-handles">${handles}</span>
-                </div>
-            `;
-        });
-    }
+        corpo.innerHTML += `
+            <div class="tabela-row">
+                <span class="col-pid">${pid}</span>
+                <span class="col-proc">${nome}</span>
+                <span class="col-escrita">${kb}</span>
+                <span class="col-handles">${deltaHandles}</span>
+            </div>
+        `;
+    });
+}
 
     function criarGraficos(historico, servidor) {
 
