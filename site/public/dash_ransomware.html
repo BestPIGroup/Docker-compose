@@ -175,6 +175,8 @@
                         <option value="30">Últimos 30 min</option>
                         <option value="60">Última 1h</option>
                         <option value="180">Últimas 3h</option>
+                        <option value="360">6 Horas</option>
+                        <option value="1440">24 Horas</option>
                     </select>
 
                 </div>
@@ -375,9 +377,9 @@
                     return;
                 }
 
-                // var historico = filtrarEAgregarHistorico(dados.historico, qtdLinhas);
+                var historico = filtrarEAgregarHistorico(dados.historico, qtdLinhas);
 
-                var historico = dados.historico;
+                // var historico = dados.historico;
 
                 var servidor = {
                     user: dados.usuario,
