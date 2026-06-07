@@ -50,7 +50,7 @@
                             <div class="kpi-info">
                                 <h3 id="titulo-kpi-servidor">SERVIDOR</h3>
                                 <h2 id="kpi-servidor">—</h2>
-                                <span class="badge-critico">CRÍTICO</span>
+                                <span id="badge-status" class="badge-normal">—</span>
                             </div>
                         </div>
                     </div>
@@ -416,6 +416,22 @@
 
         var cardRisco = document.getElementById("card-risco");
         cardRisco.className = "kpi card-risco-" + servidor.nivel.toLowerCase();
+
+        
+        var badgeStatus = document.getElementById("badge-status");
+        
+        if (servidor.nivel.toLowerCase() == "alto") {
+            document.getElementById("badge-status").textContent = "CRÍTICO";
+            badgeStatus.className = "badge-critico" 
+        } else if (servidor.nivel.toLowerCase() == "médio") {
+            document.getElementById("badge-status").textContent = "ATENÇÃO";
+            badgeStatus.className = "badge-atencao" 
+        } else {
+            document.getElementById("badge-status").textContent = "NORMAL";
+            badgeStatus.className = "badge-normal" 
+        }
+
+        
 
     }
 
