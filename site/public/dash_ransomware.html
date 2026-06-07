@@ -308,20 +308,25 @@
         for (var i = 0; i < historico.length; i++) {
             valores.push(Number(historico[i][campo]) || 0);
         }
+        
         valores.sort(function (a, b) { return a - b; });
         return valores[Math.floor(valores.length / 2)] || 1;
     }
 
     function percentEmRelacaoAMediana(valorAtual, median) {
-
         var diferenca = ((valorAtual - median) / median * 100);
 
         if (diferenca > 0) {
-            return `Está ${diferenca.toFixed(1)}% acima do normal`;
+
+            return `<span style="color: #ff4d4d;">Está ${diferenca.toFixed(1)}% acima do normal</span>`;
+
         } else if (diferenca == 0) {
-            return `Está normal`
+            
+            return `<span style="color: #888888;">Está normal</span>`;
+
         } else {
-            return `Está ${Math.abs(diferenca).toFixed(1)}% abaixo do normal`;
+            
+            return `<span style="color: #4cd137;">Está ${Math.abs(diferenca).toFixed(1)}% abaixo do normal</span>`;
         }
     }
 
