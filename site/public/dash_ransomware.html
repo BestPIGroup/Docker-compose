@@ -172,11 +172,11 @@
 
                     <p>PERÍODO SELECIONADO: </p>
                     <select id="selectTempo" onchange="carregarGraficos()">
-                        <option value="30">Últimos 30 min</option>
-                        <option value="60">Última 1h</option>
-                        <option value="180">Últimas 3h</option>
-                        <option value="360">6 Horas</option>
-                        <option value="1440">24 Horas</option>
+                        <option value="7">Últimos 30 min</option>
+                        <option value="13">Última 1h</option>
+                        <option value="37">Últimas 3h</option>
+                        <option value="73">6 Horas</option>
+                        <option value="289">24 Horas</option>
                     </select>
 
                 </div>
@@ -303,56 +303,8 @@
         });
     }
 
-    function filtrarEAgregarHistorico(historico, minutos) {
-        if (!historico || !historico.length) return [];
-
-        var ultimo = historico[historico.length - 1].timestamp;
-        var partes = ultimo.split(" ");
-        var data = partes[0].split("/");
-        var iso = data[2] + "-" + data[1] + "-" + data[0] + "T" + partes[1];
-        var tsUltimo = new Date(iso).getTime();
-        var corte = tsUltimo - (minutos * 60 * 1000);
-
-        var filtrado = historico.filter(function (h) {
-            var p = h.timestamp.split(" ");
-            var d = p[0].split("/");
-            var i = d[2] + "-" + d[1] + "-" + d[0] + "T" + p[1];
-            return new Date(i).getTime() >= corte;
-        });
-
-        var buckets = {};
-        filtrado.forEach(function (h) {
-            var p = h.timestamp.split(" ");
-            var d = p[0].split("/");
-            var ts = new Date(d[2] + "-" + d[1] + "-" + d[0] + "T" + p[1]).getTime();
-            var bucket = Math.floor(ts / (5 * 60 * 1000)) * (5 * 60 * 1000);
-            if (!buckets[bucket]) {
-                buckets[bucket] = { itens: [], ts: bucket };
-            }
-            buckets[bucket].itens.push(h);
-        });
-
-        var resultado = Object.values(buckets).sort(function (a, b) { return a.ts - b.ts; });
-
-        return resultado.map(function (b) {
-            var itens = b.itens;
-            var media = function (campo) {
-                return itens.reduce(function (s, i) { return s + (Number(i[campo]) || 0); }, 0) / itens.length;
-            };
-            var d = new Date(b.ts);
-            var hh = String(d.getHours()).padStart(2, "0");
-            var mm = String(d.getMinutes()).padStart(2, "0");
-            return {
-                timestamp: itens[0].timestamp.slice(0, 11) + hh + ":" + mm + ":00",
-                cpu_percent: media("cpu_percent"),
-                virtual_memory_usage: media("virtual_memory_usage"),
-                disk_write_kbps: media("disk_write_kbps"),
-                disk_read_kbps: media("disk_read_kbps"),
-                total_processos: itens[itens.length - 1].total_processos,
-                score: media("score"),
-                nivel: itens[itens.length - 1].nivel
-            };
-        });
+    function filtrarHistorico(historico, quantidade) {
+        return historico.slice(-quantidade);
     }
 
     function carregarGraficos() {
@@ -377,9 +329,10 @@
                     return;
                 }
 
-                var historico = filtrarEAgregarHistorico(dados.historico, qtdLinhas);
-
-                // var historico = dados.historico;
+                var historico = filtrarHistorico(
+                    dados.historico,
+                    qtdLinhas
+                );
 
                 var servidor = {
                     user: dados.usuario,
