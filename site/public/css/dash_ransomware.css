@@ -418,31 +418,38 @@
 .kpi-top {
     display: flex;
     flex-direction: row;
+    align-items: center;
     justify-content: space-between;
-    align-content: space-between;
+    width: 100%;
 }
 
 .kpi-icon {
     display: flex;
-    justify-content: center;
     align-items: center;
-    width: 30px;
-    padding-top: 25px;
+    justify-content: center;
+    width: 50px; 
+    height: 50px;
+    flex-shrink: 0;
+}
+
+.kpi-icon img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    margin: 1rem 0 0 0.5rem
 }
 
 .kpi-info {
     display: flex;
     flex-direction: column;
-    flex-wrap: wrap;
-    justify-content: flex-end;
     align-items: flex-end;
     text-align: right;
-    width: 80%;
+    flex-grow: 1;
 }
 
-.kpi-icon img {
-    width: 28px;
-    height: 28px;
+.kpi-obs {
+    text-align: right;
+    width: 100%;
 }
 
  .kpi h1 {
