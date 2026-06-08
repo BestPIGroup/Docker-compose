@@ -22,7 +22,7 @@ function cadastrar(nome, email, senha, telefone, funcao, matricula, fk_unidade) 
     return database.executar(instrucaoSql);
 }
 
-function cadastrar_Func(nome, email, senha, telefone, funcao, matricula, fk_unidade,fk_responsavel) {
+function cadastrar_Func(nome, email, senha, telefone, funcao, matricula, fk_unidade,fk_responsavel, id_unidade_slackJira, token_api, email_jira, url_jira, key_url_jira, webhook_slack) {
 
     console.log("ACESSEI O USUARIO MODEL \n \n\t\t >> Se aqui der erro de 'Error: connect ECONNREFUSED',\n \t\t >> verifique suas credenciais de acesso ao banco\n \t\t >> e se o servidor de seu BD está rodando corretamente. \n\n function cadastrar():", nome, email, senha, telefone, funcao, matricula, fk_unidade,fk_responsavel);
     
@@ -30,6 +30,7 @@ function cadastrar_Func(nome, email, senha, telefone, funcao, matricula, fk_unid
     //  e na ordem de inserção dos dados.
     var instrucaoSql = `
         INSERT INTO usuario (nome, email, senha, telefone, funcao, identificador, fk_unidade,fk_responsavel) VALUES ('${nome}', '${email}', '${senha}', '${telefone}', '${funcao}', '${matricula}','${fk_unidade}','${fk_responsavel}');
+        INSERT INTO slackJira(id_unidade_slackJira, token_api, email_jira, url_jira, key_url_jira, webhook_slack) VALUES ('${id_unidade_slackJira}', '${token_api}', '${email_jira}', '${url_jira}', '${key_url_jira}, '${webhook_slack}');
     `;
     console.log("Executando a instrução SQL: \n" + instrucaoSql);
     return database.executar(instrucaoSql);

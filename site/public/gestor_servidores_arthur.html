@@ -1,0 +1,1758 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Argos | Painéis</title>
+    <link rel="stylesheet" href="./css/gestor_servidores_arthur.css">
+    <link rel="icon" href="./assets/LogoArgos.png">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- ---- Sidebar ---- -->
+    <header class="sidebar">
+        <div class="logo" href="index.html">
+            <img src="./assets/LogoArgosIcon.png">
+        </div>
+        <ul class="listaOpcoes">
+            <li>
+                <a href="./gestor_servidores.html">
+                    <div class="item">
+                        <img src="./assets/server2.png" alt="Servidores">
+                        <p>Servidores</p>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href="./relatorios.html">
+                    <div class="item">
+                        <img src="./assets/file.png" alt="Servidores">
+                        <p>Relatórios</p>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href="./funcionarios.html">
+                    <div class="item">
+                        <img src="./assets/team.png" alt="Servidores">
+                        <p>Funcionários</p>
+                    </div>
+                </a>
+            </li>
+        </ul>
+        <div class="saida">
+            <div class="item">
+                <a href="./perfil.html" id="perfil_botao">
+                    <img src="./assets/user3.png" alt="Perfil">
+                    <p>Gestor</p>
+                    <p id="nome_usuario">Perfil</p>
+                </a>
+            </div>
+            <a href="index.html">
+                <div class="item">
+                    <img src="./assets/saida.png" alt="Sair" onclick="logout()">
+                    <p>Sair</p>
+                </div>
+            </a>
+        </div>
+    </header>
+
+    <!-- ---- Conteúdo principal com KPIs e cards dos servidores ---- -->
+    <div class="conteudo">
+        <div class="box">
+            <div class="kpis">
+                <div class="kpi card-erro">
+                    <img src="./assets/warningRed.png" alt="">
+                    Servidores Críticos<h2 id="crit">--</h2>
+                </div>
+                <div class="kpi card-atencao">
+                    <img src="./assets/warningOrange.png" alt="">
+                    Servidores em Atenção<h2 id="atencao">--</h2>
+                </div>
+                <div class="kpi">
+                    <img src="./assets/hardwareWhite.png" alt="">
+                    Alertas de Hardware<h2 id="alert">--</h2>
+                </div>
+                <div class="kpi">
+                    <img src="./assets/unlockWhite.png" alt="">
+                    Ciberameaças<h2 id="threats">--</h2>
+                </div>
+                <div class="kpi kpi-alerta-sino" id="card-alerta-sino">
+                    <button class="btn-fechar-alerta" onclick="fecharAlertaNovo()">X</button>
+                    <img src="./assets/bellWhite.png" alt="">
+                    Alerta novo!<h2 id="kpi-sino">--</h2>
+                </div>
+            </div>
+            <div class="retangulo">
+                <p>Servidores</p>
+                <button class="btn-adicionar" onclick="window.location.href='cadastro_servidor.html'">
+                    Adicionar Servidor
+                </button>
+            </div>
+        </div>
+        <div class="campo" id="campoServidores"></div>
+    </div>
+
+    <!-- ---- Modal de edição dos limites dos componentes ---- -->
+    <div class="modal-overlay" id="modal-editar" onclick="fecharModalEditar(event)">
+        <div class="modal-editar-conteudo">
+            <div class="modal-editar-header">
+                <div class="modal-editar-titulo-grupo"><img src="./assets/server2.png" class="modal-server-icon"><div><h2 id="modal-server-nome">Servidor</h2><span class="modal-server-badge" id="modal-server-badge"></span></div></div>
+                <button class="modal-fechar-btn" onclick="fecharModalEditar()">X</button>
+            </div>
+            <div class="modal-editar-body">
+                <p class="modal-secao-titulo">Componentes Monitorados</p>
+                <p class="modal-secao-sub">Ative ou desative os componentes que serão monitorados neste servidor.</p>
+                <div class="modal-componentes">
+                    <div class="comp-item">
+                        <div class="comp-info">
+                            <img src="./assets/hardwareWhite.png" class="comp-icon" alt="">
+                            <div><p class="comp-nome">CPU</p><p class="comp-desc">Porcentagem de uso</p></div>
+                        </div>
+                        <label class="toggle"><input type="checkbox" data-check-componente="CPU"><span class="toggle-slider"></span></label>
+                    </div>
+                    <div class="comp-item">
+                        <div class="comp-info">
+                            <img src="./assets/hardwareWhite.png" class="comp-icon" alt="">
+                            <div><p class="comp-nome">Processos</p><p class="comp-desc">Número de processos em execução</p></div>
+                        </div>
+                        <label class="toggle"><input type="checkbox" data-check-componente="Processos"><span class="toggle-slider"></span></label>
+                    </div>
+                    <div class="comp-item">
+                        <div class="comp-info">
+                            <img src="./assets/hardwareWhite.png" class="comp-icon" alt="">
+                            <div><p class="comp-nome">RAM</p><p class="comp-desc">Porcentagem de uso</p></div>
+                        </div>
+                        <label class="toggle"><input type="checkbox" data-check-componente="RAM"><span class="toggle-slider"></span></label>
+                    </div>
+                    <div class="comp-item">
+                        <div class="comp-info">
+                            <img src="./assets/hardwareWhite.png" class="comp-icon" alt="">
+                            <div><p class="comp-nome">Disco</p><p class="comp-desc">Uso de armazenamento em porcentagem</p></div>
+                        </div>
+                        <label class="toggle"><input type="checkbox" data-check-componente="Disco"><span class="toggle-slider"></span></label>
+                    </div>
+                    <div class="comp-item">
+                        <div class="comp-info">
+                            <img src="./assets/hardwareWhite.png" class="comp-icon" alt="">
+                            <div><p class="comp-nome">Rede</p><p class="comp-desc">Tráfego de entrada e saída</p></div>
+                        </div>
+                        <label class="toggle"><input type="checkbox" data-check-componente="Rede"><span class="toggle-slider"></span></label>
+                    </div>
+                    <div class="comp-item">
+                        <div class="comp-info">
+                            <img src="./assets/shield.png" class="comp-icon" alt="">
+                            <div><p class="comp-nome">Ransomware</p><p class="comp-desc">Alertas de criptografia suspeita</p></div>
+                        </div>
+                        <label class="toggle"><input type="checkbox" data-check-componente="Ransomware"><span class="toggle-slider"></span></label>
+                    </div>
+                    <div class="comp-item">
+                        <div class="comp-info">
+                            <img src="./assets/shield.png" class="comp-icon" alt="">
+                            <div><p class="comp-nome">DDoS</p><p class="comp-desc">Alertas de tráfego anormal</p></div>
+                        </div>
+                        <label class="toggle"><input type="checkbox" data-check-componente="DDoS"><span class="toggle-slider"></span></label>
+                    </div>
+                    <div class="comp-item">
+                        <div class="comp-info">
+                            <img src="./assets/shield.png" class="comp-icon" alt="">
+                            <div><p class="comp-nome">Malware</p><p class="comp-desc">Alertas de assinatura suspeita</p></div>
+                        </div>
+                        <label class="toggle"><input type="checkbox" data-check-componente="Malware"><span class="toggle-slider"></span></label>
+                    </div>
+                    <div class="modal-limiar-secao">
+                        <p class="modal-secao-titulo">Limiar de Alerta</p>
+                        <p class="modal-secao-sub">Defina a partir de qual valor cada componente dispara um alerta.</p>
+                        <div class="modal-limiares">
+                            <div class="limiar-item">
+                                <label>CPU <span class="limiar-valor" id="val-cpu">--</span></label>
+                                <input type="range" min="10" max="100" class="limiar-range" data-limite-componente="CPU" oninput="atualizarLimiar('val-cpu', this.value, '%')">
+                            </div>
+                            <div class="limiar-item">
+                                <label>Processos <span class="limiar-valor" id="val-processos">--</span></label>
+                                <input type="range" min="10" max="3000" class="limiar-range" data-limite-componente="Processos" oninput="atualizarLimiar('val-processos', this.value)">
+                            </div>
+                            <div class="limiar-item">
+                                <label>RAM <span class="limiar-valor" id="val-ram">--</span></label>
+                                <input type="range" min="10" max="100" class="limiar-range" data-limite-componente="RAM" oninput="atualizarLimiar('val-ram', this.value, '%')">
+                            </div>
+                            <div class="limiar-item">
+                                <label>Disco <span class="limiar-valor" id="val-disco">--</span></label>
+                                <input type="range" min="10" max="100" class="limiar-range" data-limite-componente="Disco" oninput="atualizarLimiar('val-disco', this.value, '%')">
+                            </div>
+                            <div class="limiar-item">
+                                <label>Rede <span class="limiar-valor" id="val-rede">--</span></label>
+                                <input type="range" min="10" max="4000" class="limiar-range" data-limite-componente="Rede" oninput="atualizarLimiar('val-rede', this.value, 'Mbps')">
+                            </div>
+                            <div class="limiar-item">
+                                <label>Ransomware <span class="limiar-valor" id="val-ransomware">--</span></label>
+                                <input type="range" min="1" max="100" class="limiar-range" data-limite-componente="Ransomware" oninput="atualizarLimiar('val-ransomware', this.value)">
+                            </div>
+                            <div class="limiar-item">
+                                <label>DDoS <span class="limiar-valor" id="val-ddos">--</span></label>
+                                <input type="range" min="1" max="100" class="limiar-range" data-limite-componente="DDoS" oninput="atualizarLimiar('val-ddos', this.value)">
+                            </div>
+                            <div class="limiar-item">
+                                <label>Malware <span class="limiar-valor" id="val-malware">--</span></label>
+                                <input type="range" min="1" max="100" class="limiar-range" data-limite-componente="Malware" oninput="atualizarLimiar('val-malware', this.value)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-editar-footer"><button class="btn-modal-cancelar" onclick="fecharModalEditar()">Cancelar</button><button class="btn-modal-salvar" onclick="salvarConfiguracoes()">Salvar Configurações</button></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ---- Modal do painel de alertas ---- -->
+    <div class="modal-overlay" id="modal-painel-alertas" onclick="fecharModalAlertasOverlay(event)">
+        <div class="modal-alertas-layout">
+            <div class="modal-alertas-kpis" onclick="event.stopPropagation()">
+                <div class="kpi card-erro">
+                    <img src="./assets/warningRed.png" alt="">
+                    Servidores Críticos<h2 id="modalCriticos">--</h2>
+                </div>
+                <div class="kpi card-atencao">
+                    <img src="./assets/warningOrange.png" alt="">
+                    Servidores em Alerta<h2 id="modalAtencao">--</h2>
+                </div>
+            </div>
+            <div class="modal-painel-alertas" onclick="event.stopPropagation()">
+            <div class="modal-header-alertas">
+                <div class="header-info-servidor">
+                    <img src="./assets/server2.png" alt="server">
+                    <div class="header-status">
+                        <h2 id="modalAlertasNome"></h2>
+                        <span id="modalAlertasInfo" class="info-status"></span>
+                    </div>
+                </div>
+                <div class="modal-alertas-controles">
+                    <span id="ultimaAtualizacaoModal">Última atualização: --</span>
+                    <div class="modal-alertas-titulo">
+                        <h2>Painel de alertas</h2>
+                        <label for="periodoTempoSelect">Ordenar por:</label>
+                        <select id="periodoTempoSelect" class="select-periodo">
+                        </select>
+                    </div>
+                </div>
+                <button class="btn-fechar-modal-x" type="button" onclick="fecharModalAlertas()">X</button>
+            </div>
+            <div class="modal-body-alertas">
+                <div class="linha-superior">
+                    <section class="alert-card rosquinha-card">
+                        <div class="rosquinha-copy">
+                            <h3>Percentual de Alertas</h3>
+                            <span>do dia</span>
+                            <div class="rosquinha-wrap">
+                                <canvas id="graficoMedidor"></canvas>
+                                <strong id="labelPercentualAlertas"></strong>
+                            </div>
+                        </div>
+                        <div class="rosquinha-stats" id="resumoMedidor"></div>
+                    </section>
+                    <section class="alert-card timeline-card">
+                        <div class="alert-card-header">
+                            <h3>Número de alertas ao longo do dia</h3>
+                            <span class="alert-icon calendar-icon"></span>
+                        </div>
+                        <div class="trend-grid" id="trendResumo"></div>
+                        <div class="line-chart-wrap">
+                            <canvas id="graficoLinha"></canvas>
+                        </div>
+                    </section>
+                    <section class="alert-card components-card">
+                        <div class="alert-card-header">
+                            <h3>Alertas por componente</h3>
+                            <img class="icone-card-alertas" src="https://cdn-icons-png.flaticon.com/512/1504/1504385.png" alt="Ícone de componente">
+                        </div>
+                        <div class="component-feature">
+                            <div>
+                                <span>Maior número de leituras:</span>
+                                <strong id="componenteDestaqueNome"></strong>
+                            </div>
+                            <div>
+                                <span>Número de Alertas:</span>
+                                <strong id="componenteDestaqueValor"></strong>
+                            </div>
+                        </div>
+                        <div class="component-chart-wrap">
+                            <canvas id="graficoComponentes"></canvas>
+                        </div>
+                    </section>
+                </div>
+                <div class="linha-inferior">
+                    <section class="alert-card daily-card">
+                        <div class="alert-card-header">
+                            <h3 id="tituloAlertasDia"></h3>
+                            <span class="alert-icon calendar-icon"></span>
+                        </div>
+                        <div class="daily-bars" id="dailyBars"></div>
+                        <div class="daily-summary" id="dailySummary"></div>
+                    </section>
+                    <section class="alert-card feed-card">
+                        <div class="alert-card-header">
+                            <h3 id="tituloListaAlertas">Alertas da última hora:</h3>
+                            <img class="icone-card-alertas" src="https://cdn-icons-png.flaticon.com/512/2141/2141420.png" alt="Ícone de alerta">
+                        </div>
+                        <ul class="feed-list" id="listaAlertas"></ul>
+                        <div class="feed-filtros">
+                            <button type="button" class="feed-filtro-ativo" data-filtro-alertas="hora" onclick="trocarFiltroAlertas('hora')">Última hora</button>
+                            <button type="button" data-filtro-alertas="periodo" onclick="trocarFiltroAlertas('periodo')">No período</button>
+                        </div>
+                    </section>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // ---- Aqui ficam os dados e funções da tela ----
+    let dadosDosServidores = {};
+    let metricasDosServidores = {};
+
+    const graficos = {
+        linha: null,
+        medidor: null,
+        componentes: null
+    };
+
+    let ultimaAtualizacaoModal = null;
+    let intervaloAtualizacaoCards = null;
+    let intervaloAtualizacaoModal = null;
+    let atualizandoCards = false;
+    let atualizandoModal = false;
+    let filtroListaAlertas = 'hora';
+    let servidorEmEdicao = { nome: '', mac: '' };
+
+    // ---- Aqui ficam os tempos de atualização automática ----
+    const tempoAtualizacaoCards = 60 * 1000;
+    const tempoAtualizacaoModal = 5 * 60 * 1000;
+    const quantidadeDeLeiturasS3 = 200000;
+
+    // ---- Aqui fica o formato das leituras que vêm do bucket normal ----
+    const colunasDoCsvClient = [
+        'idMac',
+        'usuarios',
+        'timestamp',
+        'cpu_percent',
+        'cpu_time_user',
+        'cpu_ctx_switches',
+        'top_3_processos_cpu',
+        'top_3_processos_disco',
+        'total_processos',
+        'virtual_memory_usage',
+        'disk_read_mbps',
+        'disk_percent',
+        'disk_write_mbps',
+        'net_kbps_sent',
+        'net_kbps_recv',
+        'net_packets_sent',
+        'net_packets_recv',
+        'net_dropin',
+        'net_dropout',
+        'usuarios_logados',
+        'virtual_memory_status',
+        'cpu_percent_status',
+        'disk_percent_status',
+        'net_errors',
+        'total_arquivos_abertos',
+        'mediana_net_sent',
+        'mediana_net_recv'
+    ];
+
+    // ---- Aqui ficam os componentes aceitos nos alertas ----
+    const componentesPermitidos = {
+        RAM: 'RAM',
+        CPU: 'CPU',
+        DISCO: 'Disco',
+        REDE: 'Rede',
+        RANSOMWARE: 'Ransomware',
+        DDOS: 'DDoS',
+        MALWARE: 'Malware',
+        PROCESSOS: 'Processos',
+        PROCESSO: 'Processos'
+    };
+
+    // ---- Aqui ficam os campos usados no modal de edição ----
+    const camposDeLimite = {
+        CPU: { nome: 'CPU', texto: 'val-cpu', sufixo: '%' },
+        PROCESSOS: { nome: 'Processos', texto: 'val-processos', sufixo: '' },
+        RAM: { nome: 'RAM', texto: 'val-ram', sufixo: '%' },
+        DISCO: { nome: 'Disco', texto: 'val-disco', sufixo: '%' },
+        REDE: { nome: 'Rede', texto: 'val-rede', sufixo: 'Mbps' },
+        RANSOMWARE: { nome: 'Ransomware', texto: 'val-ransomware', sufixo: '' },
+        DDOS: { nome: 'DDoS', texto: 'val-ddos', sufixo: '' },
+        MALWARE: { nome: 'Malware', texto: 'val-malware', sufixo: '' }
+    };
+
+    // ---- Aqui ficam as classes visuais de cada status ----
+    const visualPorStatus = {
+        "CRÍTICO": {
+            ponto: "dot-critico",
+            etiqueta: "badge-critico",
+            modal: "modal-badge-critico",
+            info: "info-critico",
+            seguranca: "Desprotegido",
+            segurancaClasse: "status-alert"
+        },
+        "ATENÇÃO": {
+            ponto: "dot",
+            etiqueta: "badge",
+            modal: "modal-badge-atencao",
+            info: "info-atencao",
+            seguranca: "Íntegro",
+            segurancaClasse: "status-normal"
+        },
+        "NORMAL": {
+            ponto: "dot-normal",
+            etiqueta: "badge-normal",
+            modal: "modal-badge-normal",
+            info: "info-normal",
+            seguranca: "Íntegro",
+            segurancaClasse: "status-normal"
+        },
+        "SEM DADOS": {
+            ponto: "dot-normal",
+            etiqueta: "badge-normal",
+            modal: "modal-badge-normal",
+            info: "info-normal",
+            seguranca: "--",
+            segurancaClasse: "status-normal"
+        }
+    };
+
+    // ---- Aqui ficam as funções utilitárias da tela ----
+    function pegar(id) {
+        return document.getElementById(id);
+    }
+
+    function colocarTexto(id, texto) {
+        const elemento = pegar(id);
+        if (elemento) elemento.textContent = texto;
+    }
+
+    function criarElemento(tag, classe, html = '') {
+        const elemento = document.createElement(tag);
+        if (classe) elemento.className = classe;
+        if (html) elemento.innerHTML = html;
+        return elemento;
+    }
+
+    function visualDoStatus(status) {
+        return visualPorStatus[status] || visualPorStatus.NORMAL;
+    }
+
+    function normalizarStatus(status) {
+        const texto = String(status || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toUpperCase();
+
+        if (texto.includes('CRIT')) return 'CRÍTICO';
+        if (texto.includes('ATEN')) return 'ATENÇÃO';
+        if (texto.includes('NORMAL')) return 'NORMAL';
+        return 'SEM DADOS';
+    }
+
+    function limitarNumero(valor, minimo, maximo) {
+        return Math.max(minimo, Math.min(maximo, valor));
+    }
+
+    function valorTela(valor) {
+        return valor === null || valor === undefined || valor === '' ? '--' : valor;
+    }
+
+    function formatarDataHora(data) {
+        const doisDigitos = valor => String(valor).padStart(2, '0');
+        const dia = doisDigitos(data.getDate());
+        const mes = doisDigitos(data.getMonth() + 1);
+        const ano = data.getFullYear();
+        const hora = doisDigitos(data.getHours());
+        const minuto = doisDigitos(data.getMinutes());
+        const segundo = doisDigitos(data.getSeconds());
+        return `${dia}/${mes}/${ano} ${hora}:${minuto}:${segundo}`;
+    }
+
+    function atualizarTextoUltimaAtualizacao() {
+        const data = ultimaAtualizacaoModal ? formatarDataHora(ultimaAtualizacaoModal) : '--';
+        colocarTexto('ultimaAtualizacaoModal', `Última atualização: ${data}`);
+    }
+
+    function destruirGrafico(nome) {
+        if (graficos[nome]) {
+            graficos[nome].destroy();
+            graficos[nome] = null;
+        }
+    }
+
+    // ---- Aqui ta a função que cria os cards dos servidores ----
+    function gerarCards() {
+        const container = pegar('campoServidores');
+        container.innerHTML = '';
+
+        const ordemDosStatus = { 'CRÍTICO': 0, 'ATENÇÃO': 1, 'NORMAL': 2, 'SEM DADOS': 3 };
+        Object.entries(dadosDosServidores).sort(([nomeA], [nomeB]) => {
+            const statusServidorA = normalizarStatus(metricasDosServidores[nomeA]?.status || 'NORMAL');
+            const statusServidorB = normalizarStatus(metricasDosServidores[nomeB]?.status || 'NORMAL');
+            return ordemDosStatus[statusServidorA] - ordemDosStatus[statusServidorB];
+        }).forEach(([nomeServidor]) => {
+            const metricas = metricasDosServidores[nomeServidor] || {};
+            const status = normalizarStatus(metricas.status);
+            const visual = visualDoStatus(status);
+            const textoSeguranca = metricas.seguranca || visual.seguranca;
+            const classeSeguranca = textoSeguranca === 'Desprotegido' ? 'status-alert' : 'status-normal';
+            const card = criarElemento('div', 'card');
+            const macServidor = dadosDosServidores[nomeServidor] || metricas.mac || metricas.Mac || metricas.endereco_mac || '';
+            card.dataset.servidor = nomeServidor;
+            card.dataset.mac = macServidor;
+
+            card.innerHTML = `
+                <div class="card-top">
+                    <div class="div-esquerda"><img src="./assets/server2.png" class="img-main-server" alt="Server"></div>
+                    <div class="div-direita">
+                        <div class="header-row">
+                            <span class="server-title"><span class="${visual.ponto}">●</span> ${nomeServidor}</span>
+                            <span class="${visual.etiqueta}">${status}</span>
+                        </div>
+                        <ul class="info-list">
+                            <li><img src="./assets/hardwareWhite.png" class="mini-icon">Alertas de Hardware: ${valorTela(metricas.hardware)}</li>
+                            <li><img src="./assets/shield.png" class="mini-icon">Ciberataques Detectados: ${valorTela(metricas.cyber)}</li>
+                            <li><img src="./assets/lock.png" class="mini-icon">Segurança: <span class="${classeSeguranca}">${textoSeguranca}</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="div-inferior">
+                    <a href="./assets/relatorio_hardware.pdf" target="_blank">
+                        <button class="btn btn-left">
+                            <img src="./assets/pdf.png" class="btn-icon">Download de Relatório
+                        </button>
+                    </a>
+                    <button class="btn btn-right editar-btn" type="button">
+                        <img src="./assets/edit.png" class="btn-icon">Editar Servidor
+                    </button>
+                </div>
+            `;
+
+            card.querySelector('.editar-btn')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                abrirModalEditar(nomeServidor, status, macServidor);
+            });
+
+            card.addEventListener('click', (e) => {
+                if (e.target.closest('.editar-btn')) return;
+                abrirModalAlertasPorCard(card);
+            });
+
+            container.appendChild(card);
+        });
+    }
+
+    // ---- Aqui ficam as funções que atualizam sessão e KPIs no bgl ----
+    const nomeDoUsuario = pegar('nome_usuario');
+    function verificarSessao() {
+        if (sessionStorage.NOME_USUARIO) nomeDoUsuario.textContent = sessionStorage.NOME_USUARIO;
+        atualizarKpisPagina();
+        fecharAlertaNovo();
+        atualizarKpisModalAlertas();
+    }
+
+    function atualizarKpisPagina() {
+        const metricas = Object.values(metricasDosServidores);
+        if (metricas.length === 0) {
+            Object.entries({ crit: '--', atencao: '--', alert: '--', threats: '--' }).forEach(([id, valor]) => colocarTexto(id, valor));
+            return;
+        }
+        colocarTexto('crit', metricas.filter(item => normalizarStatus(item.status) === 'CRÍTICO').length);
+        colocarTexto('atencao', metricas.filter(item => normalizarStatus(item.status) === 'ATENÇÃO').length);
+        colocarTexto('alert', metricas.reduce((soma, item) => soma + Number(item.hardware || 0), 0));
+        colocarTexto('threats', metricas.reduce((soma, item) => soma + Number(item.cyber || 0), 0));
+    }
+
+    function atualizarKpisModalAlertas() {
+        colocarTexto('modalCriticos', pegar('crit')?.textContent || '0');
+        colocarTexto('modalAtencao', pegar('atencao')?.textContent || '0');
+    }
+
+    // ---- Aqui ficam as funções que carregam e salvam os limites do modal editar ----
+    function atualizarLimiar(id, valor, sufixo = '') {
+        const texto = pegar(id);
+        if (!texto) return;
+        texto.textContent = `${valor}${sufixo}`;
+        texto.dataset.temLimite = 'true';
+    }
+
+    function pegarCampoDeLimite(nome) {
+        return camposDeLimite[textoNormalizado(nome)] || null;
+    }
+
+    function pegarInputDoLimite(campo) {
+        return document.querySelector(`[data-limite-componente="${campo.nome}"]`);
+    }
+
+    function pegarCheckDoLimite(campo) {
+        return document.querySelector(`[data-check-componente="${campo.nome}"]`);
+    }
+
+    function limparLimitesDoModal() {
+        Object.values(camposDeLimite).forEach(campo => {
+            const texto = pegar(campo.texto);
+            const input = pegarInputDoLimite(campo);
+            const check = pegarCheckDoLimite(campo);
+
+            if (texto) {
+                texto.textContent = '--';
+                delete texto.dataset.temLimite;
+            }
+
+            if (input) {
+                input.value = input.min || 0;
+                delete input.dataset.idComponente;
+            }
+
+            if (check) check.checked = false;
+        });
+    }
+
+    function aplicarLimiteNoModal(componente) {
+        const campo = pegarCampoDeLimite(componente.chave || componente.nome || componente.idComponente);
+        if (!campo) return;
+
+        const input = pegarInputDoLimite(campo);
+        const check = pegarCheckDoLimite(campo);
+        const limite = Number(componente.limite);
+
+        if (check) check.checked = componente.exibir === true || componente.exibir === 1;
+        if (!input || !Number.isFinite(limite)) return;
+
+        input.dataset.idComponente = componente.idComponente || '';
+        input.value = limitarNumero(limite, Number(input.min), Number(input.max));
+        atualizarLimiar(campo.texto, input.value, campo.sufixo);
+    }
+
+    async function carregarLimitesDoServidor(mac) {
+        if (!mac) return;
+        limparLimitesDoModal();
+
+        const resposta = await fetch('/limitesComponentes/buscar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ mac })
+        });
+
+        if (!resposta.ok) throw new Error(await resposta.text());
+        const dados = await resposta.json();
+        (dados.componentes || []).forEach(aplicarLimiteNoModal);
+    }
+
+    function coletarLimitesDoModal() {
+        return Object.values(camposDeLimite).map(campo => {
+            const texto = pegar(campo.texto);
+            const input = pegarInputDoLimite(campo);
+            const check = pegarCheckDoLimite(campo);
+
+            if (!texto?.dataset.temLimite || !input) return null;
+
+            return {
+                nome: campo.nome,
+                idComponente: input.dataset.idComponente || undefined,
+                limite: Number(input.value),
+                exibir: check?.checked || false
+            };
+        }).filter(Boolean);
+    }
+
+    // ---- Aqui fica umas funções de navegação e fechamento ----
+    function fecharAlertaNovo() {
+        const alerta = pegar('card-alerta-sino');
+        if (alerta) alerta.style.display = 'none';
+    }
+
+    function logout() { sessionStorage.clear(); window.location.href = 'login.html'; }
+
+    async function abrirModalEditar(nome, badge, mac) {
+        servidorEmEdicao = { nome, mac };
+        colocarTexto('modal-server-nome', nome);
+        const etiquetaModal = pegar('modal-server-badge');
+        etiquetaModal.textContent = badge;
+        etiquetaModal.className = 'modal-server-badge';
+        etiquetaModal.classList.add(visualDoStatus(badge).modal);
+        pegar('modal-editar').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+
+        try {
+            await carregarLimitesDoServidor(mac);
+        } catch (erro) {
+            console.warn('Não foi possível carregar os limites do servidor:', erro);
+        }
+    }
+
+    function fecharModalEditar(event) {
+        if (event && event.target !== pegar('modal-editar')) return;
+        pegar('modal-editar').style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
+    async function salvarConfiguracoes() {
+        const botao = document.querySelector('.btn-modal-salvar');
+        const componentes = coletarLimitesDoModal();
+
+        if (!servidorEmEdicao.mac || componentes.length === 0) return;
+
+        botao.disabled = true;
+        botao.textContent = 'Salvando...';
+
+        try {
+            const resposta = await fetch('/limitesComponentes/atualizar', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    mac: servidorEmEdicao.mac,
+                    componentes
+                })
+            });
+
+            if (!resposta.ok) throw new Error(await resposta.text());
+
+            const dadosAtualizados = await resposta.json();
+            (dadosAtualizados.componentes || []).forEach(aplicarLimiteNoModal);
+            botao.textContent = '✓ Salvo!';
+            botao.style.backgroundColor = '#12921c';
+
+            setTimeout(() => {
+                botao.textContent = 'Salvar Configurações';
+                botao.style.backgroundColor = '';
+                botao.disabled = false;
+                pegar('modal-editar').style.display = 'none';
+                document.body.style.overflow = '';
+            }, 1200);
+        } catch (erro) {
+            console.warn('Não foi possível salvar os limites:', erro);
+            botao.textContent = 'Erro ao salvar';
+            botao.style.backgroundColor = '#ff3434';
+
+            setTimeout(() => {
+                botao.textContent = 'Salvar Configurações';
+                botao.style.backgroundColor = '';
+                botao.disabled = false;
+            }, 1600);
+        }
+    }
+
+    // ---- Aqui ficam os períodos disponíveis no filtro do modal de alertas ----
+    const opcoesPeriodo = [
+        { valor: 'hoje', rotulo: 'Hoje' },
+        { valor: 'ontem', rotulo: 'Ontem' },
+        { valor: 'semana', rotulo: 'Última semana' },
+        { valor: 'mes', rotulo: 'Último mês' },
+        { valor: 'trimestre', rotulo: 'Últimos três meses' }
+    ];
+
+    // ---- Estrutura base do painel de alertas ----
+    const dadosPainelAlertas = {
+        padrao: {
+            tituloDia: '',
+            medidor: { percentual: null, alertas: null, leituras: null },
+            tendencias: [],
+            linha: { labels: [], valores: [] },
+            componentes: [],
+            dias: [],
+            resumoDia: [],
+            alertas: []
+        },
+        servidores: {}
+    };
+
+    // ---- Funções que tratam datas e períodos ----
+    function copiarDados(base) {
+        return JSON.parse(JSON.stringify(base));
+    }
+
+    function dataDoRegistro(registro) {
+        const [dia, mes, ano] = String(registro?.data || '').split('/').map(Number);
+        const [hora = 0, minuto = 0, segundo = 0] = String(registro?.hora || '00:00:00').split(':').map(Number);
+        if (!dia || !mes || !ano) return null;
+        return new Date(ano, mes - 1, dia, hora, minuto, segundo);
+    }
+
+    function inicioDoDia(data) {
+        return new Date(data.getFullYear(), data.getMonth(), data.getDate());
+    }
+
+    function somarDias(data, dias) {
+        const novaData = new Date(data);
+        novaData.setDate(novaData.getDate() + dias);
+        return novaData;
+    }
+
+    function somarMeses(data, meses) {
+        const novaData = new Date(data);
+        novaData.setMonth(novaData.getMonth() + meses);
+        return novaData;
+    }
+
+    function formatarDataCurta(data) {
+        return `${String(data.getDate()).padStart(2, '0')}/${String(data.getMonth() + 1).padStart(2, '0')}`;
+    }
+
+    function formatarDataCompleta(data) {
+        return `${String(data.getDate()).padStart(2, '0')}/${String(data.getMonth() + 1).padStart(2, '0')}/${data.getFullYear()}`;
+    }
+
+    function formatarHoraCompleta(data) {
+        return `${String(data.getHours()).padStart(2, '0')}:${String(data.getMinutes()).padStart(2, '0')}:${String(data.getSeconds()).padStart(2, '0')}`;
+    }
+
+    function formatarMes(data) {
+        return `${String(data.getMonth() + 1).padStart(2, '0')}/${data.getFullYear()}`;
+    }
+
+    function nomeDiaSemana(data) {
+        return ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'][data.getDay()];
+    }
+
+    function nomeDiaCompleto(data) {
+        return ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'][data.getDay()];
+    }
+
+    function periodoSelecionado(valorPeriodo) {
+        const hoje = inicioDoDia(new Date());
+        const amanha = somarDias(hoje, 1);
+        const ontem = somarDias(hoje, -1);
+
+        const periodos = {
+            hoje: { inicio: hoje, fim: amanha, tipo: 'dia', titulo: `Alertas por ${nomeDiaCompleto(hoje)}` },
+            ontem: { inicio: ontem, fim: hoje, tipo: 'dia', titulo: `Alertas por ${nomeDiaCompleto(ontem)}` },
+            semana: { inicio: somarDias(hoje, -6), fim: amanha, tipo: 'dia', titulo: 'Alertas por dia' },
+            mes: { inicio: somarDias(hoje, -29), fim: amanha, tipo: 'semana', titulo: 'Alertas por semana' },
+            trimestre: { inicio: somarMeses(hoje, -2), fim: amanha, tipo: 'mes', titulo: 'Alertas por mês' }
+        };
+
+        return periodos[valorPeriodo] || periodos.hoje;
+    }
+
+    function registrosDoPeriodo(registros, periodo) {
+        return (Array.isArray(registros) ? registros : []).filter(registro => {
+            const data = dataDoRegistro(registro);
+            return data && data >= periodo.inicio && data < periodo.fim;
+        });
+    }
+
+    function textoNormalizado(valor) {
+        return String(valor || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toUpperCase();
+    }
+
+    function normalizarComponente(nome) {
+        return componentesPermitidos[textoNormalizado(nome)] || null;
+    }
+
+    // ---- Funções que tratam os alertas do CSV ----
+    function mensagensValidas(registro) {
+        return (registro?.mensagens || []).map(alerta => {
+            const componente = normalizarComponente(alerta.componente);
+            if (!componente) return null;
+            return { ...alerta, componente };
+        }).filter(Boolean);
+    }
+
+    function dataDoAlerta(alerta) {
+        return dataDoRegistro({ data: alerta?.data, hora: alerta?.hora });
+    }
+
+    function alertasDosUltimosMinutos(alertas, minutos) {
+        const limite = new Date(Date.now() - minutos * 60 * 1000);
+        return (Array.isArray(alertas) ? alertas : []).filter(alerta => {
+            const data = dataDoAlerta(alerta);
+            return data && data >= limite;
+        });
+    }
+
+    function totalMensagens(registros) {
+        return (Array.isArray(registros) ? registros : []).reduce((total, registro) => total + mensagensValidas(registro).length, 0);
+    }
+
+    function contarComponentes(registros) {
+        return (Array.isArray(registros) ? registros : []).reduce((contagem, registro) => {
+            mensagensValidas(registro).forEach(alerta => {
+                contagem[alerta.componente] = (contagem[alerta.componente] || 0) + 1;
+            });
+            return contagem;
+        }, {});
+    }
+
+    function montarComponentesDoPeriodo(registros) {
+        const porComponente = contarComponentes(registros);
+        const maiorComponente = Object.keys(porComponente).sort((a, b) => porComponente[b] - porComponente[a])[0];
+
+        return Object.entries(porComponente).map(([nome, alertas]) => ({
+            nome,
+            alertas,
+            cor: nome === maiorComponente ? '#ff3b3b' : '#2f83ff'
+        }));
+    }
+
+    function montarListaAlertasDoPeriodo(registros) {
+        return (Array.isArray(registros) ? registros : []).flatMap(registro =>
+            mensagensValidas(registro).map(item => ({
+                texto: `${item.componente}: ${item.mensagem}`,
+                data: registro.data,
+                hora: registro.hora
+            }))
+        );
+    }
+
+    // ---- Funções que agrupam alertas para os gráficos ----
+    function criarMapaDeGrupos(grupos) {
+        return grupos.reduce((mapa, grupo) => {
+            mapa[grupo.chave] = grupo;
+            return mapa;
+        }, {});
+    }
+
+    function gruposPorPeriodo(periodo) {
+        const grupos = [];
+
+        if (periodo.tipo === 'dia') {
+            for (let data = new Date(periodo.inicio); data < periodo.fim; data = somarDias(data, 1)) {
+                const chave = data.toISOString().slice(0, 10);
+                grupos.push({ chave, label: formatarDataCurta(data), inicio: new Date(data), fim: somarDias(data, 1) });
+            }
+        } else if (periodo.tipo === 'semana') {
+            let numeroSemana = 1;
+            for (let data = new Date(periodo.inicio); data < periodo.fim; data = somarDias(data, 7)) {
+                grupos.push({ chave: `semana-${numeroSemana}`, label: `S${numeroSemana}`, inicio: new Date(data), fim: somarDias(data, 7) });
+                numeroSemana++;
+            }
+        } else {
+            for (let data = new Date(periodo.inicio.getFullYear(), periodo.inicio.getMonth(), 1); data < periodo.fim; data = somarMeses(data, 1)) {
+                grupos.push({ chave: formatarMes(data), label: formatarMes(data), inicio: new Date(data), fim: somarMeses(data, 1) });
+            }
+        }
+
+        return grupos;
+    }
+
+    function gruposMesmoDiaDaSemana(periodo, quantidade = 6) {
+        const grupos = [];
+        const diaSelecionado = inicioDoDia(periodo.inicio);
+        const primeiroDia = somarDias(diaSelecionado, -7 * (quantidade - 1));
+
+        for (let indice = 0; indice < quantidade; indice++) {
+            const data = somarDias(primeiroDia, indice * 7);
+            const chave = data.toISOString().slice(0, 10);
+
+            grupos.push({
+                chave,
+                label: nomeDiaSemana(data),
+                inicio: data,
+                fim: somarDias(data, 1)
+            });
+        }
+
+        return grupos;
+    }
+
+    function gruposComparacaoDoPeriodo(periodo) {
+        const duracaoEmDias = (periodo.fim - periodo.inicio) / (24 * 60 * 60 * 1000);
+
+        if (periodo.tipo === 'dia' && duracaoEmDias <= 2) {
+            return gruposMesmoDiaDaSemana(periodo);
+        }
+
+        return gruposPorPeriodo(periodo);
+    }
+
+    function contarPorGrupos(registros, grupos) {
+        const mapa = criarMapaDeGrupos(grupos);
+        Object.values(mapa).forEach(grupo => grupo.valor = 0);
+
+        (Array.isArray(registros) ? registros : []).forEach(registro => {
+            const data = dataDoRegistro(registro);
+            if (!data) return;
+            const grupo = grupos.find(item => data >= item.inicio && data < item.fim);
+            if (grupo) mapa[grupo.chave].valor += mensagensValidas(registro).length;
+        });
+
+        return grupos.map(grupo => ({ ...grupo, valor: mapa[grupo.chave]?.valor || 0 }));
+    }
+
+    function gruposUteisDaComparacao(registros, periodo) {
+        const gruposContados = contarPorGrupos(registros, gruposComparacaoDoPeriodo(periodo));
+        const gruposComValor = gruposContados.filter(grupo => grupo.valor > 0);
+        return gruposComValor.length >= 2 && gruposComValor.length <= 4 ? gruposComValor : gruposContados;
+    }
+
+    function gruposLinha(registros, periodo) {
+        if (periodo.tipo !== 'dia' || periodo.fim - periodo.inicio > 2 * 24 * 60 * 60 * 1000) {
+            return contarPorGrupos(registros, gruposPorPeriodo(periodo));
+        }
+
+        const grupos = Array.from({ length: 24 }, (_, hora) => ({
+            chave: `${hora}`,
+            label: `${hora}h`,
+            valor: 0
+        }));
+
+        registros.forEach(registro => {
+            const data = dataDoRegistro(registro);
+            if (data) grupos[data.getHours()].valor += mensagensValidas(registro).length;
+        });
+
+        return grupos;
+    }
+
+    function montarLinhaDoPeriodo(registros, periodo) {
+        const grupos = gruposLinha(registros, periodo);
+        return {
+            labels: grupos.map(grupo => grupo.label),
+            valores: grupos.map(grupo => grupo.valor)
+        };
+    }
+
+    function montarComparacaoDoPeriodo(registros, periodo) {
+        const grupos = gruposUteisDaComparacao(registros, periodo);
+        const base = grupos[0]?.valor || 0;
+        const maximo = Math.max(...grupos.map(grupo => grupo.valor), base, 1);
+        const fimDoDiaAtual = somarDias(inicioDoDia(new Date()), 1).getTime();
+
+        return grupos.map((grupo, indice) => {
+            const diferenca = base > 0 ? Math.round(((grupo.valor - base) / base) * 100) : (grupo.valor > 0 ? 100 : 0);
+            const abaixo = grupo.valor < base;
+            const acima = grupo.valor > base;
+            const grupoEhHoje = periodo.tipo === 'dia' && grupo.fim?.getTime() === fimDoDiaAtual;
+
+            return {
+                label: grupoEhHoje ? 'HOJE' : grupo.label,
+                valor: grupo.valor,
+                ativo: indice === grupos.length - 1,
+                valorBase: base,
+                comparacao: indice === 0 ? 'base' : `${diferenca > 0 ? '+' : ''}${diferenca}%`,
+                tomComparacao: abaixo ? 'green' : (acima ? 'red' : 'neutral'),
+                cor: abaixo ? '#10c83e' : (acima ? '#e3272d' : '#5f8fe4'),
+                largura: (grupo.valor / maximo) * 100
+            };
+        });
+    }
+
+    function resumoDoPeriodo(registros, periodo) {
+        const grupos = gruposUteisDaComparacao(registros, periodo);
+        const total = grupos.reduce((soma, grupo) => soma + grupo.valor, 0);
+        const media = grupos.length > 0 ? Math.round(total / grupos.length) : 0;
+        const valorAtual = grupos[grupos.length - 1]?.valor || 0;
+        const variacao = media > 0 ? Math.round(((valorAtual - media) / media) * 100) : 0;
+
+        return [
+            { valor: media, rotulo: 'Média histórica', tom: 'neutral' },
+            { valor: valorAtual, rotulo: 'Atual', tom: 'red' },
+            { valor: `${variacao > 0 ? '+' : ''}${variacao}%`, rotulo: 'Contra a média', tom: variacao > 0 ? 'red' : 'green' }
+        ];
+    }
+
+    function montarTendenciasDoPeriodo(registros, periodo) {
+        const grupos = gruposUteisDaComparacao(registros, periodo);
+        const atual = grupos[grupos.length - 1]?.valor || 0;
+        const anterior = grupos[grupos.length - 2]?.valor || 0;
+        const diferenca = atual - anterior;
+
+        return [
+            { rotulo: 'Período anterior:', nome: '', valor: anterior, tom: 'neutral' },
+            { rotulo: 'Esse período:', nome: '', valor: atual, tom: 'neutral' },
+            { rotulo: 'Variação:', nome: diferenca > 0 ? 'Aumentou' : (diferenca < 0 ? 'Reduziu' : ''), valor: Math.abs(diferenca), direcao: diferenca > 0 ? 'up' : (diferenca < 0 ? 'down' : ''), tom: diferenca > 0 ? 'red' : (diferenca < 0 ? 'green' : 'neutral') }
+        ];
+    }
+
+    // ---- Aqui ta a função que monta os dados do servidor selecionado filtrados ----
+    function montarDadosFiltrados(nomeServidor, registros, periodoAtual, metricas, leituras) {
+        const periodo = periodoSelecionado(periodoAtual);
+        const registrosFiltrados = registrosDoPeriodo(registros, periodo);
+        const leiturasFiltradas = registrosDoPeriodo(leituras, periodo);
+        const temAlertas = Array.isArray(registros) && registros.length > 0;
+        const temLeituras = Array.isArray(leituras) && leituras.length > 0;
+        const totalDeAlertas = temAlertas ? totalMensagens(registrosFiltrados) : null;
+        const totalDeLeituras = temLeituras ? leiturasFiltradas.length : null;
+        const percentual = totalDeLeituras > 0 ? limitarNumero(Math.round((totalDeAlertas / totalDeLeituras) * 100), 0, 100) : null;
+        const alertasPeriodo = montarListaAlertasDoPeriodo(registrosFiltrados);
+        const alertasUltimaHora = alertasDosUltimosMinutos(montarListaAlertasDoPeriodo(registros), 60);
+
+        return montarDadosPorServidor(nomeServidor, {
+            tituloDia: periodo.titulo,
+            medidor: { percentual, alertas: totalDeAlertas, leituras: totalDeLeituras },
+            tendencias: temAlertas ? montarTendenciasDoPeriodo(registros, periodo) : [],
+            linha: temAlertas ? montarLinhaDoPeriodo(registrosFiltrados, periodo) : { labels: [], valores: [] },
+            componentes: temAlertas ? montarComponentesDoPeriodo(registrosFiltrados) : [],
+            dias: temAlertas ? montarComparacaoDoPeriodo(registros, periodo) : [],
+            resumoDia: temAlertas ? resumoDoPeriodo(registros, periodo) : [],
+            alertasPeriodo,
+            alertasUltimaHora,
+            alertas: filtroListaAlertas === 'hora' ? alertasUltimaHora : alertasPeriodo
+        }, metricas);
+    }
+
+    function corPorAlerta(percentual) {
+        if (percentual > 25) return '#ff3b3b';
+        if (percentual > 10) return '#ff9d00';
+        return '#dddddd';
+    }
+
+    // ---- Aqui ficam as funções que preparam os dados antes de mostrar no painel ----
+    function montarDadosPorServidor(nomeServidor, dadosBaseServidor, metricasInformadas) {
+        const metricas = metricasInformadas || metricasDosServidores[nomeServidor] || {};
+
+        return {
+            ...dadosBaseServidor,
+            nome: nomeServidor,
+            status: metricas.status || dadosBaseServidor.status || null,
+            medidor: dadosBaseServidor.medidor || { percentual: null, alertas: null, leituras: null },
+            tendencias: Array.isArray(dadosBaseServidor.tendencias) ? dadosBaseServidor.tendencias : [],
+            linha: dadosBaseServidor.linha || { labels: [], valores: [] },
+            componentes: Array.isArray(dadosBaseServidor.componentes) ? dadosBaseServidor.componentes : [],
+            dias: Array.isArray(dadosBaseServidor.dias) ? dadosBaseServidor.dias : [],
+            resumoDia: Array.isArray(dadosBaseServidor.resumoDia) ? dadosBaseServidor.resumoDia : [],
+            alertasPeriodo: Array.isArray(dadosBaseServidor.alertasPeriodo) ? dadosBaseServidor.alertasPeriodo : [],
+            alertasUltimaHora: Array.isArray(dadosBaseServidor.alertasUltimaHora) ? dadosBaseServidor.alertasUltimaHora : [],
+            alertas: Array.isArray(dadosBaseServidor.alertas) ? dadosBaseServidor.alertas : []
+        };
+    }
+
+    function prepararSelectPeriodo() {
+        const select = pegar('periodoTempoSelect');
+        if (!select || select.dataset.renderizado === 'true') return;
+        select.innerHTML = '';
+        opcoesPeriodo.forEach(opcao => {
+            const option = criarElemento('option');
+            option.value = opcao.valor;
+            option.textContent = opcao.rotulo;
+            select.appendChild(option);
+        });
+        select.dataset.renderizado = 'true';
+        select.addEventListener('change', () => {
+            const servidorSelecionado = select.dataset.servidorSelecionado;
+            if (servidorSelecionado) renderizarPainelAlertas(pegarDadosDoPainel(servidorSelecionado));
+        });
+    }
+
+    function pegarDadosDoPainel(nomeServidor) {
+        const select = pegar('periodoTempoSelect');
+        const periodoAtual = select?.value || 'hoje';
+        const dadosConfiguradosServidor = dadosPainelAlertas.servidores[nomeServidor] || {};
+        if (Array.isArray(dadosConfiguradosServidor.registros)) {
+            const metricas = dadosConfiguradosServidor.metricas || metricasDosServidores[nomeServidor] || {};
+            return montarDadosFiltrados(
+                nomeServidor,
+                dadosConfiguradosServidor.registros,
+                periodoAtual,
+                metricas,
+                dadosConfiguradosServidor.leituras || []
+            );
+        }
+        const dadosDoPeriodo = dadosConfiguradosServidor.periodos?.[periodoAtual] || dadosConfiguradosServidor.base || dadosPainelAlertas.padrao;
+        const metricas = dadosConfiguradosServidor.metricas || metricasDosServidores[nomeServidor] || {};
+        const dadosMontadosServidor = montarDadosPorServidor(nomeServidor, copiarDados(dadosDoPeriodo), metricas);
+        return dadosMontadosServidor;
+    }
+
+    // ---- Aqui ficam as funções que renderizam os cards do modal de alertas ----
+    function renderizarResumoMedidor(resumo) {
+        const container = pegar('resumoMedidor');
+        container.innerHTML = '';
+        [
+            { rotulo: 'Número de alertas', valor: resumo.alertas },
+            { rotulo: 'Total de leituras', valor: resumo.leituras }
+        ].forEach(item => {
+            container.appendChild(criarElemento('div', 'rosquinha-stat', `<span>${item.rotulo}</span><strong>${valorTela(item.valor)}</strong>`));
+        });
+    }
+
+    function renderizarTendencias(tendencias) {
+        const container = pegar('trendResumo');
+        container.innerHTML = '';
+        tendencias.forEach(item => {
+            const nome = item.nome ? `<strong>${item.nome}</strong>` : '';
+            const seta = item.direcao === 'up' ? '▲' : (item.direcao === 'down' ? '▼' : '');
+            const setaHtml = seta ? `<i class="trend-seta">${seta}</i>` : '';
+            container.appendChild(criarElemento('div', `trend-card trend-${item.tom || 'neutral'}`, `<span>${item.rotulo || ''}</span>${nome}<b><em>${valorTela(item.valor)}</em>${setaHtml}</b>`));
+        });
+    }
+
+    function renderizarComponentes(componentes) {
+        if (!Array.isArray(componentes) || componentes.length === 0) componentes = [];
+        if (componentes.length === 0) {
+            const destaqueNome = pegar('componenteDestaqueNome');
+            if (destaqueNome) {
+                destaqueNome.textContent = '--';
+                destaqueNome.className = '';
+            }
+            colocarTexto('componenteDestaqueValor', '--');
+            desenharGraficoComponentes([]);
+            return;
+        }
+        const maior = componentes.reduce((atual, item) => item.alertas > atual.alertas ? item : atual, componentes[0]);
+        const destaqueNome = pegar('componenteDestaqueNome');
+        if (destaqueNome) {
+            destaqueNome.textContent = maior.nome;
+            destaqueNome.className = maior.nome.length > 9 ? 'texto-componente-longo' : '';
+        }
+        colocarTexto('componenteDestaqueValor', maior.alertas);
+        desenharGraficoComponentes(componentes);
+    }
+
+    function renderizarDias(dados) {
+        colocarTexto('tituloAlertasDia', dados.tituloDia);
+        const maximo = Math.max(...dados.dias.map(item => item.valor), 1);
+        const barras = pegar('dailyBars');
+        barras.innerHTML = '';
+        barras.className = dados.dias.length <= 4 ? 'daily-bars daily-bars-compact' : 'daily-bars';
+        dados.dias.forEach(item => {
+            const linha = criarElemento('div');
+            linha.className = item.ativo ? 'daily-row daily-row-active' : 'daily-row';
+            const label = criarElemento('span');
+            const trilha = criarElemento('div');
+            const barra = criarElemento('i');
+            const valor = criarElemento('strong');
+            const comparacao = criarElemento('span');
+            label.className = 'daily-label';
+            label.textContent = item.label;
+            trilha.className = 'daily-track';
+            barra.style.width = `${item.largura ?? ((item.valor / maximo) * 100)}%`;
+            barra.style.background = item.cor;
+            if (item.ativo && item.valorBase !== undefined && item.valorBase !== null) {
+                trilha.style.setProperty('--posicao-referencia', `${limitarNumero((item.valorBase / maximo) * 100, 0, 100)}%`);
+            }
+            valor.textContent = item.valor;
+            const classeComparacao = item.tomComparacao === 'green' ? 'daily-green' : (item.tomComparacao === 'red' ? 'daily-red' : 'daily-neutral');
+            comparacao.className = `daily-change ${item.comparacao ? classeComparacao : 'daily-base'}`;
+            comparacao.textContent = item.comparacao || 'base';
+            trilha.appendChild(barra);
+            linha.append(label, trilha, valor, comparacao);
+            barras.appendChild(linha);
+        });
+
+        const resumo = pegar('dailySummary');
+        resumo.innerHTML = '';
+        dados.resumoDia.forEach(item => {
+            resumo.appendChild(criarElemento('div', `summary-pill summary-${item.tom}`, `<strong>${item.valor}</strong><span>${item.rotulo}</span>`));
+        });
+    }
+
+    function atualizarBotoesFiltroAlertas() {
+        document.querySelectorAll('[data-filtro-alertas]').forEach(botao => {
+            botao.classList.toggle('feed-filtro-ativo', botao.dataset.filtroAlertas === filtroListaAlertas);
+        });
+    }
+
+    function tituloDosAlertas() {
+        return filtroListaAlertas === 'hora' ? 'Alertas da última hora:' : 'Alertas do período:';
+    }
+
+    function trocarFiltroAlertas(filtro) {
+        filtroListaAlertas = filtro === 'periodo' ? 'periodo' : 'hora';
+        const servidorSelecionado = servidorSelecionadoNoModal();
+        if (servidorSelecionado) renderizarPainelAlertas(pegarDadosDoPainel(servidorSelecionado));
+    }
+
+    function renderizarListaAlertas(alertas) {
+        const lista = pegar('listaAlertas');
+        lista.innerHTML = '';
+        colocarTexto('tituloListaAlertas', tituloDosAlertas());
+        atualizarBotoesFiltroAlertas();
+        const alertasRecentesOrdenados = [...(Array.isArray(alertas) ? alertas : [])].sort((a, b) => {
+            const dataA = new Date(`${String(a.data || '01/01/1970').split('/').reverse().join('-')}T${a.hora || '00:00'}`);
+            const dataB = new Date(`${String(b.data || '01/01/1970').split('/').reverse().join('-')}T${b.hora || '00:00'}`);
+            return dataB - dataA;
+        });
+        alertasRecentesOrdenados.forEach(item => {
+            lista.appendChild(criarElemento('li', '', `<span>${item.texto}</span><strong>${item.data} ${item.hora}</strong>`));
+        });
+    }
+
+    function renderizarPainelAlertas(dados) {
+        prepararSelectPeriodo();
+        atualizarTextoUltimaAtualizacao();
+        colocarTexto('modalAlertasNome', dados.nome);
+        const status = pegar('modalAlertasInfo');
+        status.textContent = `• ${valorTela(dados.status)}`;
+        status.className = 'info-status';
+        status.classList.add(visualDoStatus(dados.status).info);
+
+        colocarTexto('labelPercentualAlertas', dados.medidor.percentual === null || dados.medidor.percentual === undefined ? '--' : `${dados.medidor.percentual}%`);
+        renderizarResumoMedidor(dados.medidor);
+        renderizarTendencias(dados.tendencias);
+        renderizarComponentes(dados.componentes);
+        renderizarDias(dados);
+        renderizarListaAlertas(dados.alertas);
+        desenharGraficoMedidor(dados.medidor.percentual);
+        desenharGraficoLinha(dados.linha);
+    }
+
+    // ---- Aqui ficam as funções que tratam dados externos de alertas e leituras ----
+    function separarDataHoraDaLeitura(timestamp) {
+        const texto = String(timestamp || '').trim();
+        if (!texto) return { data: '', hora: '' };
+
+        if (/^\d{2}\/\d{2}\/\d{4}/.test(texto)) {
+            const partes = texto.split(/\s+/);
+            return { data: partes[0] || '', hora: partes[1] || '00:00:00' };
+        }
+
+        const dataConvertida = new Date(texto);
+        if (Number.isNaN(dataConvertida.getTime())) return { data: '', hora: '' };
+        return { data: formatarDataCompleta(dataConvertida), hora: formatarHoraCompleta(dataConvertida) };
+    }
+
+    function montarCamposDaLeitura(item) {
+        if (!Array.isArray(item)) return item || {};
+
+        return colunasDoCsvClient.reduce((campos, coluna, indice) => {
+            campos[coluna] = item[indice] || '';
+            return campos;
+        }, {});
+    }
+
+    function montarLeituraDoCsvClient(item) {
+        const campos = montarCamposDaLeitura(item);
+        const timestamp = campos.timestamp || campos.Timestamp || campos.dataHora || '';
+        if (campos.data && campos.hora) {
+            return {
+                ...(Array.isArray(item) ? {} : item),
+                mac: campos.idMac || campos.mac || campos.MacServer || '',
+                data: campos.data,
+                hora: campos.hora,
+                timestamp: timestamp || `${campos.data} ${campos.hora}`,
+                campos,
+                valores: Array.isArray(item) ? item : []
+            };
+        }
+
+        const dataHora = separarDataHoraDaLeitura(timestamp);
+
+        if (!dataHora.data || !dataHora.hora) return null;
+
+        return {
+            ...(Array.isArray(item) ? {} : item),
+            mac: campos.idMac || campos.mac || campos.MacServer || '',
+            data: dataHora.data,
+            hora: dataHora.hora,
+            timestamp,
+            campos,
+            valores: Array.isArray(item) ? item : []
+        };
+    }
+
+    function normalizarLeiturasS3(dadosS3) {
+        const registros = Array.isArray(dadosS3?.registros)
+            ? dadosS3.registros
+            : (Array.isArray(dadosS3) ? dadosS3 : []);
+
+        return registros.map(montarLeituraDoCsvClient).filter(Boolean);
+    }
+
+    function montarPainelComAlertasS3(nomeServidor, respostaS3) {
+        const registros = Array.isArray(respostaS3?.registros) ? respostaS3.registros : [];
+        const alertas = montarListaAlertasDoPeriodo(registros);
+        const totalDeAlertas = alertas.length;
+
+        if (!dadosPainelAlertas.servidores[nomeServidor]) dadosPainelAlertas.servidores[nomeServidor] = {};
+        dadosPainelAlertas.servidores[nomeServidor].registros = registros;
+        dadosPainelAlertas.servidores[nomeServidor].base = {
+            tituloDia: '',
+            medidor: { percentual: null, alertas: registros.length > 0 ? totalDeAlertas : null, leituras: null },
+            tendencias: [],
+            linha: { labels: [], valores: [] },
+            componentes: montarComponentesDoPeriodo(registros),
+            dias: [],
+            resumoDia: [],
+            alertas
+        };
+    }
+
+    function textoDoAlerta(alerta) {
+        return textoNormalizado(`${alerta?.componente || ''} ${alerta?.mensagem || ''}`);
+    }
+
+    function ehAlertaCyber(alerta) {
+        return /(MALWARE|DDOS|RANSOMWARE|CYBER|SEGURANCA|INVASAO|ATAQUE)/.test(textoDoAlerta(alerta));
+    }
+
+    function ehAlertaHardware(alerta) {
+        return /(HARDWARE|CPU|RAM|DISCO|REDE|MEMORIA|PROCESSADOR|PROCESSOS)/.test(textoDoAlerta(alerta));
+    }
+
+    function contarAlertasDoServidor(registros) {
+        return (Array.isArray(registros) ? registros : []).reduce((contagem, registro) => {
+            mensagensValidas(registro).forEach(alerta => {
+                if (ehAlertaCyber(alerta)) contagem.cyber++;
+                else if (ehAlertaHardware(alerta)) contagem.hardware++;
+            });
+            return contagem;
+        }, { hardware: 0, cyber: 0 });
+    }
+
+    function atualizarMetricasDoServidor(nomeServidor, respostaS3) {
+        const contagem = contarAlertasDoServidor(respostaS3?.registros);
+        const status = contagem.cyber > 0 ? 'CRÍTICO' : (contagem.hardware > 0 ? 'ATENÇÃO' : 'NORMAL');
+
+        metricasDosServidores[nomeServidor] = {
+            ...(metricasDosServidores[nomeServidor] || {}),
+            hardware: contagem.hardware,
+            cyber: contagem.cyber,
+            status,
+            seguranca: contagem.cyber > 0 ? 'Desprotegido' : 'Íntegro'
+        };
+    }
+
+    // ---- Aqui ficam as funções que buscam dados nos buckets S3 ----
+    async function buscarLeiturasS3DoServidor(nomeServidor, mac) {
+        if (!mac) return null;
+
+        try {
+            const resposta = await fetch('/conexaoS3/buscar_registros', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ MacServer: mac, QtdLinhas: quantidadeDeLeiturasS3 })
+            });
+
+            if (!resposta.ok) throw new Error(await resposta.text());
+
+            const dadosS3 = await resposta.json();
+            const leituras = normalizarLeiturasS3(dadosS3);
+            if (!dadosPainelAlertas.servidores[nomeServidor]) dadosPainelAlertas.servidores[nomeServidor] = {};
+            dadosPainelAlertas.servidores[nomeServidor].leituras = leituras;
+            return { registros: leituras };
+        } catch (erro) {
+            console.warn('Não foi possível buscar leituras no S3:', erro);
+            return null;
+        }
+    }
+
+    async function buscarAlertasS3DoServidor(nomeServidor, mac) {
+        if (!mac) return null;
+
+        try {
+            const resposta = await fetch('/alertasS3/buscar_registros_alertas', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ MacServer: mac })
+            });
+
+            if (!resposta.ok) throw new Error(await resposta.text());
+            const dadosS3 = await resposta.json();
+            montarPainelComAlertasS3(nomeServidor, dadosS3);
+            atualizarMetricasDoServidor(nomeServidor, dadosS3);
+            return dadosS3;
+        } catch (erro) {
+            console.warn('Não foi possível buscar alertas no S3:', erro);
+            return null;
+        }
+    }
+
+    // ---- Aqui ficam as funções que carregam servidores registrados ----
+    function pegarUnidadeAtual() {
+        return sessionStorage.getItem('ID_UNIDADE') || sessionStorage.getItem('fk_unidade') || '';
+    }
+
+    function montarServidorRegistrado(servidor, indice) {
+        const nome = servidor.alias || servidor.nome || `Servidor ${servidor.idServidor || indice + 1}`;
+        const mac = servidor.mac || servidor.endereco_mac || servidor.enderecoMac || servidor.Mac || '';
+
+        dadosDosServidores[nome] = mac;
+        metricasDosServidores[nome] = {
+            ...(metricasDosServidores[nome] || {}),
+            mac,
+            status: normalizarStatus(servidor.status || servidor.status_servidor),
+            hardware: null,
+            cyber: null,
+            seguranca: '--'
+        };
+    }
+
+    // ---- Aqui ficam as funções de atualização automática da tela ----
+    async function atualizarAlertasDosCards() {
+        if (atualizandoCards) return;
+        const servidores = Object.entries(dadosDosServidores);
+
+        atualizandoCards = true;
+        try {
+            await Promise.all(servidores.map(async ([nomeServidor, mac]) => {
+                await Promise.all([
+                    buscarAlertasS3DoServidor(nomeServidor, mac),
+                    buscarLeiturasS3DoServidor(nomeServidor, mac)
+                ]);
+            }));
+        } finally {
+            atualizandoCards = false;
+        }
+
+        gerarCards();
+        atualizarKpisPagina();
+        atualizarKpisModalAlertas();
+    }
+
+    function modalAlertasEstaAberto() {
+        return pegar('modal-painel-alertas')?.style.display === 'flex';
+    }
+
+    function servidorSelecionadoNoModal() {
+        return pegar('periodoTempoSelect')?.dataset.servidorSelecionado || '';
+    }
+
+    async function atualizarModalAberto() {
+        if (atualizandoModal || !modalAlertasEstaAberto()) return;
+
+        const nomeServidor = servidorSelecionadoNoModal();
+        const macServidor = dadosDosServidores[nomeServidor] || metricasDosServidores[nomeServidor]?.mac || '';
+        if (!nomeServidor || !macServidor) return;
+
+        atualizandoModal = true;
+        try {
+            await Promise.all([
+                buscarAlertasS3DoServidor(nomeServidor, macServidor),
+                buscarLeiturasS3DoServidor(nomeServidor, macServidor)
+            ]);
+            ultimaAtualizacaoModal = new Date();
+            gerarCards();
+            atualizarKpisPagina();
+            atualizarKpisModalAlertas();
+            renderizarPainelAlertas(pegarDadosDoPainel(nomeServidor));
+        } finally {
+            atualizandoModal = false;
+        }
+    }
+
+    function iniciarAtualizacaoAutomatica() {
+        if (!intervaloAtualizacaoCards) {
+            intervaloAtualizacaoCards = setInterval(atualizarAlertasDosCards, tempoAtualizacaoCards);
+        }
+
+        if (!intervaloAtualizacaoModal) {
+            intervaloAtualizacaoModal = setInterval(atualizarModalAberto, tempoAtualizacaoModal);
+        }
+    }
+
+    async function carregarServidoresRegistrados() {
+        const fkUnidade = pegarUnidadeAtual();
+        const rota = fkUnidade ? `/servidores/listar_servidores/${fkUnidade}` : '/servidores/listar_servidores';
+
+        try {
+            const resposta = await fetch(rota);
+            if (!resposta.ok) throw new Error(await resposta.text());
+
+            const servidores = await resposta.json();
+            dadosDosServidores = {};
+            metricasDosServidores = {};
+
+            (Array.isArray(servidores) ? servidores : []).forEach(montarServidorRegistrado);
+            gerarCards();
+            atualizarKpisPagina();
+            atualizarKpisModalAlertas();
+            await atualizarAlertasDosCards();
+        } catch (erro) {
+            console.warn('Não foi possível carregar os servidores registrados:', erro);
+        }
+    }
+
+    // ---- Aqui ta a função que permite alimentar a tela com dados externos manualmente ----
+    function atualizarDadosDoPainel(novosDados) {
+        ultimaAtualizacaoModal = new Date();
+        const temDadosSeparados = novosDados.servidores || novosDados.metricas || novosDados.painel;
+        if (Array.isArray(novosDados.servidores)) {
+            dadosDosServidores = Object.fromEntries(novosDados.servidores.map(servidor => [
+                servidor.nome,
+                servidor.mac || servidor.Mac || servidor.endereco_mac || servidor.ip || ''
+            ]));
+        } else if (novosDados.servidores) {
+            dadosDosServidores = { ...novosDados.servidores };
+        }
+        if (novosDados.metricas) metricasDosServidores = { ...novosDados.metricas };
+        if (novosDados.painel) Object.assign(dadosPainelAlertas, novosDados.painel);
+        if (!temDadosSeparados) Object.assign(dadosPainelAlertas, novosDados);
+        gerarCards();
+        atualizarKpisPagina();
+        atualizarKpisModalAlertas();
+        const select = pegar('periodoTempoSelect');
+        const servidorSelecionado = select?.dataset.servidorSelecionado;
+        const modalEstaAberto = pegar('modal-painel-alertas')?.style.display === 'flex';
+        if (modalEstaAberto && servidorSelecionado) renderizarPainelAlertas(pegarDadosDoPainel(servidorSelecionado));
+    }
+
+    // ---- Aqui ficam as funções que desenham os gráficos com Chart.js ----
+    function desenharGraficoLinha(dados) {
+        const canvas = pegar('graficoLinha');
+        if (!canvas) return;
+        destruirGrafico('linha');
+        const valoresDoGrafico = Array.isArray(dados.valores) ? dados.valores : [];
+        const maiorValorDoGrafico = Math.max(...valoresDoGrafico, 0);
+        const limiteLinha = maiorValorDoGrafico <= 10 ? 10 : Math.ceil((maiorValorDoGrafico + 1) / 5) * 5;
+        const passoLinha = limiteLinha <= 10 ? 2 : 5;
+
+        graficos.linha = new Chart(canvas, {
+            type: 'line',
+            data: {
+                labels: dados.labels,
+                datasets: [{
+                    data: valoresDoGrafico,
+                    borderColor: '#ff3434',
+                    backgroundColor: 'transparent',
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    pointHoverRadius: 4,
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: '#ff3434',
+                    pointBorderWidth: 2,
+                    tension: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false }, tooltip: { enabled: true } },
+                scales: {
+                    y: {
+                        min: 0,
+                        max: limiteLinha,
+                        grid: { display: false },
+                        ticks: { color: '#41547a', stepSize: passoLinha, font: { size: 10 } }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#41547a', font: { size: 10 } }
+                    }
+                }
+            }
+        });
+    }
+
+    function desenharGraficoComponentes(componentes) {
+        const canvas = pegar('graficoComponentes');
+        if (!canvas) return;
+        destruirGrafico('componentes');
+
+        const componentesDoGrafico = Array.isArray(componentes) ? componentes : [];
+        const maiorValorDoGrafico = Math.max(...componentesDoGrafico.map(item => item.alertas), 1);
+        const limiteComponentes = maiorValorDoGrafico <= 10 ? 10 : Math.ceil((maiorValorDoGrafico + 1) / 5) * 5;
+        graficos.componentes = new Chart(canvas, {
+            type: 'bar',
+            data: {
+                labels: componentesDoGrafico.map(item => item.nome),
+                datasets: [{
+                    data: componentesDoGrafico.map(item => item.alertas),
+                    backgroundColor: componentesDoGrafico.map(item => item.cor),
+                    borderWidth: 0,
+                    borderRadius: 3,
+                    barThickness: 12
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: true }
+                },
+                scales: {
+                    x: {
+                        min: 0,
+                        max: limiteComponentes,
+                        grid: { color: 'rgba(255, 255, 255, 0.5)', lineWidth: 1 },
+                        border: { display: false },
+                        ticks: { color: 'rgba(255, 255, 255, 0.42)', stepSize: limiteComponentes <= 10 ? 2 : 5, font: { size: 9 } }
+                    },
+                    y: {
+                        grid: { display: false },
+                        border: { display: false },
+                        ticks: { color: 'rgba(255, 255, 255, 0.32)', font: { size: 9 } }
+                    }
+                }
+            }
+        });
+    }
+
+    function desenharGraficoMedidor(percentual) {
+        const canvas = pegar('graficoMedidor');
+        if (!canvas) return;
+        destruirGrafico('medidor');
+        const percentualSeguro = Number(percentual) || 0;
+        const corDosAlertas = corPorAlerta(percentualSeguro);
+
+        graficos.medidor = new Chart(canvas, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [percentualSeguro, 100 - percentualSeguro],
+                    backgroundColor: [corDosAlertas, '#9b9b9b'],
+                    borderWidth: 0,
+                    cutout: '58%'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                resizeDelay: 100,
+                rotation: -90,
+                circumference: 180,
+                plugins: { legend: { display: false }, tooltip: { enabled: false } }
+            }
+        });
+    }
+
+    // ---- Aqui ficam as funções que abrem e fecham o modal de alertas ----
+    async function abrirModalAlertasPorCard(cartaoServidor) {
+        if (!cartaoServidor) return;
+        if (cartaoServidor instanceof Event) cartaoServidor = cartaoServidor.target;
+        if (cartaoServidor && cartaoServidor.closest) cartaoServidor = cartaoServidor.closest('.card') || cartaoServidor;
+        if (typeof cartaoServidor === 'string') cartaoServidor = document.querySelector(`.card[data-servidor="${cartaoServidor}"]`);
+        if (!cartaoServidor || !cartaoServidor.getAttribute) return;
+
+        const nome = cartaoServidor.dataset.servidor;
+        const mac = cartaoServidor.dataset.mac;
+        const select = pegar('periodoTempoSelect');
+        if (select) select.dataset.servidorSelecionado = nome;
+
+        ultimaAtualizacaoModal = null;
+        atualizarKpisModalAlertas();
+        renderizarPainelAlertas(pegarDadosDoPainel(nome));
+
+        const overlay = pegar('modal-painel-alertas');
+        overlay.style.display = 'flex';
+        overlay.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+
+        const [alertasAtualizados, leiturasAtualizadas] = await Promise.all([
+            buscarAlertasS3DoServidor(nome, mac),
+            buscarLeiturasS3DoServidor(nome, mac)
+        ]);
+
+        if ((!alertasAtualizados && !leiturasAtualizadas) || !modalAlertasEstaAberto() || servidorSelecionadoNoModal() !== nome) return;
+
+        ultimaAtualizacaoModal = new Date();
+        gerarCards();
+        atualizarKpisPagina();
+        atualizarKpisModalAlertas();
+        renderizarPainelAlertas(pegarDadosDoPainel(nome));
+    }
+
+    function fecharModalAlertas() {
+        const overlay = pegar('modal-painel-alertas');
+        overlay.style.display = 'none';
+        overlay.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        ['linha', 'medidor', 'componentes'].forEach(destruirGrafico);
+    }
+
+    function fecharModalAlertasOverlay(event) {
+        if (event.target === pegar('modal-painel-alertas')) fecharModalAlertas();
+    }
+
+    // ---- Aqui inicia a tela ----
+    window.atualizarDadosDoPainel = atualizarDadosDoPainel;
+
+    verificarSessao();
+    carregarServidoresRegistrados().finally(iniciarAtualizacaoAutomatica);
+
+</script>
+</body>
+</html>

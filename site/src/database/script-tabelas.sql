@@ -26,6 +26,18 @@ fkResponsavel int NOT NULL,
 FOREIGN KEY (fkResponsavel) REFERENCES usuario (idUsuario)
 );
 
+CREATE TABLE slackJira(
+id_unidade_slackJira INT UNIQUE NOT NULL PRIMARY KEY,
+token_api VARCHAR(1000) NOT NULL,
+email_jira VARCHAR(100) NOT NULL,
+url_jira VARCHAR(250) NOT NULL,
+key_url_jira VARCHAR(10) NOT NULL,
+webhook_slack VARCHAR(250) NOT NULL,
+CONSTRAINT id_unidade_slackJira
+FOREIGN KEY(id_unidade_slackJira)
+REFERENCES unidade(id_unidade)
+);
+
 CREATE TABLE servidor(
 idServidor INT PRIMARY KEY AUTO_INCREMENT,
 fornecedor VARCHAR(45),

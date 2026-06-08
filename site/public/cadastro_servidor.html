@@ -82,9 +82,9 @@
 
     function verificarMac(mac) {
 
-        const regex = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/;
-        return regex.test(mac);
-
+    const regex = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/;
+    return regex.test(mac);
+    
     }
 
 
@@ -98,11 +98,11 @@
         var status = status_select.value;
         var alias = Alias_input.value;
 
-        if (status == "a") {
+        if(status == "a"){
             status = "Ativo"
-        } else if (status == "i") {
+        }else if(status == "i"){
             status = "Inativo"
-        } else if (status == "m") {
+        }else if(status == "m"){
             status = "Manutenção"
         }
 
@@ -114,7 +114,7 @@
             mensagem_erro.innerHTML = "Preencha todos os campos!";
             setInterval(sumirMensagem, 4000);
             return false;
-        } else if (!verificarMac(Mac)) {
+        }else if(!verificarMac(Mac)){
 
             cardErro.style.display = "flex";
             mensagem_erro.innerHTML = "Codigo Mac inválido";
@@ -135,7 +135,7 @@
             })
                 .then(function (resposta) {
                     console.log("status:", resposta.status);
-                    if (resposta.ok) {
+                if (resposta.ok) {
                         return resposta.json();
                     } else {
                         return resposta.text().then(function (texto) {

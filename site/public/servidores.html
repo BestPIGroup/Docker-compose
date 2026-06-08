@@ -11,7 +11,7 @@
     <link rel="icon" href="./assets/LogoArgos.png">
 </head>
 
-<body>
+<body onload="buscarServidores()">
     <header class="sidebar">
 
         <div class="logo" href="index.html">
@@ -36,7 +36,8 @@
                 </a>
             </li>
             <li>
-                <a href="https://sptech-argos-support.atlassian.net/jira/software/projects/KAN/list?jql=project%20%3D%20KAN%20AND%20status%20%3D%20%22A%20fazer%22%20ORDER%20BY%20cf%5B10019%5D%20ASC">
+                <a
+                    href="https://sptech-argos-support.atlassian.net/jira/software/projects/KAN/list?jql=project%20%3D%20KAN%20AND%20status%20%3D%20%22A%20fazer%22%20ORDER%20BY%20cf%5B10019%5D%20ASC">
                     <div class="item">
                         <img src="./assets/jira.png" alt="Servidores">
                         <p>Jira</p>
@@ -58,9 +59,9 @@
             </a>
         </div>
     </header>
-    
+
     <div class="conteudo">
-        
+
         <div class="box">
             <div class="kpis">
                 <div class="kpi card-erro">
@@ -79,8 +80,10 @@
                     <img src="./assets/unlockWhite.png" alt="">
                     Ciberameaças<h2 id="threats">7</h2>
                 </div>
-                <div class="kpi kpi-alerta-sino" id="card-alerta-sino" onclick="window.location.href='dash_componentes.html'" style=" cursor: pointer;">
-                    <button class="btn-fechar-alerta" onclick="document.getElementById('card-alerta-sino').style.display='none'">✕</button>
+                <div class="kpi kpi-alerta-sino" id="card-alerta-sino"
+                    onclick="window.location.href='dash_componentes.html'" style=" cursor: pointer;">
+                    <button class="btn-fechar-alerta"
+                        onclick="document.getElementById('card-alerta-sino').style.display='none'">✕</button>
                     <img src="./assets/bellWhite.png" alt="">
                     Alerta novo!<h2 id="kpi-sino">Servidor 2</h2>
                 </div>
@@ -89,23 +92,271 @@
                 <p>Servidores</p>
             </div>
         </div>
-        
+
 
         <div class="grid" id="servers"></div>
 
-        </div>
+    </div>
     </div>
 </body>
 
 </html>
 <script>
 
+
+    async function buscarServidores() {
+
+        try {
+
+            const respostaServidores =
+                await fetch("servidores/buscar_servidores", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    }, body: JSON.stringify({
+                        fkUnidade: sessionStorage.ID_UNIDADE
+                    })
+                });
+
+            const servers = await respostaServidores.json();
+
+            await Promise.all(
+
+                servers.map(async (server) => {
+
+                    const respostaRegistro =
+                        await fetch("conexaoS3/buscar_registros", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({
+                                MacServer: server.endereco_mac,
+                                QtdLinhas: 1
+                            })
+                        });
+
+                    const registros = await respostaRegistro.json();
+                    server.ultimoRegistro = registros[0];
+
+                    const respostaLimites =
+                        await fetch("servidores/buscar_limites", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({
+                                id: server.id_servidor
+                            })
+                        });
+
+                    const limites = await respostaLimites.json();
+
+                    server.limites = limites;
+                    server.nivelAlerta = 0;
+
+                    server.limites.push({
+
+                        id_servidor: server.id_servidor,
+                        id_componente: 99,
+                        limite_componente: server.limites[3].limite_componente + server.limites[4].limite_componente,
+                        exibir: 1
+
+                    });
+
+                    server.limites.splice(3, 2);
+
+                    if (server.limites[0].limite_componente <= server.ultimoRegistro[3]) {
+
+                        server.nivelAlerta += 2;
+
+                    } else if (server.limites[0].limite_componente <= server.ultimoRegistro[3] * 0.8) {
+
+                        server.nivelAlerta++;
+
+                    }
+
+                    if (server.limites[1].limite_componente <= server.ultimoRegistro[9]) {
+
+                        server.nivelAlerta += 2;
+
+                    } else if (server.limites[1].limite_componente <= server.ultimoRegistro[9] * 0.8) {
+
+                        server.nivelAlerta++;
+
+                    }
+
+                    if (server.limites[2].limite_componente <= server.ultimoRegistro[11]) {
+
+                        server.nivelAlerta += 2;
+
+                    } else if (server.limites[2].limite_componente <= server.ultimoRegistro[11] * 0.8) {
+
+                        server.nivelAlerta++;
+
+                    }
+
+                    const pacotes = Number(server.ultimoRegistro[15]) + Number(server.ultimoRegistro[16]);
+
+                    if (server.limites[3].limite_componente <= pacotes) {
+
+                        server.nivelAlerta += 2;
+
+                    } else if (server.limites[3].limite_componente <= pacotes * 0.8) {
+
+                        server.nivelAlerta++;
+
+                    }
+
+                })
+
+            );
+
+            servers.sort((a, b) => b.nivelAlerta - a.nivelAlerta);
+
+            console.log(servers);
+
+            const box = document.getElementById("servers");
+
+            servers.forEach(server => {
+
+                console.log(server)
+
+                classeAdicional = ""
+                nvAlerta = "Normal"
+                seguranca = "Normal"
+                corTexto = "sec-ok"
+
+                if (server.nivelAlerta >= 4) {
+
+                    classeAdicional = "card-erro"
+                    nvAlerta = "Crítico"
+                    seguranca = "Comprometida"
+
+                } else if (server.nivelAlerta >= 2) {
+
+                    classeAdicional = "card-atencao"
+                    nvAlerta = "Atenção"
+                    corTexto = "sec-bad"
+
+                }
+
+                propCPU = 0
+                propRAM = 0
+                propDISCO = 0
+                propPACKS = 0
+
+                if ((server.ultimoRegistro[3] / server.limites[0].limite_componente) * 100 > 100) {
+
+                    propCPU = 100
+
+                } else {
+
+                    propCPU = (server.ultimoRegistro[3] / server.limites[0].limite_componente) * 100;
+
+                }
+
+                if ((server.ultimoRegistro[9] / server.limites[1].limite_componente) * 100 > 100) {
+
+                    propRAM = 100
+
+                } else {
+
+                    propRAM = (server.ultimoRegistro[9] / server.limites[9].limite_componente) * 100;
+
+                }
+
+                if ((server.ultimoRegistro[11] / server.limites[2].limite_componente) * 100 > 100) {
+
+                    propDISCO = 100
+
+                } else {
+
+                    propDISCO = (server.ultimoRegistro[11] / server.limites[2].limite_componente) * 100;
+
+                }
+
+                if ((Number(server.ultimoRegistro[15]) + Number(server.ultimoRegistro[16]) / server.limites[3].limite_componente) * 100 > 100) {
+
+                    propPACKS = 100
+
+                } else {
+
+                    propPACKS = (Number(server.ultimoRegistro[15]) + Number(server.ultimoRegistro[16]) / server.limites[3].limite_componente) * 100;
+
+                }
+
+                box.innerHTML +=
+                    `<div onclick="redirecionar('${server.endereco_mac}')">
+                                    <div class="card ${classeAdicional}">
+                                        <div class="header">
+                                            <strong>${server.alias}</strong>
+                                            <span>● ${nvAlerta}</span>
+                                        </div>
+                                        <div class="metric">
+                                            CPU ${Math.round(server.ultimoRegistro[3], 2)}%
+                                            <div class="bar">
+                                                <div class="fill cpu" style="width:${propCPU}%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="metric">
+                                            RAM ${Math.round(server.ultimoRegistro[9], 2)}%
+                                            <div class="bar">
+                                                <div class="fill ram" style="width:${propRAM}%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="metric">
+                                            Disco ${Math.round(server.ultimoRegistro[11], 2)}%
+                                            <div class="bar">
+                                                <div class="fill disk" style="width:${propDISCO}%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="metric">
+                                            Pacotes ${Math.round(Number(server.ultimoRegistro[15]) + Number(server.ultimoRegistro[16]), 2)}
+                                            <div class="bar">
+                                                <div class="fill net" style="width:${propPACKS}%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="process">Processos: ${server.ultimoRegistro[8]}</div>
+                                        <div class="process">
+                                            <img src="./assets/unlockWhite.png" alt=""> 
+                                            Segurança:
+                                            <span class="${corTexto}">
+                                            ${seguranca}
+                                            </span>
+                                        </div>
+                                        <div class="process">
+                                            <img src="./assets/bellWhite.png" alt=""> 
+                                            Ameaças: ${server.nivelAlerta}
+                                        </div>
+                                    </div>
+                                </div>`;
+
+            });
+
+        } catch (erro) {
+
+            console.error("Erro ao processar servidores:", erro);
+
+        }
+
+    }
+
+    function redirecionar(mac) {
+
+        sessionStorage.setItem("MAC", mac);
+
+        window.location.href = "./dash_componentes.html";
+
+    }
+
+    /*
     const data = [
         { nome: "Servidor 1", link: "./dash_componentes.html", status: "ok", cpu: 45, ram: 68, disk: 72, net: 120, processos: 128, alertas: 0, seguranca: "ok", ameacas: 0 },
         { nome: "Servidor 2", link: "./dash_componentes.html", status: "crit", cpu: 90, ram: 85, disk: 95, net: 320, processos: 342, alertas: 3, seguranca: "bad", ameacas: 5 },
         { nome: "Servidor 3", link: "./dash_componentes.html", status: "atencao", cpu: 60, ram: 70, disk: 65, net: 180, processos: 215, alertas: 1, seguranca: "bad", ameacas: 2 },
         { nome: "Servidor 4", link: "./dash_componentes.html", status: "ok", cpu: 35, ram: 50, disk: 40, net: 90, processos: 98, alertas: 0, seguranca: "ok", ameacas: 0 }
-    ];      
+    ];
 
     const ordem = { crit: 0, atencao: 1, ok: 2 };
     data.sort((a, b) => ordem[a.status] - ordem[b.status]);
@@ -118,7 +369,7 @@
         if (s.status === "crit") crit++;
         alert += s.alertas;
         threats += s.ameacas;
-        
+
         const link = document.createElement("a");
         link.href = s.link;
 
@@ -131,8 +382,8 @@
         } else {
             card.className = "card card-estavel";
         }
-        
-        card.onclick = () =>{  sessionStorage.setItem("servidor", JSON.stringify(s)); window.location.href = s.link;}
+
+        card.onclick = () => { sessionStorage.setItem("servidor", JSON.stringify(s)); window.location.href = s.link; }
 
         card.innerHTML = `
         <div class="header">
@@ -159,17 +410,11 @@
     <div class="process">
         <img src="./assets/bellWhite.png" alt=""> Ameaças: ${s.ameacas}
     </div>`;
-                
-                document.getElementById("servers").appendChild(card);
-                link.appendChild(card);
-                document.getElementById("servers").appendChild(link);
-    });
 
-    document.getElementById("total").innerText = data.length;
-    document.getElementById("ok").innerText = ok;
-    document.getElementById("atencao").innerText = atencao;
-    document.getElementById("crit").innerText = crit;
-    document.getElementById("alert").innerText = alert;
-    document.getElementById("threats").innerText = threats;
+        document.getElementById("servers").appendChild(card);
+        link.appendChild(card);
+        document.getElementById("servers").appendChild(link);
+    });
+    */
 
 </script>

@@ -3,8 +3,6 @@ const ransomwareModel = require("../models/ransomwareModel");
 
 function buscarDadosRansomware(req, res) {
 
-    console.log("QtdLinhas recebida:", req.body.QtdLinhas);
-    
     const mac = req.body.MacServer;
 
     ransomwareModel.buscarDadosRansomware(mac)

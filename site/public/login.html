@@ -31,55 +31,59 @@
   </div>
   <!-- ================================================= -->
     <header style="display: none;" id="navLogada">
-    <div class="nav-desktop">
-      <a href="#home" style="font-weight: bold;">Home</a>
-      <a href="./cadastro_unidade.html">Cadastro de Unidade</a>
-      <a href="./index_usuario.html">Cadastro de Servidor</a>
-    </div>
-    <div class="nav2">
-      <p> Olá, <p id="nomeUsuario"></p></p>
-      <p>|</p>
-      <a href="perfil.html">Perfil</a>
-    </div>
-  </header>
-  <header style="display: flex;" id="navDeslogada">
-    <div class="nav-desktop">
-      <a href="index.html" style="font-weight: bold;">Home</a>
-      <a href="index.html#pilares">Nossos Pilares</a>
-      <a href="./sobrenos.html">Conheça a Argos</a>
-    </div>
-    <div class="nav-mobile">
-      <a href="./index.html" style="font-weight: bold;">Home</a>
-      <a href="./index.html#pilares">Pilares</a>
-      <a href="./sobrenos.html">Argos</a>
-    </div>
-    <div class="nav2">
-      <a href="cadastro.html">Cadastro</a>
-      <p>|</p>
-      <a href="login.html">Login</a>
-    </div>
-  </header>
+        <div class="nav-desktop">
+          <a href="#home" style="font-weight: bold;">Home</a>
+          <a href="./cadastro_unidade.html">Cadastro de Unidade</a>
+        </div>
+        <div class="nav2">
+          <p> Olá,
+          <p id="nomeUsuario"></p>
+          </p>
+          <p>|</p>
+          <a href="perfil.html">Perfil</a>
+        </div>
+      </header>
+      <header style="display: flex;" id="navDeslogada">
+        <div class="nav-desktop">
+          <a href="index.html" style="font-weight: bold;">Home</a>
+          <a href="index.html#pilares">Nossos Pilares</a>
+          <a href="./sobrenos.html">Conheça a Argos</a>
+        </div>
+        <div class="nav-mobile">
+          <a href="./index.html" style="font-weight: bold;">Home</a>
+          <a href="./index.html#pilares">Pilares</a>
+          <a href="./sobrenos.html">Argos</a>
+        </div>
+        <div class="nav2">
+          <a href="cadastro.html">Cadastro</a>
+          <p>|</p>
+          <a href="login.html">Login</a>
+        </div>
+    </header>
     <div class="login">
         <div class="containers">
             <div class="cardsLogin card-login1">
                 <h2>LOGIN</h2>
                 <div class="formulario">
-                    <div class="campo">
-                        <span>E-mail <b style="color: red;">*</b></span> <br>
-                        <input id="email_input" type="email" placeholder="example@gmail.com">
-                    </div>
-                    <div class="campo">
-                        <span>Senha <b style="color: red;">*</b></span> <br>
-                        <input id="senha_input" type="password" placeholder="******">
-                    </div>
-                    <div class="campo">
-                        <span>Código de matricula<b style="color: red;">*</b></span> <br>
-                        <input id="codigo_input" type="text" placeholder="Digite o seu código de matricula">
+                    <div class="bloco-info">
+    
+                        <div class="campo">
+                            <span>E-mail <b style="color: red;">*</b></span> <br>
+                            <input id="email_input" type="email" placeholder="example@gmail.com">
+                        </div>
+                        <div class="campo">
+                            <span>Senha <b style="color: red;">*</b></span> <br>
+                            <input id="senha_input" type="password" placeholder="******">
+                        </div>
+                        <div class="campo">
+                            <span>Código de matricula<b style="color: red;">*</b></span> <br>
+                            <input id="codigo_input" type="text" placeholder="Digite o seu código de matricula">
+                        </div>
                     </div>
                     <button class="botao" onclick="entrar()">Logar</button>
                     <a href="cadastro.html">Ainda não possui uma conta? Cadastre aqui</a>
                 </div>
-
+    
             </div>
             <div class="cardsLogin card-login2">
                 <h2>BEM-VINDO DE VOLTA</h2>
@@ -90,20 +94,25 @@
         </div>
     </div>
     <footer>
-    <div class="footer">
-      <img src="./assets/LogoArgosW.png" alt="Logo">
-      <p>2026 Argos. Todos os direitos reservados.</p>
-    </div>
-    <hr>
-    <div class="sociais">
-      <p>Entre em contato conosco: <br>argos@argos.com.br</p>
-      <div class="sociais-img">
-        <img src="./assets/instagram.png" alt="Instagram">
-        <img src="./assets/whatsapp.png" alt="WhatsApp">
-        <img src="./assets/linkedin.png" alt="Linkedin">
-      </div>
-    </div>
-  </footer>
+        <div class="footer-inner">
+          <div class="footer-brand">
+            <img src="./assets/LogoArgosW.png" alt="Logo Argos">
+            <div class="footer-brand-text">
+              <span class="footer-brand-name">Argos</span>
+              <span class="footer-copy">© 2026 Argos. Todos os direitos reservados.</span>
+            </div>
+          </div>
+          <div class="footer-contact">
+            <span class="footer-contact-label">Contato</span>
+            <a href="mailto:argos@argos.com.br">argos@argos.com.br</a>
+          </div>
+          <div class="footer-social">
+            <a href="#" aria-label="Instagram"><img src="./assets/instagram.png" alt="Instagram"></a>
+            <a href="#" aria-label="WhatsApp"><img src="./assets/whatsapp.png" alt="WhatsApp"></a>
+            <a href="#" aria-label="LinkedIn"><img src="./assets/linkedin.png" alt="LinkedIn"></a>
+          </div>
+        </div>
+      </footer>
 </body>
 </html>
 <script>

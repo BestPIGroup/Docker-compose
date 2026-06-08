@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Argos | Componentes</title>
+    <link rel="stylesheet" href="./css/dash_componentes.css">
+    <link rel="stylesheet" href="./css/dash_rede.css">
+    <link rel="icon" href="./assets/LogoArgos.png">
+</head>
+
+<body onload="abrirModalRede()" style="display: flex; flex-direction: column; align-items: center;">
+    
+            <div class="kpi-box">
+
+                <div class=kpi-rede>
+
+                    <Span style="font-size: large; text-align: center;">tamanho médio dos pacotes enviados</Span>
+                    <Span id="PacoteMedioEnvio" style="font-size: x-large; font-weight: bolder;">78.4KB</Span>
+                    <span style="font-size: small;">últimos 30 minutos</span>
+
+                </div>
+
+                <div class=kpi-rede>
+
+                    <Span style="font-size: large; text-align: center;">tamanho médio dos pacotes recebidos</Span>
+                    <Span id="PacoteMedioRecebimento" style="font-size: x-large; font-weight: bolder;">69.7KB</Span>
+                    <span style="font-size: small;">últimos 30 minutos</span>
+
+                </div>
+
+                <div class=kpi-rede>
+
+                    <Span style="font-size: large; text-align: center;">taxa de crescimento de tráfego</Span>
+                    <Span id="taxaCrescimento" style="font-size: x-large; font-weight: bolder;">11%</Span>
+                    <span style="font-size: small;">últimos 15 minutos</span>
+
+                </div>
+
+            </div>
+
+            <div class="grid-graficos">
+
+                <div class="grafico-rede">
+
+                    <canvas id="grafico-rede-envio"></canvas>
+
+                </div>
+
+                <div class="grafico-rede">
+
+                    <canvas id="grafico-rede-recebimento"></canvas>
+
+                </div>
+                <div class="grafico-rede-proporcao">
+
+                    <canvas id="grafico-rede-proporcao"></canvas>
+                    <span id="textoPorporcaoVel">0/0</span>
+
+                </div>
+                <div class="grafico-rede">
+
+                    <canvas id="grafico-pacotes-envio"></canvas>
+
+                </div>
+                <div class="grafico-rede">
+
+                    <canvas id="grafico-pacotes-recebimento"></canvas>
+
+                </div>
+                <div class="grafico-rede-proporcao">
+
+                    <canvas id="grafico-pacotes-proporcao"></canvas>
+                    <span id="textoPorporcaoPacks">0/0</span>
+
+                </div>
+
+            </div>
+
+</body>
+
+</html>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+    
+    //Código do Murilo
+
+    async function abrirModalRede() {
+
+        lista = await buscarDadosRede();
+        console.log(lista);
+        carregarGraficosRede(lista);
+
+    }
+
+    function fecharModalRede(modal) {
+
+        mod = document.getElementById(modal);
+        Chart.getChart("grafico-rede-envio")?.destroy();
+        Chart.getChart("grafico-rede-recebimento")?.destroy();
+        Chart.getChart("grafico-rede-proporcao")?.destroy();
+        Chart.getChart("grafico-pacotes-envio")?.destroy();
+        Chart.getChart("grafico-pacotes-recebimento")?.destroy();
+        Chart.getChart("grafico-pacotes-proporcao")?.destroy();
+        mod.style.display = "none";
+
+    }
+
+    function carregarGraficosRede(lista) {
+
+        console.log(lista);
+        dados = [[], [], [], [], [], [], []]
+        textoVel = document.getElementById("textoPorporcaoVel");
+        textoPacks = document.getElementById("textoPorporcaoPacks");
+        KpiPacoteEnvio = document.getElementById("PacoteMedioEnvio");
+        KpiPacoteRecebimento = document.getElementById("PacoteMedioRecebimento");
+        KpiTaxa = document.getElementById("taxaCrescimento");
+
+        for (i = 0; i < 7;) {
+
+            dados[0].push(lista[i][2].slice(11,));
+            dados[1].push(lista[i][13]);
+            dados[2].push(lista[i][14]);
+            dados[3].push(lista[i][15]);
+            dados[4].push(lista[i][16]);
+            dados[5].push(lista[i][24]);
+            dados[6].push(lista[i][25]);
+
+            if(lista.length > 1){
+
+                i ++;
+
+            }else{
+
+                if(dados[0].length == 7){
+
+                    break;
+
+                }
+
+            }
+
+        }
+
+
+        somaVelEnvio = 0;
+        somaVelRecebimento = 0;
+        somaPacksEnvio = 0;
+        somaPacksRecebimento = 0;
+        ListaSomaVelEnvio = [];
+        ListaSomaVelRecebimento = [];
+        ListaSomaPacksEnvio = [];
+        ListaSomaPacksRecebimento = [];
+
+        for (var i = 0; i < 7; i++) {
+
+            somaVelEnvio += Number(dados[1][i]);
+            ListaSomaVelEnvio.push(Number(dados[1][i]));
+
+
+        }
+
+        for (var i = 0; i < 7; i++) {
+
+            somaVelRecebimento += Number(dados[2][i]);
+            ListaSomaVelRecebimento.push(Number(dados[2][i]));
+
+        }
+
+        for (var i = 0; i < 7; i++) {
+
+            somaPacksEnvio += Number(dados[3][i]);
+            ListaSomaPacksEnvio.push(Number(dados[3][i]));
+
+        }
+
+        for (var i = 0; i < 7; i++) {
+
+            somaPacksRecebimento += Number(dados[4][i]);
+            ListaSomaPacksRecebimento.push(Number(dados[4][i]));
+
+        }
+
+        QminAnterior = 0
+        QminAtual = 0
+
+        for (var i = 0; i < 4; i++) {
+
+            QminAnterior += ListaSomaVelEnvio[i] + ListaSomaVelRecebimento[i]
+            console.log("a")
+
+        }
+
+        for (var i = 6; i > 2; i--) {
+
+            QminAtual += ListaSomaVelEnvio[i] + ListaSomaVelRecebimento[i]
+            console.log("b")
+
+        }
+
+        KpiPacoteEnvio.textContent = (somaVelEnvio / somaPacksEnvio).toFixed(2) + " Kb"
+        KpiPacoteRecebimento.textContent = (somaVelRecebimento / somaPacksRecebimento).toFixed(2) + " Kb"
+        KpiTaxa.textContent = (((QminAtual - QminAnterior) / QminAnterior) * 100).toFixed(2) + " %"
+
+
+        const ctxRedeEnvio = document.getElementById('grafico-rede-envio');
+        const ctxRedeRecebimento = document.getElementById('grafico-rede-recebimento');
+        const ctxRedePoporcao = document.getElementById("grafico-rede-proporcao");
+        const ctxPacotesEnvio = document.getElementById("grafico-pacotes-envio");
+        const ctxPacotesRecebimento = document.getElementById("grafico-pacotes-recebimento");
+        const ctxPacotesPoporcao = document.getElementById("grafico-pacotes-proporcao");
+
+        const PacotesEnviados = dados[3][6];
+        const PacotesRecebidos = dados[4][6];
+
+        const VelocidadeEnvio = dados[1][6];
+        const VelocidadeRecebimento = dados[2][6];
+
+        const ChartRedeEnvio = new Chart(ctxRedeEnvio, {
+            type: 'line',
+            data: {
+
+                labels: dados[0],
+                datasets: [{
+                    label: "Pico",
+                    data: dados[1],
+                    borderColor: '#4A73FF',
+                    backgroundColor: '#4A73FF',
+                    borderWidth: 1
+                }, {
+                    label: "Mediana",
+                    data: dados[5],
+                    borderColor: '#FFD700',
+                    backgroundColor: '#FFD700',
+                    borderWidth: 1
+                }],
+
+            },
+            options: {
+                color: "#rgba(255,255,255,1)",
+                layout: {
+                    padding: {
+                        bottom: 0,
+                        top: 0,
+                        left: 0,
+                        right: 0
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: 'rgba(255,255,255,0.15)'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Tempo',
+                            color: "#FFFFFF",
+                            padding: {
+                                top: 0
+                            }
+                        },
+                        ticks: {
+                            padding: 0,
+                            color: "#FFFFFF"
+                        }
+                    },
+
+                    y: {
+                        grid: {
+                            color: 'rgba(255,255,255,0.15)'
+                        },
+                        title: {
+                            display: true,
+                            text: 'kbps',
+                            color: "#FFFFFF",
+                            padding: {
+                                bottom: 0
+                            }
+                        },
+                        ticks: {
+                            padding: 0,
+                            color: "#FFFFFF"
+                        }
+                    }
+                }, plugins: {
+
+                    legend: {
+
+                        display: true,
+                        labels: {
+                            color: '#FFFFFF'
+                        }
+
+
+                    }, title: {
+                        display: true,
+                        text: 'Velocidade de envio da Rede',
+                        color: "#FFFFFF",
+                        padding: {
+                            top: 0,
+                            bottom: 0
+                        },
+                        font: {
+                            size: 14
+                        }
+                    }
+
+
+                }
+            }
+        });
+
+        const ChartRedeRecebimento = new Chart(ctxRedeRecebimento, {
+            type: 'line',
+            data: {
+
+                labels: dados[0],
+                datasets: [{
+                    label: "Pico",
+                    data: dados[2],
+                    borderColor: '#4A73FF',
+                    backgroundColor: '#4A73FF',
+                    borderWidth: 1
+                }, {
+                    label: "Mediana",
+                    data: dados[6],
+                    borderColor: '#FFD700',
+                    backgroundColor: '#FFD700',
+                    borderWidth: 1
+                }],
+
+            },
+            options: {
+                color: "#rgba(255,255,255,1)",
+                layout: {
+                    padding: {
+                        bottom: 0,
+                        top: 0,
+                        left: 0,
+                        right: 0
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: 'rgba(255,255,255,0.15)'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Tempo',
+                            color: "#FFFFFF",
+                            padding: {
+                                top: 0
+                            }
+                        },
+                        ticks: {
+                            padding: 0,
+                            color: "#FFFFFF"
+                        }
+                    },
+
+                    y: {
+                        grid: {
+                            color: 'rgba(255,255,255,0.15)'
+                        },
+                        title: {
+                            display: true,
+                            text: 'kbps',
+                            color: "#FFFFFF",
+                            padding: {
+                                bottom: 0
+                            }
+                        },
+                        ticks: {
+                            padding: 0,
+                            color: "#FFFFFF"
+                        }
+                    }
+                }, plugins: {
+
+                    legend: {
+
+                        display: true,
+                        labels: {
+                            color: '#FFFFFF'
+                        }
+
+
+                    }, title: {
+                        display: true,
+                        text: 'Velocidade de recebimento da Rede',
+                        color: "#FFFFFF",
+                        padding: {
+                            top: 0,
+                            bottom: 0
+                        },
+                        font: {
+                            size: 14
+                        }
+                    }
+
+
+                }
+            }
+        });
+
+        const ChartRedeProporcao = new Chart(ctxRedePoporcao, {
+            type: 'doughnut',
+
+            data: {
+                datasets: [{
+                    data: [
+                        VelocidadeEnvio / VelocidadeRecebimento * 100,
+                        100 - VelocidadeEnvio / VelocidadeRecebimento * 100
+                    ],
+
+                    backgroundColor: [
+                        '#4A73FF',
+                        '#FFD700'
+                    ],
+
+                    borderWidth: 0
+                }]
+            },
+
+            options: {
+
+                responsive: true,
+                maintainAspectRatio: false,
+
+                rotation: 270,
+                circumference: 180,
+
+                cutout: '75%',
+
+                layout: {
+                    padding: {
+                        top: 20,
+                        bottom: 0
+                    }
+                },
+
+                plugins: {
+
+                    legend: {
+                        display: false
+                    },
+
+                    tooltip: {
+                        enabled: false
+                    },
+
+                    title: {
+                        display: true,
+                        text: 'Proporção de velocidade de envio e recebimento',
+                        color: '#FFFFFF',
+
+                        font: {
+                            size: 16,
+                            weight: 'bold'
+                        },
+
+                        padding: {
+                            top: 10,
+                            bottom: 20
+                        }
+                    },
+                }
+            }
+
+        });
+
+        textoVel.textContent = Math.round(VelocidadeEnvio) + "/" + Math.round(VelocidadeRecebimento)
+
+        const ChartPacotesEnvio = new Chart(ctxPacotesEnvio, {
+            type: 'line',
+            data: {
+
+                labels: dados[0],
+                datasets: [{
+                    label: "Pico",
+                    data: dados[3],
+                    borderColor: '#4A73FF',
+                    backgroundColor: '#4A73FF',
+                    borderWidth: 1
+                }, {
+                    label: "Mediana",
+                    data: dados[5],
+                    borderColor: '#FFD700',
+                    backgroundColor: '#FFD700',
+                    borderWidth: 1
+                }, {
+                    label: "Nv. Alerta",
+                    data: Array(7).fill(700),
+                    borderColor: '#FF4D4D',
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    borderDash: [10, 5],
+
+                    fill: false
+                }],
+
+            },
+            options: {
+                color: "#rgba(255,255,255,1)",
+                layout: {
+                    padding: {
+                        bottom: 0,
+                        top: 0,
+                        left: 0,
+                        right: 0
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: 'rgba(255,255,255,0.15)'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Tempo',
+                            color: "#FFFFFF",
+                            padding: {
+                                top: 0
+                            }
+                        },
+                        ticks: {
+                            padding: 0,
+                            color: "#FFFFFF"
+                        }
+                    },
+
+                    y: {
+                        grid: {
+                            color: 'rgba(255,255,255,0.15)'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Pacotes',
+                            color: "#FFFFFF",
+                            padding: {
+                                bottom: 0
+                            }
+                        },
+                        ticks: {
+                            padding: 0,
+                            color: "#FFFFFF"
+                        }
+                    }
+                }, plugins: {
+
+                    legend: {
+
+                        display: true,
+                        labels: {
+                            color: '#FFFFFF'
+                        }
+
+
+                    }, title: {
+                        display: true,
+                        text: 'Pacotes Enviados',
+                        color: "#FFFFFF",
+                        padding: {
+                            top: 0,
+                            bottom: 0
+                        },
+                        font: {
+                            size: 14
+                        }
+                    }
+
+
+                }
+            }
+        });
+
+        const ChartPacotesRecebimento = new Chart(ctxPacotesRecebimento, {
+            type: 'line',
+            data: {
+
+                labels: dados[0],
+                datasets: [{
+                    label: "Pico",
+                    data: dados[4],
+                    borderColor: '#4A73FF',
+                    backgroundColor: '#4A73FF',
+                    borderWidth: 1
+                }, {
+                    label: "Mediana",
+                    data: dados[6],
+                    borderColor: '#FFD700',
+                    backgroundColor: '#FFD700',
+                    borderWidth: 1
+                }, {
+                    label: "Nv. Alerta",
+                    data: Array(7).fill(700),
+                    borderColor: '#FF4D4D',
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    borderDash: [10, 5],
+
+                    fill: false
+                }],
+
+            },
+            options: {
+                color: "#rgba(255,255,255,1)",
+                layout: {
+                    padding: {
+                        bottom: 0,
+                        top: 0,
+                        left: 0,
+                        right: 0
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: 'rgba(255,255,255,0.15)'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Tempo',
+                            color: "#FFFFFF",
+                            padding: {
+                                top: 0
+                            }
+                        },
+                        ticks: {
+                            padding: 0,
+                            color: "#FFFFFF"
+                        }
+                    },
+
+                    y: {
+                        grid: {
+                            color: 'rgba(255,255,255,0.15)'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Pacotes',
+                            color: "#FFFFFF",
+                            padding: {
+                                bottom: 0
+                            }
+                        },
+                        ticks: {
+                            padding: 0,
+                            color: "#FFFFFF"
+                        }
+                    }
+                }, plugins: {
+
+                    legend: {
+
+                        display: true,
+                        labels: {
+                            color: '#FFFFFF'
+                        }
+
+
+                    }, title: {
+                        display: true,
+                        text: 'Pacotes Recebidos',
+                        color: "#FFFFFF",
+                        padding: {
+                            top: 0,
+                            bottom: 0
+                        },
+                        font: {
+                            size: 14
+                        }
+                    }
+
+
+                }
+            }
+        });
+
+        const ChartPacotesProporcao = new Chart(ctxPacotesPoporcao, {
+            type: 'doughnut',
+
+            data: {
+                datasets: [{
+                    data: [
+                        PacotesEnviados / PacotesRecebidos * 100,
+                        100 - PacotesEnviados / PacotesRecebidos * 100
+                    ],
+
+                    backgroundColor: [
+                        '#4A73FF',
+                        '#FFD700'
+                    ],
+
+                    borderWidth: 0
+                }]
+            },
+
+            options: {
+
+                responsive: true,
+                maintainAspectRatio: false,
+
+                rotation: 270,
+                circumference: 180,
+
+                cutout: '75%',
+
+                layout: {
+                    padding: {
+                        top: 20,
+                        bottom: 0
+                    }
+                },
+
+                plugins: {
+
+                    legend: {
+                        display: false
+                    },
+
+                    tooltip: {
+                        enabled: false
+                    },
+
+                    title: {
+                        display: true,
+                        text: 'Proporção de pacotes enviados e recebidos',
+                        color: '#FFFFFF',
+
+                        font: {
+                            size: 16,
+                            weight: 'bold'
+                        },
+
+                        padding: {
+                            top: 10,
+                            bottom: 20
+                        }
+                    },
+                }
+            }
+
+        });
+
+        textoPacks.textContent = Math.round(PacotesEnviados) + "/" + Math.round(PacotesRecebidos)
+
+        listaCharts = [ChartRedeEnvio, ChartRedeRecebimento, ChartRedeProporcao, ChartPacotesEnvio, ChartPacotesRecebimento, ChartPacotesProporcao]
+
+        setTimeout(function () {
+            atualizarDadosRede(listaCharts, ListaSomaVelEnvio, ListaSomaVelRecebimento, ListaSomaPacksEnvio, ListaSomaPacksRecebimento);
+        }, 10000);
+
+    }
+
+    function buscarDadosRede() {
+
+        var mac = sessionStorage.MAC;
+        var linhas = 7;
+
+        return fetch("conexaoS3/buscar_registros", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                MacServer: mac,
+                QtdLinhas: linhas
+            })
+        }).then(resposta => resposta.json());
+
+    }
+
+    function atualizarDadosRede(Charts, ListaSomaVelEnvio, ListaSomaVelRecebimento, ListaSomaPacksEnvio, ListaSomaPacksRecebimento) {
+
+        ListaSomaVelEnvioN = ListaSomaVelEnvio;
+        ListaSomaVelRecebimentoN = ListaSomaVelRecebimento;
+        ListaSomaPacksEnvioN = ListaSomaPacksEnvio;
+        ListaSomaPacksRecebimentoN = ListaSomaPacksRecebimento;
+
+        var mac = sessionStorage.MAC;
+        var linhas = 1;
+
+        fetch("conexaoS3/buscar_registros", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                MacServer: mac,
+                QtdLinhas: linhas
+            })
+        }).then(function (resposta) {
+
+            return resposta.json();
+
+        }).then(function (dados) {
+
+            for (let i = 0; i < 5; i++) {
+
+                if (i == 0 || i == 1 || i == 3 || i == 4) {
+
+                    Charts[i].data.labels.shift();
+                    Charts[i].data.labels.push(lista[0][2].slice(11,));
+
+                    if (i == 0) {
+
+                        Charts[i].data.datasets[0].data.shift();
+                        Charts[i].data.datasets[0].data.push(dados[0][13]);
+                        Charts[i].data.datasets[1].data.shift();
+                        Charts[i].data.datasets[1].data.push(dados[0][25]);
+
+                    } else if (i == 1) {
+
+                        Charts[i].data.datasets[0].data.shift();
+                        Charts[i].data.datasets[0].data.push(dados[0][14]);
+                        Charts[i].data.datasets[1].data.shift();
+                        Charts[i].data.datasets[1].data.push(dados[0][26]);
+
+                    } else if (i == 3) {
+
+                        Charts[i].data.datasets[0].data.shift();
+                        Charts[i].data.datasets[0].data.push(dados[0][15]);
+                        Charts[i].data.datasets[1].data.shift();
+                        Charts[i].data.datasets[1].data.push(dados[0][25]);
+
+                    } else if (i == 4) {
+
+                        Charts[i].data.datasets[0].data.shift();
+                        Charts[i].data.datasets[0].data.push(dados[0][16]);
+                        Charts[i].data.datasets[1].data.shift();
+                        Charts[i].data.datasets[1].data.push(dados[0][26]);
+
+                    }
+
+                } else if (i == 2 || i == 5) {
+
+                    if (i == 2) {
+
+                        Charts[i].data.datasets[0].data = [dados[0][13], dados[0][14]];
+                        textoVel = document.getElementById("textoPorporcaoVel");
+                        textoVel.textContent = Math.round(dados[0][13]) + "/" + Math.round(dados[0][14])
+
+                    } else if (i == 5) {
+
+                        Charts[i].data.datasets[0].data = [dados[0][15], dados[0][16]];
+                        textoPacks = document.getElementById("textoPorporcaoVel");
+                        textoPacks.textContent = Math.round(dados[0][15]) + "/" + Math.round(dados[0][16])
+
+                    }
+
+                }
+
+                Charts[i].update();
+
+            }
+
+            ListaSomaVelEnvioN.shift();
+            ListaSomaVelEnvioN.push(Number(dados[0][13]));
+            ListaSomaVelRecebimentoN.shift();
+            ListaSomaVelRecebimentoN.push(Number(dados[0][14]));
+            ListaSomaPacksEnvioN.shift();
+            ListaSomaPacksEnvioN.push(Number(dados[0][15]));
+            ListaSomaPacksRecebimentoN.shift();
+            ListaSomaPacksRecebimentoN.push(Number(dados[0][16]));
+
+            somaVelEnvio = 0;
+            somaVelRecebimento = 0;
+            somaPacksEnvio = 0;
+            somaPacksRecebimento = 0;
+            QminAnterior = 0;
+            QminAtual = 0;
+
+            console.log(ListaSomaVelEnvioN)
+
+            for (var i = 0; i < 7; i++) {
+
+                somaVelEnvio += Number(ListaSomaVelEnvioN[i]);
+
+            }
+
+            for (var i = 0; i < 7; i++) {
+
+                somaVelRecebimento += Number(ListaSomaVelRecebimentoN[i]);
+
+            }
+
+            for (var i = 0; i < 7; i++) {
+
+                somaPacksEnvio += Number(ListaSomaPacksEnvioN[i]);
+
+            }
+
+            for (var i = 0; i < 7; i++) {
+
+                somaPacksRecebimento += Number(ListaSomaPacksRecebimentoN[i]);
+
+            }
+
+            for (var i = 0; i < 4; i++) {
+
+                QminAnterior += Number(ListaSomaVelEnvioN[i]) + Number(ListaSomaVelRecebimentoN[i])
+                console.log("a")
+
+            }
+
+            for (var i = 6; i > 2; i--) {
+
+                QminAtual += Number(ListaSomaVelEnvioN[i]) + Number(ListaSomaVelRecebimentoN[i])
+                console.log("b")
+
+            }
+
+            KpiPacoteEnvio = document.getElementById("PacoteMedioEnvio");
+            KpiPacoteRecebimento = document.getElementById("PacoteMedioRecebimento");
+            KpiTaxa = document.getElementById("taxaCrescimento");
+
+            KpiPacoteEnvio.textContent = (somaVelEnvio / somaPacksEnvio).toFixed(2) + " Kb"
+            KpiPacoteRecebimento.textContent = (somaVelRecebimento / somaPacksRecebimento).toFixed(2) + " Kb"
+            KpiTaxa.textContent = (((QminAtual - QminAnterior) / QminAnterior) * 100).toFixed(2) + " %"
+
+        });
+
+        setTimeout(function () {
+            atualizarDadosRede(Charts, ListaSomaVelEnvioN, ListaSomaVelRecebimentoN, ListaSomaPacksEnvioN, ListaSomaPacksRecebimentoN);
+        }, 10000);
+    }
+
+</script>
