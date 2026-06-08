@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="./css/dash_componentes.css">
     <link rel="icon" href="./assets/LogoArgos.png">
 </head>
+
 <body onload="carregarGraficos()">
 
     <dialog id="modalGrafico" class="modal-overlay">
@@ -143,7 +144,7 @@
                 minTardeNoite: 70, maxTardeNoite: 85
             },
             {
-                nome: "Disco e Ramsomwarw",
+                nome: "Disco",
                 status: "atencao",
                 maxEixoY: 100, rotuloY: "Uso de disco (%)",
                 valorAtencao: 85, valorCritico: 92,
@@ -205,7 +206,7 @@
             cartao.className = "card-componente";
 
             if (componente.nome == "Rede") {
-                cartao.setAttribute("data-arquivo", "dash_rede.html"); // <--------- COLOCAR .html do Murilo
+                cartao.setAttribute("data-arquivo", "dash_ransomware.html"); // <--------- COLOCAR .html do Murilo
                 cartao.setAttribute("role", "button");
                 cartao.setAttribute("tabindex", "0");
                 cartao.style.cursor = "pointer";
@@ -226,7 +227,7 @@
                     '</div>' +
                     '</div>';
             } else if (componente.nome == "Processos") {
-                cartao.setAttribute("data-arquivo", "pagina_proc.html"); // <--------- COLOCAR .html do Luã
+                cartao.setAttribute("data-arquivo", "dash_ransomware.html"); // <--------- COLOCAR .html do Luã
                 cartao.setAttribute("role", "button");
                 cartao.setAttribute("tabindex", "0");
                 cartao.style.cursor = "pointer";
@@ -266,7 +267,7 @@
                     '</div>' +
                     '</div>';
             } else if (componente.nome == "CPU") {
-                cartao.setAttribute("data-arquivo", "dash_cpu.html"); // <--------- COLOCAR .html do Victor
+                cartao.setAttribute("data-arquivo", "dash_ransomware.html"); // <--------- COLOCAR .html do Victor
                 cartao.setAttribute("role", "button");
                 cartao.setAttribute("tabindex", "0");
                 cartao.style.cursor = "pointer";
@@ -286,7 +287,7 @@
                     '</div>' +
                     '</div>';
             } else if (componente.nome == "RAM") {
-                cartao.setAttribute("data-arquivo", "dash_componentes_ram.html"); // <--------- COLOCAR .html da Flávia
+                cartao.setAttribute("data-arquivo", "dash_ransomware.html"); // <--------- COLOCAR .html da Flávia
                 cartao.setAttribute("role", "button");
                 cartao.setAttribute("tabindex", "0");
                 cartao.style.cursor = "pointer";

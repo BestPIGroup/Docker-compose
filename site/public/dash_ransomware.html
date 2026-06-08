@@ -32,6 +32,8 @@
                             <span id="ultimaAtualizacao">--/--/---- --:--:--</span>
                         </span>
                     </div>
+
+                    <!-- <button class="btn-fechar">✕</button> -->
                 </div>
             </div>
 
@@ -50,17 +52,18 @@
                             <div class="kpi-info">
                                 <h3 id="titulo-kpi-servidor">SERVIDOR</h3>
                                 <h2 id="kpi-servidor">—</h2>
-                                <span id="badge-status" class="badge-normal">—</span>
+                                <span class="badge-critico">CRÍTICO</span>
                             </div>
+
                         </div>
                     </div>
 
                     <!-- RISCO -->
-                    <div class="kpi card-risco-baixo" id="card-risco">
+                    <div class="kpi card-risco-alto" id="card-risco">
                         <div class="kpi-top">
 
                             <div class="kpi-icon">
-
+                                <img src="./assets/ransonware/!-red.png" alt="">
                             </div>
 
                             <div class="kpi-info">
@@ -69,26 +72,10 @@
                             </div>
 
                         </div>
-                    </div>
-
-                    <!-- ALERTAS -->
-                    <div class="kpi">
-                        <div class="kpi-top">
-
-                            <div class="kpi-icon">
-                                <img src="./assets/ransonware/ransomware.png" alt="">
-                            </div>
-
-                            <div class="kpi-info">
-                                <h4>Quantidade de alertas</h4>
-                                <h1 id="kpi_alertas" style="color: #3077d4;">0</h1>
-                            </div>
-
-                        </div>
 
                         <div class="kpi-obs">
-                            <p id="alertas_select">
-                                <span id="tempo_select">--</span>
+                            <p id="obs-risco">
+                                <span>0</span>% acima do normal
                             </p>
                         </div>
                     </div>
@@ -159,17 +146,37 @@
                         </div>
                     </div>
 
+                    <!-- PROCESSOS -->
+                    <div class="kpi">
+                        <div class="kpi-top">
+
+                            <div class="kpi-icon">
+                                <img src="./assets/ransonware/process.png" alt="">
+                            </div>
+
+                            <div class="kpi-info">
+                                <h4>Processos ativos</h4>
+                                <h2 id="kpi_processos">0</h2>
+                            </div>
+
+                        </div>
+
+                        <div class="kpi-obs">
+                            <p id="aumento_processos">
+                                <span>0</span> nos últimos 10 min
+                            </p>
+                        </div>
+                    </div>
+
                 </div>
 
                 <div class="retangulo">
 
                     <p>PERÍODO SELECIONADO: </p>
                     <select id="selectTempo" onchange="carregarGraficos()">
-                        <option value="7">Últimos 30 min</option>
-                        <option value="13">Última 1h</option>
-                        <option value="37">Últimas 3h</option>
-                        <option value="73">Últimas 6h</option>
-                        <option value="289">Últimas 24h</option>
+                        <option value="30">Últimos 30 min</option>
+                        <option value="60">Última 1h</option>
+                        <option value="180">Últimas 3h</option>
                     </select>
 
                 </div>
@@ -205,8 +212,8 @@
                                 <div class="tabela-header">
                                     <span class="col-pid">PID</span>
                                     <span class="col-proc">PROCESSO</span>
-                                    <span class="col-escrita">Escrita (KB/s)</span>
-                                    <span class="col-handles">Δ Handles</span>
+                                    <span class="col-escrita">Escrita (MB)</span>
+                                    <span class="col-handles">Handles</span>
                                 </div>
 
                                 <div class="tabela-body" id="corpoTabelaProcessos"></div>
@@ -230,19 +237,13 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <script
-        src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.0.1/dist/chartjs-plugin-annotation.min.js"></script>
 
 </body>
 
 </html>
 
 <script>
-
-    var macServidor = "bc:cd:99:c2:86:34"; //mac_address mockado
-    // var macServidor = sessionStorage.MAC; 
-    var aliasServidor = "miyuki";
-    // var aliasServidor = sessionStorage.ALIAS;
 
     var recomendacoesRansomware = [
         {
@@ -301,150 +302,63 @@
         });
     }
 
-    function mediana(historico, campo) {
-
-        var valores = [];
-
-        for (var i = 0; i < historico.length; i++) {
-            valores.push(Number(historico[i][campo]) || 0);
-        }
-
-        valores.sort(function (a, b) { return a - b; });
-        return valores[Math.floor(valores.length / 2)] || 1;
-    }
-
-    function percentEmRelacaoAMediana(valorAtual, median) {
-        var diferenca = ((valorAtual - median) / median * 100);
-
-        if (diferenca > 0) {
-
-            return `<span style="color: #ff4d4d;">Está ${diferenca.toFixed(1)}% acima do normal</span>`;
-
-        } else if (diferenca == 0) {
-
-            return `<span style="color: #888888;">Está normal</span>`;
-
-        } else {
-
-            return `<span style="color: #4cd137;">Está ${Math.abs(diferenca).toFixed(1)}% abaixo do normal</span>`;
-        }
-    }
-
-    function filtrarHistorico(historico, quantidade) {
-        return historico.slice(-quantidade);
-    }
-
     function carregarGraficos() {
-
-        var macServidor = sessionStorage.MAC; //mac_address mockado
-        var qtdLinhas = Number(document.getElementById("selectTempo").value);
 
         renderizarRecomendacoes();
 
-        console.log("Select mudou para:", qtdLinhas);
+        var macServidor = "bc:cd:99:c2:86:34"; //mac_address mockado
+        var qtdLinhas = Number(document.getElementById("selectTempo").value);
 
-        fetch("ransomware/dados", {
+        fetch("/ransomware/dados", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ MacServer: macServidor, QtdLinhas: qtdLinhas })
         })
-            .then(function (resposta) { return resposta.json(); })
-            .then(function (dados) {
+        .then(function (resposta) { return resposta.json(); })
+        .then(function (dados) {
 
-                console.log("Dados recebidos:", dados);
+            console.log("Dados recebidos:", dados);
 
-                if (!dados || dados.erro) {
-                    console.log("Nenhum dado encontrado");
-                    return;
-                }
+            if (!dados || dados.erro) {
+                console.log("Nenhum dado encontrado");
+                return;
+            }
 
-                var historico = filtrarHistorico(
-                    dados.historico,
-                    qtdLinhas
-                );
+            var historico = dados.historico.slice(-qtdLinhas);
 
-                console.log("Recebidos:", dados.historico.length);
-                console.log("Filtrados:", historico.length);
+            var servidor = {
+                user:                   dados.usuario,
+                timestamp:              dados.ultima_atualizacao,
+                cpu_percent:            dados.cpu_percent,
+                virtual_memory_usage:   dados.virtual_memory_usage,
+                disk_write_mbps:        dados.disk_write_mbps,
+                disk_read_mbps:         dados.disk_read_mbps,
+                disk_percent:           dados.disk_percent,
+                total_processos:        dados.total_processos,
+                top_3_processos_disco:  dados.top_3_processos_disco,
+                nivel:                  dados.nivel,
+                pct_acima_cpu:          dados.pct_acima_cpu,
+                pct_acima_ram:          dados.pct_acima_ram,
+                pct_acima_escrita:      dados.pct_acima_escrita,
+                limite_cpu:             dados.limites.cpu,
+                limite_ram:             dados.limites.ram,
+                limite_escrita:         dados.limites.escrita_mb,
+                limite_leitura:         dados.limites.leitura_mb
+            };
 
-                var servidor = {
-                    timestamp: dados.ultima_atualizacao,
-                    cpu_percent: dados.cpu_percent,
-                    virtual_memory_usage: dados.virtual_memory_usage,
-                    disk_write_kbps: dados.disk_write_kbps,
-                    disk_read_kbps: dados.disk_read_kbps,
-                    disk_percent: dados.disk_percent,
-                    top_3_processos_disco: dados.top_3_processos_disco,
-                    nivel: dados.nivel,
-                    limite_cpu: dados.limites.cpu,
-                    limite_ram: dados.limites.ram,
-                    limite_escrita: dados.limites.escrita_kb,
-                    limite_leitura: dados.limites.leitura_kb
-                };
-
-                atualizarKPIs(servidor, historico);
-                renderizarTabelaProcessos(servidor.top_3_processos_disco);
-                criarGraficos(historico, servidor);
-            })
-            .catch(function (erro) {
-                console.log("Erro ao carregar dashboard:", erro);
-            });
+            atualizarKPIs(servidor);
+            renderizarTabelaProcessos(servidor.top_3_processos_disco);
+            criarGraficos(historico, servidor);
+        })
+        .catch(function (erro) {
+            console.log("Erro ao carregar dashboard:", erro);
+        });
     }
 
-    function atualizarKPIs(servidor, historico) {
+    function atualizarKPIs(servidor) {
 
-        var medianCpu = mediana(historico, "cpu_percent");
-        var medianRam = mediana(historico, "virtual_memory_usage");
-        var medianEscrita = mediana(historico, "disk_write_kbps");
-
-        document.getElementById("kpi-servidor").textContent = aliasServidor;
-
-        var badgeStatus = document.getElementById("badge-status");
-
-        if (servidor.nivel == "ALTO") {
-            document.getElementById("badge-status").textContent = "CRÍTICO";
-            badgeStatus.className = "badge-critico"
-        } else if (servidor.nivel == "MEDIO") {
-            document.getElementById("badge-status").textContent = "ATENÇÃO";
-            badgeStatus.className = "badge-atencao"
-        } else {
-            document.getElementById("badge-status").textContent = "NORMAL";
-            badgeStatus.className = "badge-normal"
-        }
-
+        document.getElementById("kpi-servidor").textContent = servidor.user;
         document.getElementById("ultimaAtualizacao").textContent = servidor.timestamp;
-
-        var totalAlertas = 0;
-        var nivelMaximo = "BAIXO";
-
-        for (var i = 0; i < historico.length; i++) {
-            var nivelItem = historico[i].nivel;
-
-            if (nivelItem === "ALTO" || nivelItem === "MEDIO") {
-                totalAlertas++;
-            }
-
-            if (nivelItem === "ALTO") {
-                nivelMaximo = "ALTO";
-            } else if (nivelItem === "MEDIO" && nivelMaximo !== "ALTO") {
-                nivelMaximo = "MEDIO";
-            }
-        }
-
-        document.getElementById("kpi_alertas").textContent = totalAlertas;
-
-        if (nivelMaximo === "ALTO") {
-            document.getElementById("kpi_alertas").style.color = "#e90f0f";
-        } else if (nivelMaximo === "MEDIO") {
-            document.getElementById("kpi_alertas").style.color = "#facb3d";
-        } else {
-            document.getElementById("kpi_alertas").style.color = "#3077d4";
-        }
-
-        document.getElementById("kpi-risco").textContent = nivelMaximo;
-
-        document.getElementById("card-risco").className = "kpi card-risco-" + nivelMaximo.toLowerCase();
-
-        document.getElementById("kpi_alertas").textContent = totalAlertas;
 
         document.getElementById("kpi_cpu").textContent =
             servidor.cpu_percent.toFixed(1) + "%";
@@ -453,17 +367,30 @@
             servidor.virtual_memory_usage.toFixed(1) + "%";
 
         document.getElementById("kpi_escrita").textContent =
-            servidor.disk_write_kbps.toFixed(2) + " KB/s";
+            servidor.disk_write_mbps.toFixed(2) + " MB/s";
 
-        document.getElementById("diferenca_cpu").innerHTML = percentEmRelacaoAMediana(servidor.cpu_percent, medianCpu);
+        document.getElementById("kpi_processos").textContent =
+            servidor.total_processos;
 
-        document.getElementById("diferenca_ram").innerHTML = percentEmRelacaoAMediana(servidor.virtual_memory_usage, medianRam);
+        document.getElementById("diferenca_cpu").innerHTML =
+            "<span>" + servidor.pct_acima_cpu.toFixed(1) + "</span>% acima do normal";
 
-        document.getElementById("aumento_escrita").innerHTML = percentEmRelacaoAMediana(servidor.disk_write_kbps, medianEscrita);
+        document.getElementById("diferenca_ram").innerHTML =
+            "<span>" + servidor.pct_acima_ram.toFixed(1) + "</span>% acima do normal";
 
-        var textoSelect = document.getElementById("selectTempo").selectedOptions[0].text;
+        document.getElementById("aumento_escrita").innerHTML =
+            "<span>" + servidor.pct_acima_escrita.toFixed(1) + "</span>% acima do normal";
 
-        document.getElementById("tempo_select").textContent = textoSelect;
+        document.getElementById("aumento_processos").innerHTML =
+            "<span>" + servidor.total_processos + "</span> nos últimos 10 min";
+
+        document.getElementById("kpi-risco").textContent = servidor.nivel;
+
+        var cardRisco = document.getElementById("card-risco");
+        cardRisco.className = "kpi card-risco-" + servidor.nivel.toLowerCase();
+
+        document.getElementById("obs-risco").innerHTML =
+            "<span>" + servidor.pct_acima_ram.toFixed(1) + "</span>% acima do normal";
     }
 
     function renderizarTabelaProcessos(processosTexto) {
@@ -473,28 +400,28 @@
 
         if (!processosTexto) return;
 
-        var matches = processosTexto.match(/\[(\d+),\s*'([^']+)',\s*(-?\d+),?\s*(-?\d+)?\]/g);
+        var matches = processosTexto.match(/\[(\d+),\s*'([^']+)',\s*(\d+),?\s*(\d+)?\]/g);
 
         if (!matches) return;
 
         matches.slice(0, 3).forEach(function (match) {
 
-            var partes = match.match(/\[(\d+),\s*'([^']+)',\s*(-?\d+),?\s*(-?\d+)?\]/);
+            var partes = match.match(/\[(\d+),\s*'([^']+)',\s*(\d+),?\s*(\d+)?\]/);
 
-            var pid = partes[1];
-            var nome = partes[2];
-            var writeBytes = Number(partes[3]);
-            var deltaHandles = partes[4] !== undefined ? Number(partes[4]) : "—";
-            var kb = (writeBytes / 1024).toFixed(2);
+            var pid     = partes[1];
+            var nome    = partes[2];
+            var bytes   = Number(partes[3]);
+            var handles = partes[4] !== undefined ? Number(partes[4]) : "—";
+            var mb      = (bytes / 1024 / 1024).toFixed(1);
 
             corpo.innerHTML += `
-            <div class="tabela-row">
-                <span class="col-pid">${pid}</span>
-                <span class="col-proc">${nome}</span>
-                <span class="col-escrita">${kb}</span>
-                <span class="col-handles">${deltaHandles}</span>
-            </div>
-        `;
+                <div class="tabela-row">
+                    <span class="col-pid">${pid}</span>
+                    <span class="col-proc">${nome}</span>
+                    <span class="col-escrita">${mb}</span>
+                    <span class="col-handles">${handles}</span>
+                </div>
+            `;
         });
     }
 
@@ -507,10 +434,10 @@
         container.innerHTML = "";
 
         var componentes = [
-            { nome: "CPU (%)", campo: "cpu_percent", cor: "#fa71d3db", limite: servidor.limite_cpu },
-            { nome: "RAM (%)", campo: "virtual_memory_usage", cor: "#00c853", limite: servidor.limite_ram },
-            { nome: "Leitura (KB/s)", campo: "disk_read_kbps", cor: "#00b0ff", limite: servidor.limite_leitura },
-            { nome: "Escrita (KB/s)", campo: "disk_write_kbps", cor: "#f5a623", limite: servidor.limite_escrita }
+            { nome: "CPU (%)",        campo: "cpu_percent",          cor: "#ff3b3b", limite: servidor.limite_cpu     },
+            { nome: "RAM (%)",        campo: "virtual_memory_usage", cor: "#00c853", limite: servidor.limite_ram     },
+            { nome: "Leitura (MB/s)", campo: "disk_read_mbps",       cor: "#00b0ff", limite: servidor.limite_leitura },
+            { nome: "Escrita (MB/s)", campo: "disk_write_mbps",      cor: "#f5a623", limite: servidor.limite_escrita }
         ];
 
         componentes.forEach(function (componente, indice) {
@@ -520,7 +447,7 @@
             card.innerHTML = `<div class="card-grafico"><canvas id="grafico-${indice}"></canvas></div>`;
             container.appendChild(card);
 
-            var labels = [];
+            var labels  = [];
             var valores = [];
 
             historico.forEach(function (linha) {
@@ -528,7 +455,7 @@
                 valores.push(Number(linha[componente.campo]) || 0);
             });
 
-            var ctx = document.getElementById("grafico-" + indice).getContext("2d");
+            var ctx    = document.getElementById("grafico-" + indice).getContext("2d");
             var limite = componente.limite;
 
             var anotacoes = {};
@@ -557,49 +484,18 @@
                         tension: 0.3,
                         borderWidth: 2,
                         pointRadius: 1
-                    },
-                    {
-                        label: "Limite",
-                        data: Array(labels.length).fill(limite),
-                        borderColor: "#ff0000",
-                        borderDash: [5, 5],
-                        borderWidth: 2,
-                        pointRadius: 0,
-                        fill: false
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        title: {
-                            display: true,
-                            text: componente.nome,
-                            color: "#ffffff",
-                            font: {
-                                size: 16,
-                                weight: "bold"
-                            }
-                        },
-                        legend: {
-                            display: true,
-                            position: "top"
-                        },
+                        legend: { display: true },
                         annotation: { annotations: anotacoes }
                     },
                     scales: {
-                        x: {
-                            ticks: {
-                                color: "#ffffff",
-                                maxRotation: 30,
-                                minRotation: 30
-                            }
-                        },
-                        y: {
-                            ticks: {
-                                color: "#ffffff"
-                            }
-                        }
+                        x: { ticks: { color: "#ffffff" } },
+                        y: { ticks: { color: "#ffffff" } }
                     }
                 }
             });

@@ -1409,7 +1409,7 @@
         if (!mac) return null;
 
         try {
-            const resposta = await fetch('/conexaoS3/buscar_registros', {
+            const resposta = await fetch('/alertasS3/buscar_leituras', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ MacServer: mac, QtdLinhas: quantidadeDeLeiturasS3 })
