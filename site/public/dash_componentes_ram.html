@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Argos | Componentes</title>
+    <script src="./js/sessao.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link rel="stylesheet" href="./css/dash_componentes_ram.css">
+    <link rel="stylesheet" href="./css/dash_componentes.css">
+    <link rel="icon" href="./assets/LogoArgos.png">
+</head>
+
+<body onload="carregarDadosRam()">
+
+
+
+            <div class="conteudo-dash">
+
+                <div class="kpi-dash">
+
+                    <div class="kpi-servidor">
+                        <div class="icone-servidor">
+                            <img src="./assets/server2.png" alt="Servidor">
+                        </div>
+
+                        <div class="titulo-servidor">
+                            <h2 id="servidorAcesso">Servidor</h2>
+                            <span class="badge-atencao">Atenção</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-coleta">
+                        <div class="titulo-coleta">
+                            <img src="./assets/icone_ram.png" alt="Memória RAM">
+                            <span>Maior valor coletado de RAM</span>
+                        </div>
+
+                        <div class="valor-kpi-coleta" id="maior-valor-ram">_</div>
+
+                        <div class="kpi-detecta">
+                            <p>Coleta detectada às 22:00</p>
+                        </div>
+                    </div>
+
+                    <div class="kpi-grafico">
+                        <div class="info-memoria">
+                            <h3>Uso da Memória</h3>
+
+                            <div class="percentual-ram" id="percentual-ram">_</div>
+
+                            <div class="legenda-ram">
+                                <div>
+                                    <span class="cor-uso"></span>
+                                    <span id="legenda-uso">Em uso — _</span>
+                                </div>
+
+                                <div>
+                                    <span class="cor-livre"></span>
+                                    <span id="legenda-livre">Livre — _</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grafico-memoria">
+                            <canvas id="usoMemoria"></canvas>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Gráfico principal -->
+                <div class="alerta-grafico">
+
+                    <div class="grafico-monitoramento">
+                        <h3>Monitoramento de RAM</h3>
+
+                        <div class="area-grafico-monitoramento">
+                            <canvas id="monitoramentoRam"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="alertas-ram">
+
+                        <div class="componente-titulo">
+                            <img src="./assets/warningRed.png" alt="Alerta">
+                            <h3>Alertas de Componente RAM</h3>
+                        </div>
+
+                        <div class="area-tabela-alertas">
+                            <table class="tabela-alertas">
+                                <thead>
+                                    <tr>
+                                        <th>Servidor</th>
+                                        <th>Horário do alerta</th>
+                                        <th>Valor captura</th>
+                                        <th>Acima do limite</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="corpo-alertas-ram">
+                                    <tr>
+                                        <td>Servidor 3</td>
+                                        <td>22:00</td>
+                                        <td>30,4 GB</td>
+                                        <td class="valor-acima-limite">15%</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>Servidor 4</td>
+                                        <td>19:00</td>
+                                        <td>30,4 GB</td>
+                                        <td class="valor-acima-limite">20%</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>Servidor 2</td>
+                                        <td>18:45</td>
+                                        <td>30,4 GB</td>
+                                        <td class="valor-acima-limite">5%</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>Servidor 4</td>
+                                        <td>20:00</td>
+                                        <td>30,4 GB</td>
+                                        <td class="valor-acima-limite">12%</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>Servidor 1</td>
+                                        <td>13:00</td>
+                                        <td>30,4 GB</td>
+                                        <td class="valor-acima-limite">8%</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>Servidor 2</td>
+                                        <td>15:15</td>
+                                        <td>30,4 GB</td>
+                                        <td class="valor-acima-limite">3%</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>Servidor 4</td>
+                                        <td>16:00</td>
+                                        <td>30,4 GB</td>
+                                        <td class="valor-acima-limite">17%</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+</body>
+
+</html>
+<script>
+    var todosDados = {};
+
+    const modal = document.getElementById("modal_ram");
+    const spanFechar = document.querySelector(".fechar");
+
+    let graficoUsoMemoria = null;
+    let graficoMonitoramentoRam = null;
+
+    function carregarDadosRam() {
+        fetch("dash_ram/buscar_registros", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                MacServer: sessionStorage.MAC,
+                QtdLinhas: 10
+            })
+        })
+            .then(function (resposta) {
+                return resposta.json();
+            })
+            .then(function (dados) {
+                console.log("Dados RAM:", dados);
+
+                const historico = dados.reverse();
+                const ultimo = historico[historico.length - 1];
+
+                atualizarKpisRam(ultimo, historico);
+                criarGraficoDonutRam(ultimo);
+                criarGraficoLinhaRam(historico);
+                renderizarAlertasRam(historico);
+            })
+            .catch(function (erro) {
+                console.log("Erro ao carregar RAM:", erro);
+            });
+    }
+
+    function atualizarKpisRam(ultimo, historico) {
+        const maiorValor = Math.max(...historico.map(item => Number(item.virtualMemoryUsage)));
+        const coletaMaior = historico.find(item => Number(item.virtualMemoryUsage) === maiorValor);
+
+        document.getElementById("maior-valor-ram").innerHTML = maiorValor + "%";
+        document.getElementById("percentual-ram").innerHTML = ultimo.virtualMemoryUsage + "%";
+
+        document.getElementById("legenda-uso").innerHTML = "Em uso — " + ultimo.virtualMemoryUsage + "%";
+        document.getElementById("legenda-livre").innerHTML = "Livre — " + (100 - ultimo.virtualMemoryUsage) + "%";
+
+        document.querySelector(".kpi-detecta p").innerHTML =
+            "Coleta detectada às " + coletaMaior.timestamp;
+    }
+
+    function criarGraficoDonutRam(ultimo) {
+        const uso = Number(ultimo.virtualMemoryUsage);
+        const livre = 100 - uso;
+
+        const ctx = document.getElementById("usoMemoria").getContext("2d");
+
+        if (graficoUsoMemoria) {
+            graficoUsoMemoria.destroy();
+        }
+
+        graficoUsoMemoria = new Chart(ctx, {
+            type: "doughnut",
+            data: {
+                labels: ["Em uso", "Livre"],
+                datasets: [{
+                    label: "Uso de memória",
+                    data: [uso, livre],
+                    backgroundColor: ["#FFFFFF", "#8AC3FF"],
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: "80%",
+                plugins: {
+                    legend: { display: false },
+                    title: { display: false }
+                }
+            }
+        });
+    }
+
+    function criarGraficoLinhaRam(historico) {
+        const labels = historico.map(item => {
+    return item.timestamp.split(" ")[1].substring(0,5);
+});
+        const valores = historico.map(item => Number(item.virtualMemoryUsage));
+
+        const ctx = document.getElementById("monitoramentoRam").getContext("2d");
+
+        if (graficoMonitoramentoRam) {
+            graficoMonitoramentoRam.destroy();
+        }
+
+        graficoMonitoramentoRam = new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Uso da RAM (%)",
+                    data: valores,
+                    borderColor: "#8AC3FF",
+                    backgroundColor: "rgba(75, 192, 192, 0.2)",
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: "top",
+                        labels: { color: "#ffffff" }
+                    }
+                },
+                scales: {
+                    y: {
+                        min: 0,
+                        max: 100,
+                        ticks: { color: "#ffffff" }
+                    },
+                    x: {
+                        ticks: { color: "#ffffff" }
+                    }
+                }
+            }
+        });
+    }
+
+    function renderizarAlertasRam(historico) {
+        const corpo = document.getElementById("corpo-alertas-ram");
+        corpo.innerHTML = "";
+
+        const limiteRam = 75;
+
+        historico
+            .filter(item => Number(item.virtualMemoryUsage) > limiteRam)
+            .forEach(item => {
+                const uso = Number(item.virtualMemoryUsage);
+                const acima = uso - limiteRam;
+
+                corpo.innerHTML += `
+                    <tr>
+                        <td>Servidor 3</td>
+                        <td>${item.timestamp}</td>
+                        <td>${uso}%</td>
+                        <td class="valor-acima-limite">${acima}%</td>
+                    </tr>
+                `;
+            });
+    }
+</script>

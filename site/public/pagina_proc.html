@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="./assets/LogoArgos.png">
+    <title>Dashboard Servidor</title>
+
+    <link rel="stylesheet" href="./css/pagina_proc.css">
+</head>
+
+<body onload="iniciarDashboard()">
+
+    <div class="pagina-dashboard">
+
+        <!-- TOPO -->
+        <div class="topo-dashboard">
+
+            <!-- SERVIDOR -->
+            <div class="card-servidor-topo">
+
+                <img src="./assets/server2.png">
+
+                <div class="servidor-topo-info">
+                    <h2>Servidor 3</h2>
+                    <span class="status-topo">Atenção</span>
+                </div>
+
+            </div>
+
+            <!-- KPIS -->
+            <div class="kpis-dashboard">
+                
+                <div class="kpi-card">
+                    <p>Usuário</p>
+                    <h3 id="server-user">_</h3>
+                </div>
+
+                <div class="kpi-card critico">
+                    <p>Servidores Críticos</p>
+                    <h3 id="server-critico">3</h3>
+                </div>
+
+                <div class="kpi-card alerta">
+                    <p>Servidores em Alerta</p>
+                    <h3 id="server-alerta">3</h3>
+                </div>
+
+                <div class="kpi-card">
+                    <p>Total de Processos</p>
+                    <h3 id="kpi-total-processos">402</h3>
+                </div>
+
+                <div class="kpi-card">
+                    <p>Máximo de Processos</p>
+                    <h3 id="kpi-maximo-processos">530</h3>
+                </div>
+
+                <div class="kpi-card">
+                    <p>Usuários Logados</p>
+                    <h3 id="kpi-usuarios-logados">2</h3>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- GRID -->
+        <div class="dashboard-grid">
+
+            <!-- GRÁFICO -->
+            <div class="grafico-box">
+
+                <h3>PROCESSOS</h3>
+
+
+                <div>
+                    <canvas id="myChart"></canvas>
+                </div>
+
+            </div>
+
+            <!-- GRÁFICO -->
+            <div class="grafico-box">
+
+
+                <div class="graficos"></div>
+                 <h3>TROCAS DE CONTEXTO</h3>
+                <canvas id="grafico-contexto"></canvas>
+
+
+
+            </div>
+
+            <!-- TABELA -->
+            <div class="tabela-box">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>PID</th>
+                            <th>Descrição</th>
+                            <th>Quantidade</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="corpo-tabela-processos"></tbody>
+
+                </table>
+            </div>
+
+            <div class="processos-arquivos">
+
+                <h3>PROCESSOS E ARQUIVOS ACESSADOS</h3>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Processo</th>
+                            <th>Arquivo Acessado</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="corpo-tabela-arquivos"></tbody>
+                        
+                </table>
+
+            </div>
+
+
+        </div>
+    </div>
+
+</body>
+
+</html>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+let graficoProcessos = null;
+
+let graficoContexto = null;
+
+function carregarGraficos() {
+    fetch("/dashProcessos/buscar_registros", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            MacServer: sessionStorage.MAC,
+            QtdLinhas: 10
+        })
+    })
+    .then(resposta => resposta.json())
+    .then(dados => {
+        console.log(dados);
+
+        if (!dados || dados.length === 0) {
+            console.log("Nenhum dado encontrado para esse MAC.");
+            return;
+        }
+
+        const ultimo = dados[0];
+
+        atualizarKPI(ultimo, dados);
+        criarGraficoProcessos(dados);
+        criarGraficoContexto(dados);
+        renderizarTabelaProcessos(dados);
+        renderizarTabelaArquivosSimulados();
+    })
+    .catch(erro => {
+        console.log("Erro ao carregar dashboard:", erro);
+    });
+}
+
+function atualizarKPI(ultimo, historico) {
+    document.getElementById("server-user").innerHTML = ultimo.usuario;
+    document.getElementById("kpi-total-processos").innerHTML = ultimo.totalProcessos;
+
+    document.getElementById("kpi-maximo-processos").innerHTML =
+        Math.max(...historico.map(linha => Number(linha.totalProcessos)));
+
+    document.getElementById("kpi-usuarios-logados").innerHTML = ultimo.usuariosLogados;
+}
+
+function criarGraficoProcessos(historico) {
+    const labels = historico.map(item => {
+    const hora = item.timestamp.split(" ")[1];
+    return hora.substring(0, 5);
+});
+    const valores = historico.map(linha => Number(linha.totalProcessos)).reverse();
+
+    const ctx = document.getElementById("myChart").getContext("2d");
+
+    if (graficoProcessos) {
+        graficoProcessos.destroy();
+    }
+
+    graficoProcessos = new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: labels,
+            datasets: [{
+                label: "Total de processos",
+                data: valores,
+                borderWidth: 2,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+function criarGraficoContexto(historico) {
+    const labels = historico.map(item => {
+    const hora = item.timestamp.split(" ")[1];
+    return hora.substring(0, 5);
+});
+    const valores = historico.map(linha => Number(linha.cpuCtxSwitches)).reverse();
+
+    const ctx = document.getElementById("grafico-contexto").getContext("2d");
+
+    if (graficoContexto) {
+        graficoContexto.destroy();
+    }
+
+    graficoContexto = new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: labels,
+            datasets: [{
+                label: "Trocas de contexto",
+                data: valores,
+                borderWidth: 2,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+
+function renderizarTabelaProcessos(historico) {
+    const corpo = document.getElementById("corpo-tabela-processos");
+    corpo.innerHTML = "";
+
+    const contagem = {};
+
+    historico.forEach(function (linha) {
+        const processosTexto = linha.top3ProcessosCpu;
+
+        if (!processosTexto) return;
+
+        const processos = processosTexto
+            .replaceAll("[[", "")
+            .replaceAll("]]", "")
+            .split("], [");
+
+        processos.forEach(function (processo) {
+            const dados = processo
+                .replaceAll("[", "")
+                .replaceAll("]", "")
+                .replaceAll("'", "")
+                .split(",");
+
+            const pid = dados[0]?.trim();
+            const nome = dados[1]?.trim();
+
+            if (!nome) return;
+
+            if (!contagem[nome]) {
+                contagem[nome] = {
+                    pid: pid,
+                    nome: nome,
+                    quantidade: 0
+                };
+            }
+
+            contagem[nome].quantidade++;
+        });
+    });
+
+    const top5 = Object.values(contagem)
+        .sort((a, b) => b.quantidade - a.quantidade)
+        .slice(0, 5);
+
+    top5.forEach(function (processo) {
+        corpo.innerHTML += `
+            <tr>
+                <td>${processo.pid}</td>
+                <td>${processo.nome}</td>
+                <td>${processo.quantidade}</td>
+            </tr>
+        `;
+    });
+}
+
+const arquivosSimulados = [
+    ["chrome.exe", "C:\\Users\\Admin\\Downloads\\relatorio.pdf"],
+    ["python.exe", "C:\\Projetos\\Argos\\monitoramento.py"],
+    ["mysqld.exe", "C:\\ProgramData\\MySQL\\data\\argos.ibd"],
+    ["java.exe", "C:\\SPTech\\ProjetoArgos\\app.jar"],
+    ["Code.exe", "C:\\Users\\Gamer\\Desktop\\Argos\\pagina_proc.html"],
+    ["node.exe", "C:\\Users\\Gamer\\Desktop\\Argos\\server.js"],
+    ["explorer.exe", "C:\\Users\\Gamer\\Documents\\planilha.xlsx"]
+];
+
+function renderizarTabelaArquivosSimulados() {
+    const corpo = document.getElementById("corpo-tabela-arquivos");
+
+    corpo.innerHTML = "";
+
+    const embaralhados = arquivosSimulados
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 5);
+
+    embaralhados.forEach(item => {
+        corpo.innerHTML += `
+            <tr>
+                <td>${item[0]}</td>
+                <td>${item[1]}</td>
+            </tr>
+        `;
+    });
+}
+    
+
+    function criarGraficos(historico, limites){
+
+        graficosCriados.forEach(function (grafico) {
+            grafico.destroy();
+        });
+
+        graficosCriados = [];
+
+        var container = document.querySelector(".graficos");
+
+        container.innerHTML = "";
+
+        var componentes = [
+
+            {
+                nome: "Processos",
+                campo: "total_processos",
+                cor: "#ff3b3b",
+                limite: limites.cpu_percent,
+                unidade: "Quantidade"
+            },
+
+            {
+                nome: "Troca de Contexto",
+                campo: "cpu_ctx_switches",
+                cor: "#00c853",
+                limite: limites.cpu_ctx_switches,
+                unidade: "Quantidade"
+            }
+        ];
+
+        componentes.forEach(function (componente, indice) {
+
+            var card = document.createElement("div");
+
+            card.className = "card-componente";
+
+            card.innerHTML = `
+                <div class="card-grafico">
+                    <canvas id="grafico-${indice}"></canvas>
+                </div>`;
+
+            container.appendChild(card);
+
+            var labels = [];
+
+            var valores = [];
+
+            historico.forEach(function (linha){
+
+                labels.push(linha.timestamp);
+
+                valores.push(linha[componente.campo]);
+            });
+
+            var contexto = document.getElementById(`grafico-${indice}`).getContext("2d");
+
+            var grafico = new Chart(contexto, {
+
+                type: "line",
+
+                data: {
+
+                    labels: labels,
+
+                    datasets: [
+                        {
+                        label: componente.nome,
+                            data: valores,
+                            borderColor: componente.cor,
+                            backgroundColor: "rgba(255,255,255,0.05)",
+                            fill: true,
+                            tension: 0.3,
+                            borderWidth: 2,
+                            pointRadius: 1
+                        }
+                    ]
+                },
+
+                options: {
+
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            })
+        })
+    }
+
+
+let intervaloDashboard = null;
+
+function iniciarDashboard() {
+    carregarGraficos();
+
+    intervaloDashboard = setInterval(function () {
+        carregarGraficos();
+    }, 10000);
+}
+</script>

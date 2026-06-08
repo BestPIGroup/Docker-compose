@@ -1,4 +1,4 @@
-var conexaoS3Model = require("../models/conexaoS3Model");
+var conexaoS3Model = require("../models/dash_ramModel");
 
 function buscarRegistros(req,res){
 
@@ -38,4 +38,4 @@ function buscarRegistros(req,res){
 
 module.exports = {
     buscarRegistros
-};
+}

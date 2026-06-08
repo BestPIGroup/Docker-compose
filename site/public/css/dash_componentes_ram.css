@@ -1,0 +1,474 @@
+#canvas-1 {
+    cursor: pointer;
+}
+
+#modal_ram {
+    background-color: rgba(0, 7, 18, 0.82);
+    position: fixed;
+    z-index: 999;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+.conteudo-modal-ram {
+    background-color: #0A2552;
+    width: 82%;
+    height: 85vh;
+    border-radius: 12px;
+    padding: 12px 18px 18px 18px;
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow-y: auto;
+}
+
+.div-fechar {
+    width: 100%;
+    height: 45px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.titulo-monitor-ram {
+    color: #FFFFFF;
+    margin: 0;
+}
+
+.titulo-monitor-ram h1 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.fechar {
+    color: #FF263C;
+    font-size: 27px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-right: 2px;
+}
+
+.fechar:hover {
+    color: #FFFFFF;
+}
+
+.conteudo-dash {
+    width: 80%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-top: 3%;
+}
+
+.kpi-dash {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.35fr;
+    gap: 30px;
+    align-items: stretch;
+}
+
+.kpi-servidor,
+.kpi-coleta,
+.kpi-grafico {
+    background-color: #092966;
+    border-radius: 10px;
+    height: 110px;
+    box-sizing: border-box;
+}
+
+.kpi-servidor {
+    display: flex;
+    align-items: center;
+    gap: 17px;
+    padding: 13px 10px;
+}
+
+.icone-servidor {
+    width: 60px;
+    height: 76px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.icone-servidor img {
+    width: 58px;
+    height: 58px;
+    object-fit: contain;
+}
+
+.titulo-servidor {
+    color: #FFFFFF;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.titulo-servidor h2,
+.titulo-servidor h5 {
+    font-size: 17px;
+    margin: 0;
+}
+
+.badge-atencao {
+    color: #D7A928;
+    background-color: rgba(215, 169, 40, 0.2);
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 12px;
+    border-radius: 2px;
+    width: fit-content;
+    min-width: 70px;
+    box-sizing: border-box;
+}
+
+/* KPI DA MAIOR COLETA */
+.kpi-coleta {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 11px 13px;
+}
+
+.titulo-coleta {
+    color: #AEBBD0;
+
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 7px;
+
+    width: 100%;
+    height: auto;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.titulo-coleta img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+.titulo-coleta h3,
+.titulo-coleta span {
+    margin: 0;
+    font-size: 13px;
+    font-weight: bold;
+    color: white;
+}
+
+.valor-kpi-coleta {
+    color: #FFFFFF;
+    font-size: 30px;
+    font-weight: bold;
+    margin: 10px 0 8px 12px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.valor-kpi-coleta h2 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.kpi-detecta {
+    color: #AEBBD0;
+    margin-left: 1px;
+    padding: 0;
+}
+
+.kpi-detecta p {
+    margin: 0;
+    font-size: 10px;
+    color: white;
+}
+
+.kpi-grafico {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 13px;
+}
+
+.info-memoria {
+    color: #FFFFFF;
+    width: 48%;
+
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.info-memoria h3 {
+    margin: 0;
+    font-size: 15px;
+}
+
+.percentual-ram {
+    color: #FFFFFF;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    display: block;
+}
+
+.legenda-ram {
+    color: #FFFFFF;
+    font-size: 9px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-weight: bold;
+}
+
+.legenda-ram div {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.cor-uso,
+.cor-livre {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.cor-uso {
+    background-color: #8D6BE8;
+}
+
+.cor-livre {
+    background-color: #FF8A8A;
+}
+
+.grafico-memoria {
+    width: 88px;
+    height: 88px;
+}
+
+#usoMemoria {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.grafico-monitoramento {
+    background-color: #08265C;
+    width: 50%;
+    height: 285px;
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+
+.grafico-monitoramento h3 {
+    color: #FFFFFF;
+    text-align: center;
+    font-size: 16px;
+    margin-top: 5%;
+}
+
+.area-grafico-monitoramento {
+    width: 100%;
+    height: 245px;
+}
+
+#monitoramentoRam {
+    width: 100% !important;
+    height: 85% !important;
+}
+
+/* Alertas */
+.alertas-ram {
+    background-color: #092966;
+    width: 50%;
+    height: 285px;
+    border-radius: 10px;
+    padding: 10px 13px;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+.componente-titulo {
+    color: #FFFFFF;
+    width: 100%;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.componente-titulo img {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+}
+
+.componente-titulo h3 {
+    margin: 0;
+    font-size: 12px;
+}
+
+.area-tabela-alertas {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.tabela-alertas {
+    width: 100%;
+    border-collapse: collapse;
+    color: #FFFFFF;
+}
+
+.tabela-alertas th,
+.tabela-alertas td {
+    text-align: left;
+    padding: 7px 4px;
+    border-bottom: 1px solid rgba(157, 181, 218, 0.35);
+}
+
+.tabela-alertas th {
+    color: #C4CEE0;
+    font-size: 9px;
+    text-transform: uppercase;
+}
+
+.tabela-alertas td {
+    color: #FFFFFF;
+    font-size: 8.5px;
+}
+
+.tabela-alertas td:first-child {
+    font-weight: bold;
+}
+
+.tabela-alertas .valor-acima-limite {
+    color: #FF1838;
+    font-weight: bold;
+}
+
+.alerta-grafico {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 18px;
+}
+
+.conteudo-modal-ram::-webkit-scrollbar {
+    width: 7px;
+}
+
+.conteudo-modal-ram::-webkit-scrollbar-track {
+    background-color: #071D42;
+}
+
+.conteudo-modal-ram::-webkit-scrollbar-thumb {
+    background-color: #17478A;
+    border-radius: 10px;
+}
+
+/* RESPONSIVIDADE */
+@media (max-width: 1100px) {
+    .conteudo-modal-ram {
+        width: 90%;
+    }
+
+    .conteudo-dash {
+        width: 88%;
+    }
+
+    .kpi-dash {
+        gap: 15px;
+    }
+}
+
+@media (max-width: 850px) {
+    #modal_ram {
+        align-items: flex-start;
+        padding: 15px 0;
+    }
+
+    .conteudo-modal-ram {
+        width: 95%;
+        height: auto;
+        min-height: 90vh;
+    }
+
+    .conteudo-dash {
+        width: 100%;
+    }
+
+    .kpi-dash {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .kpi-servidor,
+    .kpi-coleta,
+    .kpi-grafico {
+        width: 100%;
+        height: 115px;
+    }
+
+    .grafico-monitoramento {
+        height: 230px;
+    }
+
+    .area-grafico-monitoramento {
+        height: 205px;
+    }
+
+    .tabela-alertas {
+        min-width: 600px;
+    }
+}
+
+@media (max-width: 500px) {
+    .conteudo-modal-ram {
+        padding: 10px;
+    }
+
+    .titulo-monitor-ram h1 {
+        font-size: 14px;
+    }
+
+    .fechar {
+        font-size: 23px;
+    }
+
+    .conteudo-dash {
+        gap: 12px;
+    }
+
+    .kpi-grafico {
+        padding: 10px 20px;
+    }
+
+    .grafico-monitoramento {
+        padding: 8px 4px;
+    }
+}
