@@ -78,21 +78,21 @@
                 <div class="kpi">
                     <img src="./assets/server2.png" alt="">
                     <span id="titulo-kpi-servidor">Servidor</span>
-                    <h2 id="kpi-servidor">—</h2>
+                    <h2 id="kpi_servidor">—</h2>
                 </div>
                 <div class="kpi card-erro">
                     <img src="./assets/warningRed.png" alt="">
-                    Estado Crítico<h2 id="kpi-crit">1</h2>
+                    Estado Crítico<h2 id="kpi_crit">1</h2>
                 </div>
                 <div class="kpi card-atencao">
                     <img src="./assets/warningOrange.png" alt="">
-                    Estado de Alerta<h2 id="kpi-alerta">1</h2>
+                    Estado de Alerta<h2 id="kpi_alerta">1</h2>
                 </div>
                 <div class="kpi kpi-alerta-sino" id="card-alerta-sino">
                     <button class="btn-fechar-alerta"
                         onclick="document.getElementById('card-alerta-sino').style.display='none'">✕</button>
                     <img src="./assets/bellWhite.png" alt="">
-                    Alerta novo!<h2 id="kpi-sino">CPU</h2>
+                    Alerta novo!<h2 id="kpi_sino">CPU</h2>
                 </div>
             </div>
             <div class="retangulo">
@@ -130,7 +130,7 @@
 
         kpiServidor.textContent = sessionStorage.ALIAS;
         kpiCrit.textContent = sessionStorage.TOTAL_CRITICOS;
-        kpialerta.textContent = sessionStorage.TOTAL_CRITICOS;
+        kpiAlerta.textContent = sessionStorage.TOTAL_CRITICOS;
 
         const componentes = [
             {
@@ -490,14 +490,14 @@
     if (servidor) {
         document.getElementById("titulo-kpi-servidor").innerText = servidor.nome;
         if (servidor.status == "crit") {
-            document.getElementById("kpi-servidor").style.color = "#ff3b3b";
-            document.getElementById("kpi-servidor").innerHTML = "Crítico";
+            document.getElementById("kpi_servidor").style.color = "#ff3b3b";
+            document.getElementById("kpi_servidor").innerHTML = "Crítico";
         } else if (servidor.status == "atencao") {
-            document.getElementById("kpi-servidor").style.color = "#f5a623";
-            document.getElementById("kpi-servidor").innerHTML = "Atenção";
+            document.getElementById("kpi_servidor").style.color = "#f5a623";
+            document.getElementById("kpi_servidor").innerHTML = "Atenção";
         } else {
-            document.getElementById("kpi-servidor").style.color = "#12921C";
-            document.getElementById("kpi-servidor").innerHTML = "Normal";
+            document.getElementById("kpi_servidor").style.color = "#12921C";
+            document.getElementById("kpi_servidor").innerHTML = "Normal";
         }
 
     }
