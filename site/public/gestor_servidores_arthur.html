@@ -1026,6 +1026,10 @@
             if (grupo) grupo.ligacoes += quantidadeLigacoesDaLeitura(leitura);
         });
 
+        grupos.forEach(grupo => {
+            grupo.ligacoes = Number(grupo.ligacoes.toFixed(0));
+        });
+
         return grupos;
     }
 
