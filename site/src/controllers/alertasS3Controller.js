@@ -1,13 +1,17 @@
 const alertasS3Model = require("../models/alertasS3Model");
 
 function montarDadosDaBusca(req) {
+    const dados = {
+        ...(req.query || {}),
+        ...(req.body || {})
+    };
     return {
-        mac: req.body.MacServer || req.body.MacServers || req.body.mac,
-        linhas: req.body.QtdLinhas || req.body.linhas,
+        mac: dados.MacServer || dados.MacServers || dados.mac,
+        linhas: dados.QtdLinhas || dados.linhas,
         filtros: {
-            dataInicio: req.body.dataInicio || req.body.DataInicio,
-            dataFim: req.body.dataFim || req.body.DataFim,
-            ultimosMinutos: req.body.ultimosMinutos || req.body.UltimosMinutos
+            dataInicio: dados.dataInicio || dados.DataInicio,
+            dataFim: dados.dataFim || dados.DataFim,
+            ultimosMinutos: dados.ultimosMinutos || dados.UltimosMinutos
         }
     };
 }
