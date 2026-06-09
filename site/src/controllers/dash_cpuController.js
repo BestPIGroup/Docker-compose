@@ -129,13 +129,13 @@ function buscarRegistros(req, res) {
 }
 
 function buscarLimites(req, res) {
-    var id = req.body.id;
+    var mac = req.body.mac;
 
-    if (!id) {
-        return res.status(400).send("ID do servidor não fornecido");
+    if (!mac) {
+        return res.status(400).send("MAC do servidor não fornecido");
     }
 
-    dash_cpuModel.buscarLimites(id)
+    dash_cpuModel.buscarLimites(mac)
         .then(function (resultado) {
             const limites = {};
             resultado.forEach(row => {

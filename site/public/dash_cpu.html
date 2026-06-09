@@ -139,8 +139,7 @@
         //     window.location.href = "servidores.html";
         // }
 
-        const macServidor = servidor.mac;
-        const idServidor = servidor.id_servidor;   
+        const macServidor = servidor.MAC;
 
         let limiteCPU = null;
         let limiteCS = null;
@@ -240,7 +239,7 @@
         }
 
         async function buscarLimites() {
-            if (!idServidor) {
+            if (!macServidor) {
                 console.warn('ID do servidor não disponível. Limites não serão exibidos.');
                 return;
             }
@@ -248,7 +247,7 @@
                 const resp = await fetch('/dash_cpu/buscarLimites', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: idServidor })
+                    body: JSON.stringify({ id: macServidor })
                 });
                 if (resp.ok) {
                     const limites = await resp.json();
