@@ -22,7 +22,21 @@ function responderErro(res, erro, texto) {
     res.status(500).json(erro);
 }
 
-async function buscarDados(req, res, funcaoModel, textoErro) {
+function erroEhNoSuchKey(erro) {
+    return erro?.code === "NoSuchKey" || erro?.name === "NoSuchKey" || erro?.statusCode === 404;
+}
+
+function responderSemAlertas(res, mac) {
+    res.json({
+        mac,
+        total: 0,
+        registros: [],
+        porComponente: {},
+        atualizadoEm: new Date().toISOString()
+    });
+}
+
+async function buscarDados(req, res, funcaoModel, textoErro, opcoes = {}) {
     const { mac, linhas, filtros } = montarDadosDaBusca(req);
 
     if (mac === undefined) {
@@ -34,12 +48,19 @@ async function buscarDados(req, res, funcaoModel, textoErro) {
         const resultado = await funcaoModel(mac, linhas, filtros);
         res.send(resultado);
     } catch (erro) {
+        if (opcoes.noSuchKeyComoVazio && erroEhNoSuchKey(erro)) {
+            responderSemAlertas(res, mac);
+            return;
+        }
+
         responderErro(res, erro, textoErro);
     }
 }
 
 function buscarRegistrosAlertas(req, res) {
-    return buscarDados(req, res, alertasS3Model.buscarRegistrosAlertas, "Não foi possível ler o csv de alertas");
+    return buscarDados(req, res, alertasS3Model.buscarRegistrosAlertas, "Não foi possível ler o csv de alertas", {
+        noSuchKeyComoVazio: true
+    });
 }
 
 function buscarLeiturasNormais(req, res) {
