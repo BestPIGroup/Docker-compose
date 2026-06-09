@@ -724,7 +724,7 @@ input {
 }
 
 .modal-alertas-layout {
-    width: min(1460px, calc(100vw - 16px));
+    width: min(1560px, calc(100vw - 16px));
     max-height: calc(100vh - 16px);
     display: grid;
     grid-template-columns: 150px minmax(0, 1fr);
@@ -764,7 +764,7 @@ input {
 }
 
 .modal-painel-alertas {
-    width: min(1290px, calc(100vw - 178px));
+    width: min(1390px, calc(100vw - 178px));
     max-height: calc(100vh - 16px);
     display: flex;
     flex-direction: column;
@@ -915,7 +915,7 @@ input {
 
 .linha-superior {
     display: grid;
-    grid-template-columns: minmax(360px, 1.35fr) minmax(260px, 0.78fr) minmax(280px, 0.9fr);
+    grid-template-columns: minmax(420px, 1.52fr) minmax(260px, 0.74fr) minmax(280px, 0.84fr);
     align-items: stretch;
     gap: 16px;
 }
@@ -1101,7 +1101,7 @@ input {
 }
 
 .timeline-card {
-    padding: 0 24px 17px;
+    padding: 0 20px 17px;
     display: flex;
     flex-direction: column;
 }
@@ -1197,9 +1197,9 @@ input {
 .trend-card b em {
     max-width: 100%;
     overflow: visible;
-    font-size: 22px;
+    font-size: 18px;
     font-style: normal;
-    line-height: 24px;
+    line-height: 20px;
     white-space: nowrap;
 }
 
