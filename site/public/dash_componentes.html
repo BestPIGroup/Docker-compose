@@ -183,7 +183,7 @@
             {
                 nome: "Rede",
                 status: "ok",
-                maxEixoY: Number(Number(dados[ultimoIndice][13]) + Number(dados[ultimoIndice][14])) * 2, rotuloY: "Tráfego de rede (Kbps)"
+                maxEixoY: Number(Math.max(Number(dados[ultimoIndice][13])) + Math.max(Number(dados[ultimoIndice][14]))) * 2, rotuloY: "Tráfego de rede (Kbps)"
             },
             {
                 nome: "Processos",
