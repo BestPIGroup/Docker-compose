@@ -30,8 +30,64 @@ const colunasClient = [
     "net_errors",
     "total_arquivos_abertos",
     "mediana_net_sent",
-    "mediana_net_recv"
+    "mediana_net_recv",
+    "ligacoes"
 ];
+
+const aliasesColunasLeitura = {
+    IDMAC: "idMac",
+    ID_MAC: "idMac",
+    MAC: "idMac",
+    MACADRESS: "idMac",
+    MACADDRESS: "idMac",
+    USER: "usuarios",
+    USUARIO: "usuarios",
+    USUARIOS: "usuarios",
+    TIMESTAMP: "timestamp",
+    LIGACOES: "ligacoes",
+    LIGACAO: "ligacoes"
+};
+
+function normalizarNomeColuna(coluna) {
+    return String(coluna || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-zA-Z0-9]+/g, "_")
+        .replace(/^_+|_+$/g, "")
+        .toUpperCase();
+}
+
+function nomePadraoColuna(coluna) {
+    const nomeNormalizado = normalizarNomeColuna(coluna);
+    const colunaClient = colunasClient.find(item => normalizarNomeColuna(item) === nomeNormalizado);
+    return aliasesColunasLeitura[nomeNormalizado] || colunaClient || String(coluna || "").trim();
+}
+
+function obterCabecalhoLeituras(linhasCsv) {
+    const linhaCabecalho = linhasCsv.find(linha => {
+        const texto = normalizarNomeColuna(linha);
+        return texto.includes("TIMESTAMP") && /(ID_MAC|IDMAC|MAC)/.test(texto);
+    });
+
+    return linhaCabecalho ? String(linhaCabecalho).split(";").map(coluna => coluna.trim()) : [];
+}
+
+function montarCamposLeitura(valores, cabecalho = []) {
+    const campos = colunasClient.reduce((objeto, coluna, indice) => {
+        objeto[coluna] = valores[indice] || "";
+        return objeto;
+    }, {});
+
+    if (!Array.isArray(cabecalho) || cabecalho.length === 0) return campos;
+
+    cabecalho.forEach((coluna, indice) => {
+        const valor = valores[indice] || "";
+        campos[nomePadraoColuna(coluna)] = valor;
+        campos[String(coluna || "").trim()] = valor;
+    });
+
+    return campos;
+}
 
 function configurarS3() {
     AWS.config.update({
@@ -118,25 +174,24 @@ function montarRegistroDaLinha(linha) {
     return dadosLinha ? montarRegistro(dadosLinha) : null;
 }
 
-function montarLeitura(linha) {
+function montarLeitura(linha, cabecalho = []) {
     const valores = String(linha || "").trim().split(";");
     if (valores.length < 3) return null;
 
-    const campos = colunasClient.reduce((objeto, coluna, indice) => {
-        objeto[coluna] = valores[indice] || "";
-        return objeto;
-    }, {});
+    const campos = montarCamposLeitura(valores, cabecalho);
 
     if (!campos.idMac || campos.idMac === "idMac") return null;
 
     const { data, hora } = separarDataHora(campos.timestamp);
     if (!data || !hora) return null;
+    const ligacoes = Number(String(campos.ligacoes || campos.Ligacoes || campos["Ligações"] || "0").replace(",", "."));
 
     return {
         mac: campos.idMac,
         timestamp: campos.timestamp,
         data,
         hora,
+        ligacoes: Number.isFinite(ligacoes) ? ligacoes : 0,
         campos,
         valores,
         linhaOriginal: linha
@@ -198,10 +253,11 @@ function filtrarLinhasDoServidor(conteudo, mac, linhas, montarItem) {
     const limite = Number(linhas) > 0 ? Number(linhas) : Infinity;
     const registros = [];
     const linhasCsv = String(conteudo || "").split(/\r?\n/);
+    const cabecalhoLeituras = montarItem === montarLeitura ? obterCabecalhoLeituras(linhasCsv) : [];
     const macComparacao = String(mac || "").trim().toLowerCase();
 
     for (let indice = linhasCsv.length - 1; indice >= 0; indice--) {
-        const registro = montarItem(linhasCsv[indice]);
+        const registro = montarItem(linhasCsv[indice], cabecalhoLeituras);
         const macRegistro = String(registro?.mac || "").trim().toLowerCase();
         if (!registro || macRegistro !== macComparacao) continue;
 

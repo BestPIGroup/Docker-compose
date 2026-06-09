@@ -94,7 +94,6 @@
                             <table class="tabela-alertas">
                                 <thead>
                                     <tr>
-                                        <th>Servidor</th>
                                         <th>Horário do alerta</th>
                                         <th>Valor captura</th>
                                         <th>Acima do limite</th>
@@ -103,49 +102,42 @@
 
                                 <tbody id="corpo-alertas-ram">
                                     <tr>
-                                        <td>Servidor 3</td>
                                         <td>22:00</td>
                                         <td>30,4 GB</td>
                                         <td class="valor-acima-limite">15%</td>
                                     </tr>
 
                                     <tr>
-                                        <td>Servidor 4</td>
                                         <td>19:00</td>
                                         <td>30,4 GB</td>
                                         <td class="valor-acima-limite">20%</td>
                                     </tr>
 
                                     <tr>
-                                        <td>Servidor 2</td>
                                         <td>18:45</td>
                                         <td>30,4 GB</td>
                                         <td class="valor-acima-limite">5%</td>
                                     </tr>
 
                                     <tr>
-                                        <td>Servidor 4</td>
                                         <td>20:00</td>
                                         <td>30,4 GB</td>
                                         <td class="valor-acima-limite">12%</td>
                                     </tr>
 
                                     <tr>
-                                        <td>Servidor 1</td>
                                         <td>13:00</td>
                                         <td>30,4 GB</td>
                                         <td class="valor-acima-limite">8%</td>
                                     </tr>
 
                                     <tr>
-                                        <td>Servidor 2</td>
                                         <td>15:15</td>
                                         <td>30,4 GB</td>
                                         <td class="valor-acima-limite">3%</td>
                                     </tr>
 
                                     <tr>
-                                        <td>Servidor 4</td>
                                         <td>16:00</td>
                                         <td>30,4 GB</td>
                                         <td class="valor-acima-limite">17%</td>
@@ -207,8 +199,8 @@
         const maiorValor = Math.max(...historico.map(item => Number(item.virtualMemoryUsage)));
         const coletaMaior = historico.find(item => Number(item.virtualMemoryUsage) === maiorValor);
 
-        document.getElementById("maior-valor-ram").innerHTML = maiorValor + "%";
-        document.getElementById("percentual-ram").innerHTML = ultimo.virtualMemoryUsage + "%";
+        document.getElementById("maior-valor-ram").innerHTML = maiorValor.toFixed(2) + "%";
+        document.getElementById("percentual-ram").innerHTML = ultimo.virtualMemoryUsage.toFixed(2) + "%";
 
         document.getElementById("legenda-uso").innerHTML = "Em uso — " + ultimo.virtualMemoryUsage + "%";
         document.getElementById("legenda-livre").innerHTML = "Livre — " + (100 - ultimo.virtualMemoryUsage) + "%";
@@ -312,7 +304,6 @@
 
                 corpo.innerHTML += `
                     <tr>
-                        <td>Servidor 3</td>
                         <td>${item.timestamp}</td>
                         <td>${uso}%</td>
                         <td class="valor-acima-limite">${acima}%</td>
