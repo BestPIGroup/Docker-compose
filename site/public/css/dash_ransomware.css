@@ -475,20 +475,20 @@ select {
         display: none;
     }
 
-
-
-
     .box {
         padding-top: 7px;
         gap: 8px;
     }
 
     .kpis {
-        gap: 8px;
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 12px;
     }
 
     .kpi {
-        flex: 1 1 80px;
+        flex: 1;
+        min-width: 300px;
         max-width: none;
         font-size: 10px;
         padding: 6px 8px;
@@ -832,16 +832,16 @@ select {
 
 .campo {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    gap: 20px;
+    align-items: flex-start;
 }
 
 .graficos {
-    display: flex;
-    flex-wrap: wrap;
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 20px;
-    justify-content: flex-start;
-    flex: 1 1 auto;
-    min-width: 0;
 }
 
 /* -------------------------- LISTAS ---------------------------- */
@@ -900,7 +900,8 @@ select {
 .rec-icone-wrapper img {
     width: 100%;
     height: 100%;
-    object-fit: contain; /* Impede distorções no PNG */
+    object-fit: contain;
+    /* Impede distorções no PNG */
 }
 
 /* Alinhamento dos blocos de texto (Título acima da Descrição) */
@@ -908,7 +909,8 @@ select {
     display: flex;
     flex-direction: column;
     gap: 3px;
-    text-align: left; /* Garante que o texto fique alinhado à esquerda */
+    text-align: left;
+    /* Garante que o texto fique alinhado à esquerda */
 }
 
 /* Estilização do Título Principal */
