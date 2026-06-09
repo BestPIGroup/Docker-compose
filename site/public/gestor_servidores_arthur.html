@@ -10,7 +10,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <!-- ---- Sidebar ---- -->
     <header class="sidebar">
         <div class="logo" href="index.html">
             <img src="./assets/LogoArgosIcon.png">
@@ -58,7 +57,6 @@
         </div>
     </header>
 
-    <!-- ---- Conteúdo principal com KPIs e cards dos servidores ---- -->
     <div class="conteudo">
         <div class="box">
             <div class="kpis">
@@ -94,7 +92,6 @@
         <div class="campo" id="campoServidores"></div>
     </div>
 
-    <!-- ---- Modal de edição dos limites dos componentes ---- -->
     <div class="modal-overlay" id="modal-editar" onclick="fecharModalEditar(event)">
         <div class="modal-editar-conteudo">
             <div class="modal-editar-header">
@@ -140,62 +137,29 @@
                         </div>
                         <label class="toggle"><input type="checkbox" data-check-componente="Rede"><span class="toggle-slider"></span></label>
                     </div>
-                    <div class="comp-item">
-                        <div class="comp-info">
-                            <img src="./assets/shield.png" class="comp-icon" alt="">
-                            <div><p class="comp-nome">Ransomware</p><p class="comp-desc">Alertas de criptografia suspeita</p></div>
-                        </div>
-                        <label class="toggle"><input type="checkbox" data-check-componente="Ransomware"><span class="toggle-slider"></span></label>
-                    </div>
-                    <div class="comp-item">
-                        <div class="comp-info">
-                            <img src="./assets/shield.png" class="comp-icon" alt="">
-                            <div><p class="comp-nome">DDoS</p><p class="comp-desc">Alertas de tráfego anormal</p></div>
-                        </div>
-                        <label class="toggle"><input type="checkbox" data-check-componente="DDoS"><span class="toggle-slider"></span></label>
-                    </div>
-                    <div class="comp-item">
-                        <div class="comp-info">
-                            <img src="./assets/shield.png" class="comp-icon" alt="">
-                            <div><p class="comp-nome">Malware</p><p class="comp-desc">Alertas de assinatura suspeita</p></div>
-                        </div>
-                        <label class="toggle"><input type="checkbox" data-check-componente="Malware"><span class="toggle-slider"></span></label>
-                    </div>
                     <div class="modal-limiar-secao">
                         <p class="modal-secao-titulo">Limiar de Alerta</p>
                         <p class="modal-secao-sub">Defina a partir de qual valor cada componente dispara um alerta.</p>
                         <div class="modal-limiares">
                             <div class="limiar-item">
                                 <label>CPU <span class="limiar-valor" id="val-cpu">--</span></label>
-                                <input type="range" min="10" max="100" class="limiar-range" data-limite-componente="CPU" oninput="atualizarLimiar('val-cpu', this.value, '%')">
+                                <input type="range" min="0" max="100" class="limiar-range" data-limite-componente="CPU" oninput="atualizarLimiar('val-cpu', this.value, '%')">
                             </div>
                             <div class="limiar-item">
                                 <label>Processos <span class="limiar-valor" id="val-processos">--</span></label>
-                                <input type="range" min="10" max="3000" class="limiar-range" data-limite-componente="Processos" oninput="atualizarLimiar('val-processos', this.value)">
+                                <input type="range" min="0" max="3000" class="limiar-range" data-limite-componente="Processos" oninput="atualizarLimiar('val-processos', this.value)">
                             </div>
                             <div class="limiar-item">
                                 <label>RAM <span class="limiar-valor" id="val-ram">--</span></label>
-                                <input type="range" min="10" max="100" class="limiar-range" data-limite-componente="RAM" oninput="atualizarLimiar('val-ram', this.value, '%')">
+                                <input type="range" min="0" max="100" class="limiar-range" data-limite-componente="RAM" oninput="atualizarLimiar('val-ram', this.value, '%')">
                             </div>
                             <div class="limiar-item">
                                 <label>Disco <span class="limiar-valor" id="val-disco">--</span></label>
-                                <input type="range" min="10" max="100" class="limiar-range" data-limite-componente="Disco" oninput="atualizarLimiar('val-disco', this.value, '%')">
+                                <input type="range" min="0" max="100" class="limiar-range" data-limite-componente="Disco" oninput="atualizarLimiar('val-disco', this.value, '%')">
                             </div>
                             <div class="limiar-item">
                                 <label>Rede <span class="limiar-valor" id="val-rede">--</span></label>
-                                <input type="range" min="10" max="4000" class="limiar-range" data-limite-componente="Rede" oninput="atualizarLimiar('val-rede', this.value, 'Mbps')">
-                            </div>
-                            <div class="limiar-item">
-                                <label>Ransomware <span class="limiar-valor" id="val-ransomware">--</span></label>
-                                <input type="range" min="1" max="100" class="limiar-range" data-limite-componente="Ransomware" oninput="atualizarLimiar('val-ransomware', this.value)">
-                            </div>
-                            <div class="limiar-item">
-                                <label>DDoS <span class="limiar-valor" id="val-ddos">--</span></label>
-                                <input type="range" min="1" max="100" class="limiar-range" data-limite-componente="DDoS" oninput="atualizarLimiar('val-ddos', this.value)">
-                            </div>
-                            <div class="limiar-item">
-                                <label>Malware <span class="limiar-valor" id="val-malware">--</span></label>
-                                <input type="range" min="1" max="100" class="limiar-range" data-limite-componente="Malware" oninput="atualizarLimiar('val-malware', this.value)">
+                                <input type="range" min="0" max="4000" class="limiar-range" data-limite-componente="Rede" oninput="atualizarLimiar('val-rede', this.value, 'Mbps')">
                             </div>
                         </div>
                     </div>
@@ -205,7 +169,6 @@
         </div>
     </div>
 
-    <!-- ---- Modal do painel de alertas ---- -->
     <div class="modal-overlay" id="modal-painel-alertas" onclick="fecharModalAlertasOverlay(event)">
         <div class="modal-alertas-layout">
             <div class="modal-alertas-kpis" onclick="event.stopPropagation()">
@@ -308,7 +271,6 @@
     </div>
 
 <script>
-    // ---- Aqui ficam os dados e funções da tela ----
     let dadosDosServidores = {};
     let metricasDosServidores = {};
 
@@ -324,14 +286,12 @@
     let atualizandoCards = false;
     let atualizandoModal = false;
     let filtroListaAlertas = 'hora';
-    let servidorEmEdicao = { nome: '', mac: '' };
+    let servidorEmEdicao = { nome: '', mac: '', existiaLimite: false };
 
-    // ---- Aqui ficam os tempos de atualização automática ----
     const tempoAtualizacaoCards = 60 * 1000;
     const tempoAtualizacaoModal = 5 * 60 * 1000;
     const quantidadeDeLeiturasS3 = 200000;
 
-    // ---- Aqui fica o formato das leituras que vêm do bucket normal ----
     const colunasDoCsvClient = [
         'idMac',
         'usuarios',
@@ -362,7 +322,6 @@
         'mediana_net_recv'
     ];
 
-    // ---- Aqui ficam os componentes aceitos nos alertas ----
     const componentesPermitidos = {
         RAM: 'RAM',
         CPU: 'CPU',
@@ -375,19 +334,14 @@
         PROCESSO: 'Processos'
     };
 
-    // ---- Aqui ficam os campos usados no modal de edição ----
     const camposDeLimite = {
         CPU: { nome: 'CPU', texto: 'val-cpu', sufixo: '%' },
         PROCESSOS: { nome: 'Processos', texto: 'val-processos', sufixo: '' },
         RAM: { nome: 'RAM', texto: 'val-ram', sufixo: '%' },
         DISCO: { nome: 'Disco', texto: 'val-disco', sufixo: '%' },
-        REDE: { nome: 'Rede', texto: 'val-rede', sufixo: 'Mbps' },
-        RANSOMWARE: { nome: 'Ransomware', texto: 'val-ransomware', sufixo: '' },
-        DDOS: { nome: 'DDoS', texto: 'val-ddos', sufixo: '' },
-        MALWARE: { nome: 'Malware', texto: 'val-malware', sufixo: '' }
+        REDE: { nome: 'Rede', texto: 'val-rede', sufixo: 'Mbps' }
     };
 
-    // ---- Aqui ficam as classes visuais de cada status ----
     const visualPorStatus = {
         "CRÍTICO": {
             ponto: "dot-critico",
@@ -423,7 +377,6 @@
         }
     };
 
-    // ---- Aqui ficam as funções utilitárias da tela ----
     function pegar(id) {
         return document.getElementById(id);
     }
@@ -438,6 +391,23 @@
         if (classe) elemento.className = classe;
         if (html) elemento.innerHTML = html;
         return elemento;
+    }
+
+    async function buscarJson(url, dados = null, metodo = 'POST') {
+        const opcoes = { method: metodo, headers: { 'Content-Type': 'application/json' } };
+        if (dados) opcoes.body = JSON.stringify(dados);
+
+        const resposta = await fetch(url, opcoes);
+        if (!resposta.ok) throw new Error(await resposta.text());
+        return resposta.json();
+    }
+
+    function controlarModal(id, aberto) {
+        const modal = pegar(id);
+        if (!modal) return;
+        modal.style.display = aberto ? 'flex' : 'none';
+        modal.setAttribute('aria-hidden', aberto ? 'false' : 'true');
+        document.body.style.overflow = aberto ? 'hidden' : '';
     }
 
     function visualDoStatus(status) {
@@ -487,7 +457,6 @@
         }
     }
 
-    // ---- Aqui ta a função que cria os cards dos servidores ----
     function gerarCards() {
         const container = pegar('campoServidores');
         container.innerHTML = '';
@@ -549,7 +518,6 @@
         });
     }
 
-    // ---- Aqui ficam as funções que atualizam sessão e KPIs no bgl ----
     const nomeDoUsuario = pegar('nome_usuario');
     function verificarSessao() {
         if (sessionStorage.NOME_USUARIO) nomeDoUsuario.textContent = sessionStorage.NOME_USUARIO;
@@ -575,7 +543,6 @@
         colocarTexto('modalAtencao', pegar('atencao')?.textContent || '0');
     }
 
-    // ---- Aqui ficam as funções que carregam e salvam os limites do modal editar ----
     function atualizarLimiar(id, valor, sufixo = '') {
         const texto = pegar(id);
         if (!texto) return;
@@ -587,27 +554,23 @@
         return camposDeLimite[textoNormalizado(nome)] || null;
     }
 
-    function pegarInputDoLimite(campo) {
-        return document.querySelector(`[data-limite-componente="${campo.nome}"]`);
-    }
-
-    function pegarCheckDoLimite(campo) {
-        return document.querySelector(`[data-check-componente="${campo.nome}"]`);
+    function pegarControleDoLimite(campo, tipo) {
+        return document.querySelector(`[data-${tipo}-componente="${campo.nome}"]`);
     }
 
     function limparLimitesDoModal() {
         Object.values(camposDeLimite).forEach(campo => {
             const texto = pegar(campo.texto);
-            const input = pegarInputDoLimite(campo);
-            const check = pegarCheckDoLimite(campo);
+            const input = pegarControleDoLimite(campo, 'limite');
+            const check = pegarControleDoLimite(campo, 'check');
 
             if (texto) {
-                texto.textContent = '--';
-                delete texto.dataset.temLimite;
+                texto.textContent = `0${campo.sufixo}`;
+                texto.dataset.temLimite = 'true';
             }
 
             if (input) {
-                input.value = input.min || 0;
+                input.value = 0;
                 delete input.dataset.idComponente;
             }
 
@@ -619,8 +582,8 @@
         const campo = pegarCampoDeLimite(componente.chave || componente.nome || componente.idComponente);
         if (!campo) return;
 
-        const input = pegarInputDoLimite(campo);
-        const check = pegarCheckDoLimite(campo);
+        const input = pegarControleDoLimite(campo, 'limite');
+        const check = pegarControleDoLimite(campo, 'check');
         const limite = Number(componente.limite);
 
         if (check) check.checked = componente.exibir === true || componente.exibir === 1;
@@ -635,24 +598,18 @@
         if (!mac) return;
         limparLimitesDoModal();
 
-        const resposta = await fetch('/limitesComponentes/buscar', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ mac })
-        });
-
-        if (!resposta.ok) throw new Error(await resposta.text());
-        const dados = await resposta.json();
+        const dados = await buscarJson('/limitesComponentes/buscar', { mac });
+        servidorEmEdicao.existiaLimite = dados.existiaLimite === true || dados.existeLimite === true;
         (dados.componentes || []).forEach(aplicarLimiteNoModal);
     }
 
     function coletarLimitesDoModal() {
         return Object.values(camposDeLimite).map(campo => {
             const texto = pegar(campo.texto);
-            const input = pegarInputDoLimite(campo);
-            const check = pegarCheckDoLimite(campo);
+            const input = pegarControleDoLimite(campo, 'limite');
+            const check = pegarControleDoLimite(campo, 'check');
 
-            if (!texto?.dataset.temLimite || !input) return null;
+            if (!input) return null;
 
             return {
                 nome: campo.nome,
@@ -663,7 +620,6 @@
         }).filter(Boolean);
     }
 
-    // ---- Aqui fica umas funções de navegação e fechamento ----
     function fecharAlertaNovo() {
         const alerta = pegar('card-alerta-sino');
         if (alerta) alerta.style.display = 'none';
@@ -672,14 +628,13 @@
     function logout() { sessionStorage.clear(); window.location.href = 'login.html'; }
 
     async function abrirModalEditar(nome, badge, mac) {
-        servidorEmEdicao = { nome, mac };
+        servidorEmEdicao = { nome, mac, existiaLimite: false };
         colocarTexto('modal-server-nome', nome);
         const etiquetaModal = pegar('modal-server-badge');
         etiquetaModal.textContent = badge;
         etiquetaModal.className = 'modal-server-badge';
         etiquetaModal.classList.add(visualDoStatus(badge).modal);
-        pegar('modal-editar').style.display = 'flex';
-        document.body.style.overflow = 'hidden';
+        controlarModal('modal-editar', true);
 
         try {
             await carregarLimitesDoServidor(mac);
@@ -690,8 +645,7 @@
 
     function fecharModalEditar(event) {
         if (event && event.target !== pegar('modal-editar')) return;
-        pegar('modal-editar').style.display = 'none';
-        document.body.style.overflow = '';
+        controlarModal('modal-editar', false);
     }
 
     async function salvarConfiguracoes() {
@@ -704,18 +658,13 @@
         botao.textContent = 'Salvando...';
 
         try {
-            const resposta = await fetch('/limitesComponentes/atualizar', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    mac: servidorEmEdicao.mac,
-                    componentes
-                })
-            });
-
-            if (!resposta.ok) throw new Error(await resposta.text());
-
-            const dadosAtualizados = await resposta.json();
+            const rota = servidorEmEdicao.existiaLimite ? '/limitesComponentes/atualizar' : '/limitesComponentes/inserir';
+            const metodo = servidorEmEdicao.existiaLimite ? 'PUT' : 'POST';
+            const dadosAtualizados = await buscarJson(rota, {
+                mac: servidorEmEdicao.mac,
+                componentes
+            }, metodo);
+            servidorEmEdicao.existiaLimite = true;
             (dadosAtualizados.componentes || []).forEach(aplicarLimiteNoModal);
             botao.textContent = '✓ Salvo!';
             botao.style.backgroundColor = '#12921c';
@@ -724,8 +673,7 @@
                 botao.textContent = 'Salvar Configurações';
                 botao.style.backgroundColor = '';
                 botao.disabled = false;
-                pegar('modal-editar').style.display = 'none';
-                document.body.style.overflow = '';
+                controlarModal('modal-editar', false);
             }, 1200);
         } catch (erro) {
             console.warn('Não foi possível salvar os limites:', erro);
@@ -740,7 +688,6 @@
         }
     }
 
-    // ---- Aqui ficam os períodos disponíveis no filtro do modal de alertas ----
     const opcoesPeriodo = [
         { valor: 'hoje', rotulo: 'Hoje' },
         { valor: 'ontem', rotulo: 'Ontem' },
@@ -749,7 +696,6 @@
         { valor: 'trimestre', rotulo: 'Últimos três meses' }
     ];
 
-    // ---- Estrutura base do painel de alertas ----
     const dadosPainelAlertas = {
         padrao: {
             tituloDia: '',
@@ -764,7 +710,6 @@
         servidores: {}
     };
 
-    // ---- Funções que tratam datas e períodos ----
     function copiarDados(base) {
         return JSON.parse(JSON.stringify(base));
     }
@@ -850,7 +795,6 @@
         return componentesPermitidos[textoNormalizado(nome)] || null;
     }
 
-    // ---- Funções que tratam os alertas do CSV ----
     function mensagensValidas(registro) {
         return (registro?.mensagens || []).map(alerta => {
             const componente = normalizarComponente(alerta.componente);
@@ -905,7 +849,6 @@
         );
     }
 
-    // ---- Funções que agrupam alertas para os gráficos ----
     function criarMapaDeGrupos(grupos) {
         return grupos.reduce((mapa, grupo) => {
             mapa[grupo.chave] = grupo;
@@ -1065,7 +1008,6 @@
         ];
     }
 
-    // ---- Aqui ta a função que monta os dados do servidor selecionado filtrados ----
     function montarDadosFiltrados(nomeServidor, registros, periodoAtual, metricas, leituras) {
         const periodo = periodoSelecionado(periodoAtual);
         const registrosFiltrados = registrosDoPeriodo(registros, periodo);
@@ -1098,7 +1040,6 @@
         return '#dddddd';
     }
 
-    // ---- Aqui ficam as funções que preparam os dados antes de mostrar no painel ----
     function montarDadosPorServidor(nomeServidor, dadosBaseServidor, metricasInformadas) {
         const metricas = metricasInformadas || metricasDosServidores[nomeServidor] || {};
 
@@ -1155,7 +1096,6 @@
         return dadosMontadosServidor;
     }
 
-    // ---- Aqui ficam as funções que renderizam os cards do modal de alertas ----
     function renderizarResumoMedidor(resumo) {
         const container = pegar('resumoMedidor');
         container.innerHTML = '';
@@ -1288,7 +1228,6 @@
         desenharGraficoLinha(dados.linha);
     }
 
-    // ---- Aqui ficam as funções que tratam dados externos de alertas e leituras ----
     function separarDataHoraDaLeitura(timestamp) {
         const texto = String(timestamp || '').trim();
         if (!texto) return { data: '', hora: '' };
@@ -1404,20 +1343,14 @@
         };
     }
 
-    // ---- Aqui ficam as funções que buscam dados nos buckets S3 ----
     async function buscarLeiturasS3DoServidor(nomeServidor, mac) {
         if (!mac) return null;
 
         try {
-            const resposta = await fetch('/conexaoS3/buscar_registros', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ MacServer: mac, QtdLinhas: quantidadeDeLeiturasS3 })
+            const dadosS3 = await buscarJson('/alertasS3/buscar_leituras', {
+                MacServer: mac,
+                QtdLinhas: quantidadeDeLeiturasS3
             });
-
-            if (!resposta.ok) throw new Error(await resposta.text());
-
-            const dadosS3 = await resposta.json();
             const leituras = normalizarLeiturasS3(dadosS3);
             if (!dadosPainelAlertas.servidores[nomeServidor]) dadosPainelAlertas.servidores[nomeServidor] = {};
             dadosPainelAlertas.servidores[nomeServidor].leituras = leituras;
@@ -1432,14 +1365,7 @@
         if (!mac) return null;
 
         try {
-            const resposta = await fetch('/alertasS3/buscar_registros_alertas', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ MacServer: mac })
-            });
-
-            if (!resposta.ok) throw new Error(await resposta.text());
-            const dadosS3 = await resposta.json();
+            const dadosS3 = await buscarJson('/alertasS3/buscar_registros_alertas', { MacServer: mac });
             montarPainelComAlertasS3(nomeServidor, dadosS3);
             atualizarMetricasDoServidor(nomeServidor, dadosS3);
             return dadosS3;
@@ -1449,7 +1375,6 @@
         }
     }
 
-    // ---- Aqui ficam as funções que carregam servidores registrados ----
     function pegarUnidadeAtual() {
         return sessionStorage.getItem('ID_UNIDADE') || sessionStorage.getItem('fk_unidade') || '';
     }
@@ -1469,7 +1394,6 @@
         };
     }
 
-    // ---- Aqui ficam as funções de atualização automática da tela ----
     async function atualizarAlertasDosCards() {
         if (atualizandoCards) return;
         const servidores = Object.entries(dadosDosServidores);
@@ -1537,10 +1461,7 @@
         const rota = fkUnidade ? `/servidores/listar_servidores/${fkUnidade}` : '/servidores/listar_servidores';
 
         try {
-            const resposta = await fetch(rota);
-            if (!resposta.ok) throw new Error(await resposta.text());
-
-            const servidores = await resposta.json();
+            const servidores = await buscarJson(rota, null, 'GET');
             dadosDosServidores = {};
             metricasDosServidores = {};
 
@@ -1554,7 +1475,6 @@
         }
     }
 
-    // ---- Aqui ta a função que permite alimentar a tela com dados externos manualmente ----
     function atualizarDadosDoPainel(novosDados) {
         ultimaAtualizacaoModal = new Date();
         const temDadosSeparados = novosDados.servidores || novosDados.metricas || novosDados.painel;
@@ -1578,7 +1498,6 @@
         if (modalEstaAberto && servidorSelecionado) renderizarPainelAlertas(pegarDadosDoPainel(servidorSelecionado));
     }
 
-    // ---- Aqui ficam as funções que desenham os gráficos com Chart.js ----
     function desenharGraficoLinha(dados) {
         const canvas = pegar('graficoLinha');
         if (!canvas) return;
@@ -1699,7 +1618,6 @@
         });
     }
 
-    // ---- Aqui ficam as funções que abrem e fecham o modal de alertas ----
     async function abrirModalAlertasPorCard(cartaoServidor) {
         if (!cartaoServidor) return;
         if (cartaoServidor instanceof Event) cartaoServidor = cartaoServidor.target;
@@ -1716,10 +1634,7 @@
         atualizarKpisModalAlertas();
         renderizarPainelAlertas(pegarDadosDoPainel(nome));
 
-        const overlay = pegar('modal-painel-alertas');
-        overlay.style.display = 'flex';
-        overlay.setAttribute('aria-hidden', 'false');
-        document.body.style.overflow = 'hidden';
+        controlarModal('modal-painel-alertas', true);
 
         const [alertasAtualizados, leiturasAtualizadas] = await Promise.all([
             buscarAlertasS3DoServidor(nome, mac),
@@ -1736,10 +1651,7 @@
     }
 
     function fecharModalAlertas() {
-        const overlay = pegar('modal-painel-alertas');
-        overlay.style.display = 'none';
-        overlay.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = '';
+        controlarModal('modal-painel-alertas', false);
         ['linha', 'medidor', 'componentes'].forEach(destruirGrafico);
     }
 
@@ -1747,7 +1659,6 @@
         if (event.target === pegar('modal-painel-alertas')) fecharModalAlertas();
     }
 
-    // ---- Aqui inicia a tela ----
     window.atualizarDadosDoPainel = atualizarDadosDoPainel;
 
     verificarSessao();

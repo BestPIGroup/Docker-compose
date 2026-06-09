@@ -1,6 +1,37 @@
 const AWS = require("aws-sdk");
 
 const alertasPorServidor = {};
+const leiturasPorServidor = {};
+
+const colunasClient = [
+    "idMac",
+    "usuarios",
+    "timestamp",
+    "cpu_percent",
+    "cpu_time_user",
+    "cpu_ctx_switches",
+    "top_3_processos_cpu",
+    "top_3_processos_disco",
+    "total_processos",
+    "virtual_memory_usage",
+    "disk_read_mbps",
+    "disk_percent",
+    "disk_write_mbps",
+    "net_kbps_sent",
+    "net_kbps_recv",
+    "net_packets_sent",
+    "net_packets_recv",
+    "net_dropin",
+    "net_dropout",
+    "usuarios_logados",
+    "virtual_memory_status",
+    "cpu_percent_status",
+    "disk_percent_status",
+    "net_errors",
+    "total_arquivos_abertos",
+    "mediana_net_sent",
+    "mediana_net_recv"
+];
 
 function configurarS3() {
     AWS.config.update({
@@ -26,8 +57,21 @@ function separarLinhaCsv(linha) {
 }
 
 function separarDataHora(timestamp) {
-    const [data = "", hora = ""] = String(timestamp || "").split(" ");
-    return { data, hora };
+    const texto = String(timestamp || "").trim();
+    if (!texto) return { data: "", hora: "" };
+
+    if (/^\d{2}\/\d{2}\/\d{4}/.test(texto)) {
+        const [data = "", hora = "00:00:00"] = texto.split(/\s+/);
+        return { data, hora };
+    }
+
+    const dataConvertida = new Date(texto);
+    if (Number.isNaN(dataConvertida.getTime())) return { data: "", hora: "" };
+
+    return {
+        data: `${String(dataConvertida.getDate()).padStart(2, "0")}/${String(dataConvertida.getMonth() + 1).padStart(2, "0")}/${dataConvertida.getFullYear()}`,
+        hora: `${String(dataConvertida.getHours()).padStart(2, "0")}:${String(dataConvertida.getMinutes()).padStart(2, "0")}:${String(dataConvertida.getSeconds()).padStart(2, "0")}`
+    };
 }
 
 function limparTexto(valor) {
@@ -69,6 +113,36 @@ function montarRegistro(dadosLinha) {
     };
 }
 
+function montarRegistroDaLinha(linha) {
+    const dadosLinha = separarLinhaCsv(linha);
+    return dadosLinha ? montarRegistro(dadosLinha) : null;
+}
+
+function montarLeitura(linha) {
+    const valores = String(linha || "").trim().split(";");
+    if (valores.length < 3) return null;
+
+    const campos = colunasClient.reduce((objeto, coluna, indice) => {
+        objeto[coluna] = valores[indice] || "";
+        return objeto;
+    }, {});
+
+    if (!campos.idMac || campos.idMac === "idMac") return null;
+
+    const { data, hora } = separarDataHora(campos.timestamp);
+    if (!data || !hora) return null;
+
+    return {
+        mac: campos.idMac,
+        timestamp: campos.timestamp,
+        data,
+        hora,
+        campos,
+        valores,
+        linhaOriginal: linha
+    };
+}
+
 function contarPorComponente(registros) {
     return registros.reduce((contagem, registro) => {
         registro.mensagens.forEach(alerta => {
@@ -107,26 +181,31 @@ function filtrarPorPeriodo(registros, filtros) {
     });
 }
 
-function montarResultado(mac, registros) {
-    return {
+function montarResultado(mac, registros, incluirComponentes = false) {
+    const resultado = {
         mac,
         total: registros.length,
         registros,
-        porComponente: contarPorComponente(registros),
         atualizadoEm: new Date().toISOString()
     };
+
+    if (incluirComponentes) resultado.porComponente = contarPorComponente(registros);
+
+    return resultado;
 }
 
-function filtrarRegistros(conteudo, mac, linhas) {
+function filtrarLinhasDoServidor(conteudo, mac, linhas, montarItem) {
     const limite = Number(linhas) > 0 ? Number(linhas) : Infinity;
     const registros = [];
     const linhasCsv = String(conteudo || "").split(/\r?\n/);
+    const macComparacao = String(mac || "").trim().toLowerCase();
 
     for (let indice = linhasCsv.length - 1; indice >= 0; indice--) {
-        const dadosLinha = separarLinhaCsv(linhasCsv[indice]);
-        if (!dadosLinha || dadosLinha.mac !== mac) continue;
+        const registro = montarItem(linhasCsv[indice]);
+        const macRegistro = String(registro?.mac || "").trim().toLowerCase();
+        if (!registro || macRegistro !== macComparacao) continue;
 
-        registros.push(montarRegistro(dadosLinha));
+        registros.push(registro);
         if (registros.length >= limite) break;
     }
 
@@ -143,10 +222,27 @@ async function buscarRegistrosAlertas(mac, linhas, filtros) {
     }).promise();
 
     const conteudo = resposta.Body.toString("utf-8");
-    const registros = filtrarPorPeriodo(filtrarRegistros(conteudo, mac, linhas), filtros);
-    const resultado = montarResultado(mac, registros);
+    const registros = filtrarPorPeriodo(filtrarLinhasDoServidor(conteudo, mac, linhas, montarRegistroDaLinha), filtros);
+    const resultado = montarResultado(mac, registros, true);
 
     alertasPorServidor[mac] = resultado;
+    return resultado;
+}
+
+async function buscarLeiturasNormais(mac, linhas, filtros) {
+    if (!mac) throw new Error("MAC do servidor não informado");
+
+    const s3 = configurarS3();
+    const resposta = await s3.getObject({
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: process.env.AWS_BUCKET_KEY
+    }).promise();
+
+    const conteudo = resposta.Body.toString("utf-8");
+    const registros = filtrarPorPeriodo(filtrarLinhasDoServidor(conteudo, mac, linhas, montarLeitura), filtros);
+    const resultado = montarResultado(mac, registros);
+
+    leiturasPorServidor[mac] = resultado;
     return resultado;
 }
 
@@ -155,10 +251,18 @@ function buscarAlertasSalvos(mac) {
     return alertasPorServidor;
 }
 
+function buscarLeiturasSalvas(mac) {
+    if (mac) return leiturasPorServidor[mac] || null;
+    return leiturasPorServidor;
+}
+
 module.exports = {
     buscarRegistrosAlertas,
+    buscarLeiturasNormais,
     buscarAlertasSalvos,
+    buscarLeiturasSalvas,
     separarLinhaCsv,
+    montarLeitura,
     extrairMensagens,
     filtrarPorPeriodo
 };

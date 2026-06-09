@@ -473,13 +473,7 @@
             telefoneServer: telefone,
             funcaoServer: funcao,
             matriculaServer: matricula,
-            fk_unidadeServer: sessionStorage.getItem("ID_UNIDADE"),
-            id_unidade_slackJira: sessionStorage.getItem("ID_UNIDADE"),
-            token_api: tokenApiJira,
-            email_jira: emailJira,
-            url_jira: urlEquipeJira,
-            key_url_jira: chaveUrlJira,
-            webhook_slack: webHookSlack
+            fk_unidadeServer: sessionStorage.getItem("ID_UNIDADE")
           }),
         })
           .then(function (resposta) {
@@ -500,6 +494,34 @@
           .catch(function (resposta) {
             console.log(`#ERRO: ${resposta}`);
 
+          });
+
+        fetch("/usuarios/cadastrar_slackJira", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id_unidade_slackJira: sessionStorage.getItem("ID_UNIDADE"),
+            token_api: tokenApiJira,
+            email_jira: emailJira,
+            url_jira: urlEquipeJira,
+            key_url_jira: chaveUrlJira,
+            webhook_slack: webHookSlack
+          }),
+        })
+          .then(function (resposta) {
+            console.log("resposta slackJira: ", resposta);
+
+            if (!resposta.ok) {
+              console.log("Houve um erro ao tentar cadastrar as integrações Slack e Jira!");
+              resposta.text().then(texto => {
+                console.error(texto);
+              });
+            }
+          })
+          .catch(function (resposta) {
+            console.log(`#ERRO na integração Slack/Jira: ${resposta}`);
           });
 
         return false;

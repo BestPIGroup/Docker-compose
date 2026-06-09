@@ -35,19 +35,45 @@ key_url_jira VARCHAR(10) NOT NULL,
 webhook_slack VARCHAR(250) NOT NULL,
 CONSTRAINT id_unidade_slackJira
 FOREIGN KEY(id_unidade_slackJira)
-REFERENCES unidade(id_unidade)
+REFERENCES unidade(idUnidade)
 );
 
 CREATE TABLE servidor(
-idServidor INT PRIMARY KEY AUTO_INCREMENT,
-fornecedor VARCHAR(45),
-modelo VARCHAR(45),
-numero_Manutenção VARCHAR(45),
-numero_Serie VARCHAR(45),
-ultima_Manutenção VARCHAR(45),
-statuss VARCHAR(45),
-fkUnidade INT NOT NULL,
-FOREIGN KEY (fkUnidade) REFERENCES unidade (idUnidade)
+id_servidor INT PRIMARY KEY AUTO_INCREMENT,
+alias VARCHAR(45),
+endereco_mac VARCHAR(45) UNIQUE,
+status_servidor VARCHAR(45),
+fk_unidade INT NOT NULL,
+FOREIGN KEY (fk_unidade) REFERENCES unidade (idUnidade)
+);
+
+CREATE TABLE componente(
+id_componente INT PRIMARY KEY,
+nome_componente VARCHAR(45) NOT NULL
+);
+
+INSERT INTO componente(id_componente, nome_componente) VALUES
+(1, 'CPU'),
+(3, 'RAM'),
+(6, 'Disco'),
+(7, 'Processos'),
+(8, 'Rede'),
+(20, 'Ransomware'),
+(21, 'DDoS'),
+(22, 'Malware');
+
+CREATE TABLE componente_servidor (
+    id_servidor INT NOT NULL,
+    id_componente INT NOT NULL,
+    limite_componente INT NOT NULL,
+    exibir BOOLEAN,
+    PRIMARY KEY (id_servidor, id_componente),
+    CONSTRAINT fk_comp_servidor_servidor
+        FOREIGN KEY (id_servidor)
+            REFERENCES servidor(id_servidor),
+    CONSTRAINT fk_comp_servidor_componente
+        FOREIGN KEY (id_componente)
+            REFERENCES componente(id_componente)
 );
 
 CREATE TABLE limite(
@@ -56,7 +82,7 @@ limiteCPU DECIMAL,
 limiteRAM DECIMAL,
 limiteDISCO DECIMAL,
 fkServidor INT,
-FOREIGN KEY (fkServidor) REFERENCES servidor (idServidor),
+FOREIGN KEY (fkServidor) REFERENCES servidor (id_servidor),
     CONSTRAINT PRIMARY KEY (idLimite, fkServidor)
 );
 
@@ -67,7 +93,7 @@ uso_RAM DECIMAL,
 uso_DISCO DECIMAL,
 info_TIME DATETIME,
 fkServidor INT,
-FOREIGN KEY (fkServidor) REFERENCES servidor (idServidor),
+FOREIGN KEY (fkServidor) REFERENCES servidor (id_servidor),
     CONSTRAINT PRIMARY KEY (idInfo, fkServidor)
 );
 
@@ -76,7 +102,7 @@ fkServidor INT,
 fkUsuario INT,
 tolken VARCHAR(45),
 end_check DATETIME,
-FOREIGN KEY (fkServidor) REFERENCES servidor (idServidor),
+FOREIGN KEY (fkServidor) REFERENCES servidor (id_servidor),
 FOREIGN KEY (fkUsuario) REFERENCES usuario (idUsuario),
     CONSTRAINT PRIMARY KEY (fkServidor, fkUsuario)
 );

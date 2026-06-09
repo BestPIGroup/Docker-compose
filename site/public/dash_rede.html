@@ -12,72 +12,72 @@
 </head>
 
 <body onload="abrirModalRede()" style="display: flex; flex-direction: column; align-items: center;">
-    
-            <div class="kpi-box">
 
-                <div class=kpi-rede>
+    <div class="kpi-box">
 
-                    <Span style="font-size: large; text-align: center;">tamanho médio dos pacotes enviados</Span>
-                    <Span id="PacoteMedioEnvio" style="font-size: x-large; font-weight: bolder;">78.4KB</Span>
-                    <span style="font-size: small;">últimos 30 minutos</span>
+        <div class=kpi-rede>
 
-                </div>
+            <Span style="font-size: large; text-align: center;">tamanho médio dos pacotes enviados</Span>
+            <Span id="PacoteMedioEnvio" style="font-size: x-large; font-weight: bolder;">78.4KB</Span>
+            <span style="font-size: small;">últimos 30 minutos</span>
 
-                <div class=kpi-rede>
+        </div>
 
-                    <Span style="font-size: large; text-align: center;">tamanho médio dos pacotes recebidos</Span>
-                    <Span id="PacoteMedioRecebimento" style="font-size: x-large; font-weight: bolder;">69.7KB</Span>
-                    <span style="font-size: small;">últimos 30 minutos</span>
+        <div class=kpi-rede>
 
-                </div>
+            <Span style="font-size: large; text-align: center;">tamanho médio dos pacotes recebidos</Span>
+            <Span id="PacoteMedioRecebimento" style="font-size: x-large; font-weight: bolder;">69.7KB</Span>
+            <span style="font-size: small;">últimos 30 minutos</span>
 
-                <div class=kpi-rede>
+        </div>
 
-                    <Span style="font-size: large; text-align: center;">taxa de crescimento de tráfego</Span>
-                    <Span id="taxaCrescimento" style="font-size: x-large; font-weight: bolder;">11%</Span>
-                    <span style="font-size: small;">últimos 15 minutos</span>
+        <div class=kpi-rede>
 
-                </div>
+            <Span style="font-size: large; text-align: center;">taxa de crescimento de tráfego</Span>
+            <Span id="taxaCrescimento" style="font-size: x-large; font-weight: bolder;">11%</Span>
+            <span style="font-size: small;">últimos 15 minutos</span>
 
-            </div>
+        </div>
 
-            <div class="grid-graficos">
+    </div>
 
-                <div class="grafico-rede">
+    <div class="grid-graficos">
 
-                    <canvas id="grafico-rede-envio"></canvas>
+        <div class="grafico-rede">
 
-                </div>
+            <canvas id="grafico-rede-envio"></canvas>
 
-                <div class="grafico-rede">
+        </div>
 
-                    <canvas id="grafico-rede-recebimento"></canvas>
+        <div class="grafico-rede">
 
-                </div>
-                <div class="grafico-rede-proporcao">
+            <canvas id="grafico-rede-recebimento"></canvas>
 
-                    <canvas id="grafico-rede-proporcao"></canvas>
-                    <span id="textoPorporcaoVel">0/0</span>
+        </div>
+        <div class="grafico-rede-proporcao">
 
-                </div>
-                <div class="grafico-rede">
+            <canvas id="grafico-rede-proporcao"></canvas>
+            <span id="textoPorporcaoVel">0/0</span>
 
-                    <canvas id="grafico-pacotes-envio"></canvas>
+        </div>
+        <div class="grafico-rede">
 
-                </div>
-                <div class="grafico-rede">
+            <canvas id="grafico-pacotes-envio"></canvas>
 
-                    <canvas id="grafico-pacotes-recebimento"></canvas>
+        </div>
+        <div class="grafico-rede">
 
-                </div>
-                <div class="grafico-rede-proporcao">
+            <canvas id="grafico-pacotes-recebimento"></canvas>
 
-                    <canvas id="grafico-pacotes-proporcao"></canvas>
-                    <span id="textoPorporcaoPacks">0/0</span>
+        </div>
+        <div class="grafico-rede-proporcao">
 
-                </div>
+            <canvas id="grafico-pacotes-proporcao"></canvas>
+            <span id="textoPorporcaoPacks">0/0</span>
 
-            </div>
+        </div>
+
+    </div>
 
 </body>
 
@@ -87,7 +87,7 @@
 
 <script>
 
-    
+
     //Código do Murilo
 
     async function abrirModalRede() {
@@ -111,7 +111,10 @@
 
     }
 
-    function carregarGraficosRede(lista) {
+    async function carregarGraficosRede(lista) {
+
+        limites = await buscarLimites();
+        console.log(limites)
 
         console.log(lista);
         dados = [[], [], [], [], [], [], []]
@@ -123,7 +126,7 @@
 
         for (i = 0; i < 7;) {
 
-            dados[0].push(lista[i][2].slice(11,));
+            dados[0].push(lista[i][2].slice(11,16));
             dados[1].push(lista[i][13]);
             dados[2].push(lista[i][14]);
             dados[3].push(lista[i][15]);
@@ -131,13 +134,13 @@
             dados[5].push(lista[i][24]);
             dados[6].push(lista[i][25]);
 
-            if(lista.length > 1){
+            if (lista.length > 1) {
 
-                i ++;
+                i++;
 
-            }else{
+            } else {
 
-                if(dados[0].length == 7){
+                if (dados[0].length == 7) {
 
                     break;
 
@@ -489,14 +492,8 @@
                     backgroundColor: '#4A73FF',
                     borderWidth: 1
                 }, {
-                    label: "Mediana",
-                    data: dados[5],
-                    borderColor: '#FFD700',
-                    backgroundColor: '#FFD700',
-                    borderWidth: 1
-                }, {
                     label: "Nv. Alerta",
-                    data: Array(7).fill(700),
+                    data: Array(7).fill(limites[3].limite_componente),
                     borderColor: '#FF4D4D',
                     borderWidth: 2,
                     pointRadius: 0,
@@ -591,15 +588,10 @@
                     borderColor: '#4A73FF',
                     backgroundColor: '#4A73FF',
                     borderWidth: 1
-                }, {
-                    label: "Mediana",
-                    data: dados[6],
-                    borderColor: '#FFD700',
-                    backgroundColor: '#FFD700',
-                    borderWidth: 1
-                }, {
+                },
+                {
                     label: "Nv. Alerta",
-                    data: Array(7).fill(700),
+                    data: Array(7).fill(limites[4].limite_componente),
                     borderColor: '#FF4D4D',
                     borderWidth: 2,
                     pointRadius: 0,
@@ -755,7 +747,7 @@
 
         setTimeout(function () {
             atualizarDadosRede(listaCharts, ListaSomaVelEnvio, ListaSomaVelRecebimento, ListaSomaPacksEnvio, ListaSomaPacksRecebimento);
-        }, 10000);
+        }, 300000);
 
     }
 
@@ -807,35 +799,31 @@
                 if (i == 0 || i == 1 || i == 3 || i == 4) {
 
                     Charts[i].data.labels.shift();
-                    Charts[i].data.labels.push(lista[0][2].slice(11,));
+                    Charts[i].data.labels.push(lista[0][2].slice(11,16));
 
                     if (i == 0) {
 
                         Charts[i].data.datasets[0].data.shift();
                         Charts[i].data.datasets[0].data.push(dados[0][13]);
                         Charts[i].data.datasets[1].data.shift();
-                        Charts[i].data.datasets[1].data.push(dados[0][25]);
+                        Charts[i].data.datasets[1].data.push(dados[0][24]);
 
                     } else if (i == 1) {
 
                         Charts[i].data.datasets[0].data.shift();
                         Charts[i].data.datasets[0].data.push(dados[0][14]);
                         Charts[i].data.datasets[1].data.shift();
-                        Charts[i].data.datasets[1].data.push(dados[0][26]);
+                        Charts[i].data.datasets[1].data.push(dados[0][25]);
 
                     } else if (i == 3) {
 
                         Charts[i].data.datasets[0].data.shift();
                         Charts[i].data.datasets[0].data.push(dados[0][15]);
-                        Charts[i].data.datasets[1].data.shift();
-                        Charts[i].data.datasets[1].data.push(dados[0][25]);
 
                     } else if (i == 4) {
 
                         Charts[i].data.datasets[0].data.shift();
                         Charts[i].data.datasets[0].data.push(dados[0][16]);
-                        Charts[i].data.datasets[1].data.shift();
-                        Charts[i].data.datasets[1].data.push(dados[0][26]);
 
                     }
 
@@ -929,7 +917,27 @@
 
         setTimeout(function () {
             atualizarDadosRede(Charts, ListaSomaVelEnvioN, ListaSomaVelRecebimentoN, ListaSomaPacksEnvioN, ListaSomaPacksRecebimentoN);
-        }, 10000);
+        }, 300000);
+    }
+
+    async function buscarLimites() {
+
+        return fetch("servidores/buscar_limites", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                id: sessionStorage.ID_UNIDADE
+            })
+        })
+
+            .then(function (resposta) {
+                
+                return resposta.json();
+            
+            });
+
     }
 
 </script>

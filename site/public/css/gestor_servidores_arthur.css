@@ -1,7 +1,5 @@
-/* ---- Fonte ---- */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
 
-/* ---- Variáveis globais ---- */
 :root {
     --cor-azul-base: #0B2553;
     --cor-azul-claro: #082967;
@@ -14,6 +12,8 @@
     --cor-laranja: #ff9d00;
     --cor-azul-barra: #537ed4;
     --cor-linha: rgba(255, 255, 255, 0.42);
+    --cor-hover-menu: #0f1b2d;
+    --sombra-padrao: 0 10px 30px rgba(0, 0, 0, 0.3);
     --raio-modal: 16px;
     --raio-card-modal: 14px;
     --raio-interno-modal: 12px;
@@ -25,7 +25,6 @@
     --altura-menu-mobile: 65px;
 }
 
-/* ---- Reset geral ---- */
 html,
 body,
 button,
@@ -58,7 +57,6 @@ input {
     font: inherit;
 }
 
-/* ---- Sidebar ---- */
 .sidebar {
     position: fixed;
     inset: 0 auto 0 0;
@@ -115,7 +113,7 @@ input {
 }
 
 .listaOpcoes li a:hover {
-    background: #0f1b2d;
+    background: var(--cor-hover-menu);
 }
 
 .item {
@@ -175,7 +173,6 @@ input {
     gap: 4px;
 }
 
-/* ---- Página ---- */
 .box {
     position: fixed;
     top: 0;
@@ -189,7 +186,6 @@ input {
     backdrop-filter: blur(12px);
 }
 
-/* ---- KPIs do topo ---- */
 .kpis {
     width: 100%;
     display: flex;
@@ -213,7 +209,7 @@ input {
     font-size: 12px;
     text-align: center;
     white-space: nowrap;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--sombra-padrao);
 }
 
 .kpi img {
@@ -262,7 +258,7 @@ input {
     gap: 12px;
     border-radius: 10px;
     background: var(--cor-azul-base);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--sombra-padrao);
 }
 
 .box .retangulo p {
@@ -289,7 +285,6 @@ input {
     transform: translateY(-3px);
 }
 
-/* ---- Lista de servidores ---- */
 .conteudo {
     padding: 195px 20px 40px calc(var(--largura-menu) + 20px);
 }
@@ -308,7 +303,7 @@ input {
     border-radius: 12px;
     background: var(--cor-azul-base);
     color: var(--cor-texto-suave);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--sombra-padrao);
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
 }
@@ -357,10 +352,15 @@ input {
     white-space: nowrap;
 }
 
-/* ---- Status e etiquetas dos servidores ---- */
-.dot { color: var(--cor-laranja); margin-right: 5px; }
-.dot-normal { color: var(--cor-verde); margin-right: 5px; }
-.dot-critico { color: var(--cor-vermelho); margin-right: 5px; }
+.dot,
+.dot-normal,
+.dot-critico {
+    margin-right: 5px;
+}
+
+.dot { color: var(--cor-laranja); }
+.dot-normal { color: var(--cor-verde); }
+.dot-critico { color: var(--cor-vermelho); }
 
 .badge,
 .badge-normal,
@@ -368,6 +368,7 @@ input {
 .modal-server-badge,
 .info-status {
     display: inline-block;
+    padding: 4px 9px;
     border-radius: 5px;
     font-size: 0.68rem;
     font-weight: 800;
@@ -375,9 +376,9 @@ input {
     white-space: nowrap;
 }
 
-.badge { padding: 4px 9px; background: rgba(250, 204, 21, 0.18); color: var(--cor-laranja); }
-.badge-normal { padding: 4px 9px; background: rgba(34, 197, 94, 0.16); color: var(--cor-verde); }
-.badge-critico { padding: 4px 9px; background: rgba(255, 52, 52, 0.16); color: var(--cor-vermelho); }
+.badge { background: rgba(250, 204, 21, 0.18); color: var(--cor-laranja); }
+.badge-normal { background: rgba(34, 197, 94, 0.16); color: var(--cor-verde); }
+.badge-critico { background: rgba(255, 52, 52, 0.16); color: var(--cor-vermelho); }
 
 .info-list {
     list-style: none;
@@ -402,7 +403,6 @@ input {
 .status-alert { color: var(--cor-vermelho); font-weight: 800; margin-left: 4px; }
 .status-normal { color: var(--cor-verde); font-weight: 800; margin-left: 4px; }
 
-/* ---- Botões dos cards dos servidores ---- */
 .div-inferior {
     display: flex;
     border-top: 1px solid rgba(255, 255, 255, 0.18);
@@ -439,7 +439,6 @@ input {
     height: 15px;
 }
 
-/* ---- Modais base ---- */
 .modal-overlay {
     position: fixed;
     inset: 0;
@@ -451,7 +450,6 @@ input {
     background: rgba(0, 0, 0, 0.78);
 }
 
-/* ---- Modal editar servidor ---- */
 .modal-editar-conteudo {
     width: min(560px, 100%);
     max-height: 90vh;
@@ -538,7 +536,6 @@ input {
     font-size: 0.8rem;
 }
 
-/* ---- Componentes monitorados do modal editar ---- */
 .modal-componentes,
 .modal-limiares,
 .modal-limiar-secao {
@@ -629,7 +626,6 @@ input {
     transform: translateX(18px);
 }
 
-/* ---- Sliders de limite do modal editar ---- */
 .limiar-item {
     display: flex;
     flex-direction: column;
@@ -680,7 +676,6 @@ input {
     gap: 10px;
 }
 
-/* ---- Botões do modal editar ---- */
 .btn-modal-cancelar,
 .btn-modal-salvar {
     border: 0;
@@ -712,7 +707,6 @@ input {
     background: #12921c;
 }
 
-/* ---- Modal painel de alertas ---- */
 #modal-painel-alertas {
     padding: 8px;
     background: rgba(7, 28, 64, 0.78);
@@ -772,7 +766,6 @@ input {
     pointer-events: auto;
 }
 
-/* ---- Cabeçalho do modal de alertas ---- */
 .modal-header-alertas {
     position: relative;
     display: grid;
@@ -902,7 +895,6 @@ input {
     background: var(--cor-azul-profundo);
 }
 
-/* ---- Grade dos cards do modal de alertas ---- */
 .linha-superior {
     display: grid;
     grid-template-columns: 28% 39% 1fr;
@@ -963,7 +955,6 @@ input {
     opacity: 0.95;
 }
 
-/* ---- Card de percentual de alertas ---- */
 .calendar-icon::before {
     content: '';
     position: absolute;
@@ -1090,7 +1081,6 @@ input {
     min-height: 262px;
 }
 
-/* ---- Card de linha do tempo de alertas ---- */
 .timeline-card {
     padding: 0 24px 17px;
 }
@@ -1178,7 +1168,6 @@ input {
     padding-bottom: 16px;
 }
 
-/* ---- Card de alertas por componente ---- */
 .component-feature {
     width: calc(100% - 32px);
     margin: 7px auto 17px;
@@ -1236,7 +1225,6 @@ input {
     padding: 0 12px 12px;
 }
 
-/* ---- Card de comparação por período ---- */
 .daily-card {
     display: flex;
     flex-direction: column;
@@ -1247,7 +1235,6 @@ input {
     flex-direction: column;
 }
 
-/* ---- Lista de alertas ---- */
 .daily-bars {
     flex: 1;
     display: grid;
@@ -1420,7 +1407,6 @@ input {
     background: rgba(255, 255, 255, 0.22);
 }
 
-/* ---- Responsivo do modal de alertas ---- */
 @media (max-width: 1100px) {
     .modal-alertas-layout {
         grid-template-columns: 1fr;
@@ -1456,7 +1442,6 @@ input {
     }
 }
 
-/* ---- Responsivo da página em tablets e celulares ---- */
 @media (max-width: 768px) {
     .sidebar {
         inset: auto 0 0 0;
@@ -1560,7 +1545,6 @@ input {
     }
 }
 
-/* ---- Responsivo para telas muito pequenas ---- */
 @media (max-width: 480px) {
     .kpis {
         display: grid;

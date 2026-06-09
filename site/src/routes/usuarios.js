@@ -17,4 +17,17 @@ router.post("/ver_usuario", function (req, res){
 router.post("/cadastrar_Func", function (req, res) {
     usuarioController.cadastrar_Func(req, res);
 })
+
+router.post("/cadastrar_slackJira", function (req, res) {
+    usuarioController.cadastrar_slackJira(req, res);
+})
+
+router.get("/listar_funcionarios/:fk_responsavel", function (req, res) {
+    usuarioController.listar_funcionarios(req, res);
+});
+
+router.delete("/excluir_funcionario", function (req, res) {
+    usuarioController.excluir_funcionario(req, res);
+});
+
 module.exports = router;

@@ -236,8 +236,8 @@ body {
     font-weight: bold;
 }
 
-.btn-editar {
-    background-color: #0d800d;
+.btn-excluir {
+    background-color: #b91c1c;
     color: white;
     border: none;
     padding: 8px 15px;
@@ -247,8 +247,8 @@ body {
     transition: 0.3s;
 }
 
-.btn-editar:hover {
-    background-color: #12921c;
+.btn-excluir:hover {
+    background-color: #dc2626;
 }
 
 @media (max-width: 768px) {

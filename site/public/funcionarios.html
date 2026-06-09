@@ -14,13 +14,8 @@
     <header class="sidebar">
         <div class="logo">
             <a href="index.html">
-                <img src="./assets/LogoArgosIcon.png" >
+                <img src="./assets/LogoArgosIcon.png" alt="Argos">
             </a>
-        </div>
-        <header class="sidebar">
-
-        <div class="logo" href="index.html">
-            <img src="./assets/LogoArgosIcon.png">
         </div>
 
         <ul class="listaOpcoes">
@@ -36,7 +31,7 @@
             <li>
                 <a href="relatorios.html">
                     <div class="item">
-                        <img src="./assets/file.png" alt="Servidores">
+                        <img src="./assets/file.png" alt="Relatórios">
                         <p>Relatórios</p>
                     </div>
                 </a>
@@ -45,21 +40,22 @@
             <li>
                 <a href="./funcionarios.html">
                     <div class="item">
-                        <img src="./assets/team.png" alt="Servidores">
+                        <img src="./assets/team.png" alt="Funcionários">
                         <p>Funcionários</p>
                     </div>
                 </a>
             </li>
-
         </ul>
+
         <div class="saida">
             <div class="item">
                 <a href="./perfil.html" id="perfil_botao">
                     <img src="./assets/user3.png" alt="Perfil">
-                    <p >Gestor</p>
+                    <p>Gestor</p>
                     <p id="nome_usuario">Perfil</p>
                 </a>
             </div>
+
             <a href="index.html">
                 <div class="item">
                     <img src="./assets/saida.png" alt="Sair" onclick="logout()">
@@ -67,7 +63,6 @@
                 </div>
             </a>
         </div>
-    </header>
     </header>
 
     <div class="conteudo">
@@ -90,54 +85,9 @@
                         <th>Ações</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="corpoTabelaFuncionarios">
                     <tr>
-                        <td>Luã Ramalho</td>
-                        <td>lua.ramalho@argos.com</td>
-                        <td><span class="status-ativo">Ativo</span></td>
-                        <td><button class="btn-editar">Editar</button></td>
-                    </tr>
-                    <tr>
-                        <td>Flavia Silva</td>
-                        <td>flavia.silva@argos.com</td>
-                        <td><span class="status-ativo">Ativo</span></td>
-                        <td><button class="btn-editar">Editar</button></td>
-                    </tr>
-                    <tr>
-                        <td>Guilherme Souza</td>
-                        <td>guilherme.souza@argos.com</td>
-                        <td><span class="status-inativo">Inativo</span></td>
-                        <td><button class="btn-editar">Editar</button></td>
-                    </tr>
-                    <tr>
-                        <td>Bianca Oliveira</td>
-                        <td>b.oliveira@argos.com</td>
-                        <td><span class="status-ativo">Ativo</span></td>
-                        <td><button class="btn-editar">Editar</button></td>
-                    </tr>
-                    <tr>
-                        <td>Murilo Costa</td>
-                        <td>m.costa@argos.com</td>
-                        <td><span class="status-ativo">Ativo</span></td>
-                        <td><button class="btn-editar">Editar</button></td>
-                    </tr>
-                    <tr>
-                        <td>Arthur Vinícius</td>
-                        <td>a.vinicius@argos.com</td>
-                        <td><span class="status-inativo">Inativo</span></td>
-                        <td><button class="btn-editar">Editar</button></td>
-                    </tr>
-                    <tr>
-                        <td>Andreia Lima</td>
-                        <td>a.lima@argos.com</td>
-                        <td><span class="status-ativo">Ativo</span></td>
-                        <td><button class="btn-editar">Editar</button></td>
-                    </tr>
-                    <tr>
-                        <td>Victor Mendes</td>
-                        <td>v.mendes@argos.com</td>
-                        <td><span class="status-ativo">Ativo</span></td>
-                        <td><button class="btn-editar">Editar</button></td>
+                        <td colspan="4">Carregando funcionários...</td>
                     </tr>
                 </tbody>
             </table>
@@ -148,7 +98,98 @@
 </html>
 
 <script>
+    nome_usuario.innerHTML = sessionStorage.NOME_USUARIO || "Perfil";
 
-    nome_usuario.innerHTML = `${sessionStorage.NOME_USUARIO}`
+    window.onload = function () {
+        listarFuncionarios();
+    };
 
+    function listarFuncionarios() {
+        var idGestor = sessionStorage.ID_USUARIO;
+
+        if (!idGestor) {
+            corpoTabelaFuncionarios.innerHTML = `
+                <tr>
+                    <td colspan="4">Gestor não encontrado na sessão.</td>
+                </tr>
+            `;
+            return;
+        }
+
+        fetch(`/usuarios/listar_funcionarios/${idGestor}`)
+            .then(function (resposta) {
+                if (!resposta.ok) {
+                    throw "Erro ao buscar funcionários";
+                }
+
+                return resposta.json();
+            })
+            .then(function (funcionarios) {
+                montarTabelaFuncionarios(funcionarios);
+            })
+            .catch(function (erro) {
+                console.log(erro);
+                corpoTabelaFuncionarios.innerHTML = `
+                    <tr>
+                        <td colspan="4">Não foi possível carregar os funcionários.</td>
+                    </tr>
+                `;
+            });
+    }
+
+    function montarTabelaFuncionarios(funcionarios) {
+        corpoTabelaFuncionarios.innerHTML = "";
+
+        if (!funcionarios || funcionarios.length === 0) {
+            corpoTabelaFuncionarios.innerHTML = `
+                <tr>
+                    <td colspan="4">Nenhum funcionário cadastrado.</td>
+                </tr>
+            `;
+            return;
+        }
+
+        funcionarios.forEach(function (funcionario) {
+            corpoTabelaFuncionarios.innerHTML += `
+                <tr>
+                    <td>${funcionario.nome}</td>
+                    <td>${funcionario.email}</td>
+                    <td><span class="status-ativo">${funcionario.funcao || "Funcionário"}</span></td>
+                    <td>
+                        <button class="btn-excluir" onclick="excluirFuncionario(${funcionario.id_usuario})">
+                            Excluir
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    function excluirFuncionario(idUsuario) {
+        var idGestor = sessionStorage.ID_USUARIO;
+
+        if (!confirm("Deseja excluir este funcionário?")) {
+            return;
+        }
+
+        fetch("/usuarios/excluir_funcionario", {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                idUsuarioServer: idUsuario,
+                fkResponsavelServer: idGestor
+            })
+        })
+            .then(function (resposta) {
+                if (!resposta.ok) {
+                    throw "Erro ao excluir funcionário";
+                }
+
+                listarFuncionarios();
+            })
+            .catch(function (erro) {
+                console.log(erro);
+                alert("Não foi possível excluir o funcionário.");
+            });
+    }
 </script>

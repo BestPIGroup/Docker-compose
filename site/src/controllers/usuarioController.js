@@ -65,12 +65,6 @@ function cadastrar(req, res) {
     var senha = req.body.senhaServer;
     var confirmacao_senha = senha;
     var fk_unidade = req.body.fk_unidadeServer;
-    var id_unidade_slackJira = req.body.id_unidade_slackJira;
-    var tokenApiJira = req.body.token_jira_input;
-    var urlEquipeJira = req.body.url_jira_input;
-    var chaveUrlJira = req.body.url_key_jira_input;
-    var emailJira = req.body.email_jira_input;
-    var webhook_slack = req.body.link_webhook_input;
 
     /* var fkEmpresa = req.body.idEmpresaVincularServer; */
 
@@ -89,22 +83,10 @@ function cadastrar(req, res) {
         res.status(400).send("Sua função está undefined!");
     } else if (confirmacao_senha != senha){
         res.status(400).send("Suas senhas não coincidem!");
-    } else if (webhook_slack == undefined){
-        res.status(400).send("Sua webhook está undefined!");
-    } else if ( id_unidade_slackJira == undefined){
-        res.status(400).send("Seu webhook está undefined!");
-    } else if ( tokenApiJira == undefined){
-        res.status(400).send("Seu tokenApiJira está undefined!");
-    } else if ( urlEquipeJira == undefined){
-        res.status(400).send("Sua urlEquipeJira está undefined!");
-    } else if ( chaveUrlJira == undefined){
-        res.status(400).send("Sua chaveUrlJira está undefined!");
-    } else if ( emailJira == undefined){
-        res.status(400).send("Sua emailJira está undefined!");
     }else {
 
         // Passe os valores como parâmetro e vá para o arquivo usuarioModel.js
-        usuarioModel.cadastrar(nome, email, senha, telefone, funcao, matricula, fk_unidade, id_unidade_slackJira, tokenApiJira, urlEquipeJira, chaveUrlJira, emailJira, webhook_slack)
+        usuarioModel.cadastrar(nome, email, senha, telefone, funcao, matricula, fk_unidade)
             .then(function (resultado) {
                   res.json(resultado);}
             ).catch(
@@ -208,9 +190,88 @@ function cadastrar_Func(req, res) {
             );
     }
 }
+
+function cadastrar_slackJira(req, res) {
+    var id_unidade_slackJira = req.body.id_unidade_slackJira;
+    var token_api = req.body.token_api;
+    var email_jira = req.body.email_jira;
+    var url_jira = req.body.url_jira;
+    var key_url_jira = req.body.key_url_jira;
+    var webhook_slack = req.body.webhook_slack;
+
+    if (id_unidade_slackJira == undefined) {
+        res.status(400).send("O id_unidade_slackJira está undefined!");
+    } else if (token_api == undefined) {
+        res.status(400).send("O token_api está undefined!");
+    } else if (email_jira == undefined) {
+        res.status(400).send("O email_jira está undefined!");
+    } else if (url_jira == undefined) {
+        res.status(400).send("A url_jira está undefined!");
+    } else if (key_url_jira == undefined) {
+        res.status(400).send("A key_url_jira está undefined!");
+    } else if (webhook_slack == undefined) {
+        res.status(400).send("O webhook_slack está undefined!");
+    } else {
+
+        usuarioModel.cadastrar_slackJira(id_unidade_slackJira, token_api, email_jira, url_jira, key_url_jira, webhook_slack)
+            .then(function (resultado) {
+                  res.json(resultado);}
+            ).catch(
+                function (erro) {
+                    console.log(erro);
+                    console.log(
+                        "\nHouve um erro ao realizar o cadastro! Erro: ",
+                        erro.sqlMessage
+                    );
+                    res.status(500).json(erro.sqlMessage);
+                }
+            );
+    }
+}
+
+function listar_funcionarios(req, res) {
+    var fk_responsavel = req.params.fk_responsavel || req.body.fk_responsavelServer;
+
+    if (fk_responsavel == undefined) {
+        res.status(400).send("Responsável indefinido!");
+    } else {
+        usuarioModel.listar_funcionarios(fk_responsavel)
+            .then(function (resultado) {
+                res.json(resultado);
+            })
+            .catch(function (erro) {
+                console.log(erro);
+                res.status(500).json(erro.sqlMessage);
+            });
+    }
+}
+
+function excluir_funcionario(req, res) {
+    var id_usuario = req.body.idUsuarioServer;
+    var fk_responsavel = req.body.fkResponsavelServer;
+
+    if (id_usuario == undefined) {
+        res.status(400).send("Usuário indefinido!");
+    } else if (fk_responsavel == undefined) {
+        res.status(400).send("Responsável indefinido!");
+    } else {
+        usuarioModel.excluir_funcionario(id_usuario, fk_responsavel)
+            .then(function (resultado) {
+                res.json(resultado);
+            })
+            .catch(function (erro) {
+                console.log(erro);
+                res.status(500).json(erro.sqlMessage);
+            });
+    }
+}
+
 module.exports = {
     autenticar,
     cadastrar,
     ver_usuario,
-    cadastrar_Func
+    cadastrar_Func,
+    cadastrar_slackJira,
+    listar_funcionarios,
+    excluir_funcionario
 }

@@ -5,10 +5,7 @@ const componentesDoModal = [
     { chave: "PROCESSOS", nome: "Processos", id: 7 },
     { chave: "RAM", nome: "RAM", id: 3 },
     { chave: "DISCO", nome: "Disco", id: 6 },
-    { chave: "REDE", nome: "Rede", id: 8 },
-    { chave: "RANSOMWARE", nome: "Ransomware", id: 20 },
-    { chave: "DDOS", nome: "DDoS", id: 21 },
-    { chave: "MALWARE", nome: "Malware", id: 22 }
+    { chave: "REDE", nome: "Rede", id: 8 }
 ];
 
 function limparValorSql(valor) {
@@ -43,6 +40,8 @@ function buscarComponente(nomeOuId) {
 function montarResposta(mac, linhas) {
     return {
         mac,
+        existeLimite: linhas.length > 0,
+        existiaLimite: linhas.length > 0,
         componentes: componentesDoModal.map(componente => {
             const linha = linhas.find(item => Number(item.idComponente) === componente.id);
 
@@ -121,8 +120,38 @@ async function atualizarLimitesPorMac(mac, componentes) {
     return buscarLimitesPorMac(mac);
 }
 
+async function inserirLimitesPorMac(mac, componentes) {
+    if (!mac) throw new Error("MAC do servidor não informado");
+    if (!Array.isArray(componentes)) throw new Error("Componentes não informados");
+
+    const macLimpo = limparValorSql(mac);
+
+    for (const item of componentes) {
+        const componente = buscarComponente(item.chave || item.nome || item.idComponente);
+        const limite = limparNumero(item.limite);
+        if (!componente || limite === null) continue;
+
+        const exibir = limparBooleano(item.exibir);
+        const instrucaoSql = `
+            INSERT INTO componente_servidor(id_servidor, id_componente, limite_componente, exibir)
+            SELECT
+                s.id_servidor,
+                ${componente.id},
+                ${limite},
+                ${exibir}
+            FROM servidor s
+            WHERE s.endereco_mac = '${macLimpo}';
+        `;
+
+        await database.executar(instrucaoSql);
+    }
+
+    return buscarLimitesPorMac(mac);
+}
+
 module.exports = {
     buscarLimitesPorMac,
     atualizarLimitesPorMac,
+    inserirLimitesPorMac,
     componentesDoModal
 };

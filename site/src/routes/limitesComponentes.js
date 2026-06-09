@@ -3,7 +3,9 @@ const router = express.Router();
 const limitesComponentesController = require("../controllers/limitesComponentesController");
 
 router.post("/buscar", limitesComponentesController.buscarLimites);
-router.put("/atualizar", limitesComponentesController.atualizarLimites);
-router.post("/atualizar", limitesComponentesController.atualizarLimites);
+router.route("/atualizar")
+    .put(limitesComponentesController.atualizarLimites)
+    .post(limitesComponentesController.atualizarLimites);
+router.post("/inserir", limitesComponentesController.inserirLimites);
 
 module.exports = router;
