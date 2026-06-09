@@ -268,18 +268,114 @@ function filtrarLinhasDoServidor(conteudo, mac, linhas, montarItem) {
     return registros;
 }
 
+function formatarDataChaveAlertas(data) {
+    return [
+        String(data.getDate()).padStart(2, "0"),
+        String(data.getMonth() + 1).padStart(2, "0"),
+        String(data.getFullYear()).slice(-2)
+    ].join("-");
+}
+
+function dataAtualSaoPaulo() {
+    const partes = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "America/Sao_Paulo",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+    }).formatToParts(new Date()).reduce((objeto, parte) => {
+        objeto[parte.type] = parte.value;
+        return objeto;
+    }, {});
+
+    return new Date(Number(partes.year), Number(partes.month) - 1, Number(partes.day));
+}
+
+function normalizarDataBusca(valor) {
+    if (!valor) return null;
+
+    const texto = String(valor).trim();
+    const dataIso = texto.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (dataIso) return new Date(Number(dataIso[1]), Number(dataIso[2]) - 1, Number(dataIso[3]));
+
+    const dataBr = texto.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+    if (dataBr) return new Date(Number(dataBr[3]), Number(dataBr[2]) - 1, Number(dataBr[1]));
+
+    const dataConvertida = new Date(texto);
+    if (Number.isNaN(dataConvertida.getTime())) return null;
+    return new Date(dataConvertida.getFullYear(), dataConvertida.getMonth(), dataConvertida.getDate());
+}
+
+function listarDatasDaBusca(filtros) {
+    let inicio = normalizarDataBusca(filtros?.dataInicio);
+    let fim = normalizarDataBusca(filtros?.dataFim);
+
+    if (Number(filtros?.ultimosMinutos) > 0) {
+        inicio = new Date(Date.now() - Number(filtros.ultimosMinutos) * 60 * 1000);
+        fim = new Date();
+    }
+
+    if (!inicio && !fim) {
+        return [dataAtualSaoPaulo()];
+    }
+
+    inicio = inicio || fim;
+    fim = fim || inicio;
+
+    if (inicio > fim) [inicio, fim] = [fim, inicio];
+
+    const datas = [];
+    const dataAtual = new Date(inicio.getFullYear(), inicio.getMonth(), inicio.getDate());
+    const dataFinal = new Date(fim.getFullYear(), fim.getMonth(), fim.getDate());
+
+    while (dataAtual <= dataFinal) {
+        datas.push(new Date(dataAtual));
+        dataAtual.setDate(dataAtual.getDate() + 1);
+    }
+
+    return datas;
+}
+
+function montarChaveAlertas(mac, data) {
+    return `logAlertas/${formatarDataChaveAlertas(data)}_${String(mac || "").trim()}.csv`;
+}
+
+async function buscarObjetoS3SeExistir(s3, bucket, key) {
+    try {
+        return await s3.getObject({ Bucket: bucket, Key: key }).promise();
+    } catch (erro) {
+        if (erro?.code === "NoSuchKey" || erro?.statusCode === 404) return null;
+        throw erro;
+    }
+}
+
 async function buscarRegistrosAlertas(mac, linhas, filtros) {
     if (!mac) throw new Error("MAC do servidor não informado");
 
     const s3 = configurarS3();
-    const resposta = await s3.getObject({
-        Bucket: process.env.AWS_BUCKET_ALERTS_NAME,
-        Key: process.env.AWS_BUCKET_ALERTS_KEY
-    }).promise();
+    const bucket = process.env.AWS_BUCKET_ALERTS_NAME;
+    const datas = listarDatasDaBusca(filtros);
+    let todosOsRegistros = [];
 
-    const conteudo = resposta.Body.toString("utf-8");
-    const registros = filtrarPorPeriodo(filtrarLinhasDoServidor(conteudo, mac, linhas, montarRegistroDaLinha), filtros);
-    const resultado = montarResultado(mac, registros, true);
+    for (const data of datas) {
+        const key = montarChaveAlertas(mac, data);
+        const resposta = await buscarObjetoS3SeExistir(s3, bucket, key);
+        if (!resposta) continue;
+
+        const conteudo = resposta.Body.toString("utf-8");
+        const registros = filtrarLinhasDoServidor(conteudo, mac, Infinity, montarRegistroDaLinha);
+        todosOsRegistros = todosOsRegistros.concat(registros);
+    }
+
+    todosOsRegistros.sort((a, b) => {
+        const dataA = dataDoRegistro(a);
+        const dataB = dataDoRegistro(b);
+        if (!dataA || !dataB) return 0;
+        return dataB - dataA;
+    });
+
+    const registrosFiltrados = filtrarPorPeriodo(todosOsRegistros, filtros);
+    const limite = Number(linhas) > 0 ? Number(linhas) : Infinity;
+    const resultado = montarResultado(mac, registrosFiltrados.slice(0, limite), true);
 
     alertasPorServidor[mac] = resultado;
     return resultado;
