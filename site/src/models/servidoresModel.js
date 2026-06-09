@@ -5,7 +5,10 @@ const componentesPadraoCadastro = [
     { id: 3, limite: 85 },
     { id: 6, limite: 80 },
     { id: 7, limite: 100 },
-    { id: 8, limite: 100 }
+    { id: 8, limite: 100 },
+    { id: 9, limite: 80 },
+    { id: 12, limite: 20000 },
+    { id: 13, limite: 40000 }
 ];
 
 function limparValorSql(valor) {
