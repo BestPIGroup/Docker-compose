@@ -434,6 +434,7 @@ select {
 
     .graficos {
         justify-content: center;
+        max-width: fit-content;
     }
 }
 
