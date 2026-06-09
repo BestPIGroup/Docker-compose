@@ -183,7 +183,7 @@
             {
                 nome: "Rede",
                 status: "ok",
-                maxEixoY: Number(Number(dados[ultimoIndice][13]) + Number(dados[ultimoIndice][14])) * 1.1, rotuloY: "Tráfego de rede (Kbps)"
+                maxEixoY: Number(Number(dados[ultimoIndice][13]) + Number(dados[ultimoIndice][14])) * 2, rotuloY: "Tráfego de rede (Kbps)"
             },
             {
                 nome: "Processos",
@@ -387,7 +387,7 @@
                     '<div class="card-painel">' +
                     '<h2>' + componente.nome + '</h2>' +
                     '<div class="pct-valor ' + classeStatus + '">' + (valorAtual) + '</div>' +
-                    '<div class="pico-valor" style="margin-top: -12px"><span>Mbps</span></div>' +
+                    '<div class="pico-valor" style="margin-top: -12px"><span>Kbps</span></div>' +
                     '<div class="pico-bloco">' +
                     '</div>';
             } else if (componente.nome == "Processos") {
