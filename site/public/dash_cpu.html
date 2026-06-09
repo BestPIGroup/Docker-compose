@@ -134,10 +134,10 @@
     <script>
         const servidor = JSON.parse(sessionStorage.getItem("servidor"));
 
-        if (!servidor || !servidor.mac) {
-            alert("Nenhum servidor selecionado. Você será redirecionado.");
-            window.location.href = "servidores.html";
-        }
+        // if (!servidor || !servidor.mac) {
+        //     alert("Nenhum servidor selecionado. Você será redirecionado.");
+        //     window.location.href = "servidores.html";
+        // }
 
         const macServidor = servidor.mac;
         const idServidor = servidor.id_servidor;   
