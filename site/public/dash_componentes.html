@@ -118,10 +118,17 @@
 <script>
 
     nome_usuario.innerHTML = `${sessionStorage.NOME_USUARIO}`
+    kpiServidor = document.getElementById("kpi_servidor")
+    kpiCrit = document.getElementById("kpi_crit")
+    kpiAlerta = document.getElementById("kpi_alerta")
 
     var todosDados = {};
 
     function carregarGraficos() {
+
+        kpiServidor.textContent = sessionStorage.ALIAS;
+        kpiCrit.textContent = sessionStorage.TOTAL_CRITICOS;
+        kpialerta.textContent = sessionStorage.TOTAL_CRITICOS;
 
         const componentes = [
             {

@@ -103,8 +103,14 @@
 </html>
 <script>
 
+    const crit = document.getElementById("crit");
+    const atencao = document.getElementById("atencao");
+    const totalHard = document.getElementById("alert");
 
     async function buscarServidores() {
+
+        totalCrit = 0
+        totalAlerta = 0
 
         try {
 
@@ -154,6 +160,8 @@
 
                     server.limites = limites;
                     server.nivelAlerta = 0;
+                    server.totalAlertas = 0;
+                    server.totalCriticos = 0;
 
                     server.limites.push({
 
@@ -169,30 +177,37 @@
                     if (server.limites[0].limite_componente <= server.ultimoRegistro[3]) {
 
                         server.nivelAlerta += 2;
+                        server.totalCriticos ++;
+
 
                     } else if (server.limites[0].limite_componente <= server.ultimoRegistro[3] * 0.8) {
 
                         server.nivelAlerta++;
+                        server.totalAlertas ++;
 
                     }
 
                     if (server.limites[1].limite_componente <= server.ultimoRegistro[9]) {
 
                         server.nivelAlerta += 2;
+                        server.totalCriticos++;
 
                     } else if (server.limites[1].limite_componente <= server.ultimoRegistro[9] * 0.8) {
 
                         server.nivelAlerta++;
+                        server.totalAlertas++;
 
                     }
 
                     if (server.limites[2].limite_componente <= server.ultimoRegistro[11]) {
 
                         server.nivelAlerta += 2;
+                        server.totalCriticos ++;
 
                     } else if (server.limites[2].limite_componente <= server.ultimoRegistro[11] * 0.8) {
 
                         server.nivelAlerta++;
+                        server.totalAlertas ++;
 
                     }
 
@@ -201,10 +216,12 @@
                     if (server.limites[3].limite_componente <= pacotes) {
 
                         server.nivelAlerta += 2;
+                        server.totalCriticos++;
 
                     } else if (server.limites[3].limite_componente <= pacotes * 0.8) {
 
                         server.nivelAlerta++;
+                        server.totalAlertas ++;
 
                     }
 
@@ -219,6 +236,9 @@
             const box = document.getElementById("servers");
 
             servers.forEach(server => {
+
+                totalCrit += server.totalCriticos
+                totalAlerta += server.totalAlertas
 
                 console.log(server)
 
@@ -286,8 +306,12 @@
 
                 }
 
+                crit.textContent = totalCrit
+                atencao.textContent = totalAlerta
+                totalHard.textContent = totalCrit + totalAlerta
+
                 box.innerHTML +=
-                    `<div onclick="redirecionar('${server.endereco_mac}')">
+                    `<div onclick="redirecionar('${server.endereco_mac,server.alias,server.nivelAlerta,server.totalCriticos,server.totalAlertas}')">
                                     <div class="card ${classeAdicional}">
                                         <div class="header">
                                             <strong>${server.alias}</strong>
@@ -342,9 +366,13 @@
 
     }
 
-    function redirecionar(mac) {
+    function redirecionar(mac,alias,nivelAlerta,totalCriticos,totalAlertas) {
 
         sessionStorage.setItem("MAC", mac);
+        sessionStorage.setItem("ALIAS", alias);
+        sessionStorage.setItem("NV_ALERTA", nivelAlerta);
+        sessionStorage.setItem("TOTAL_CRITICOS", totalCriticos);
+        sessionStorage.setItem("TOTAL_ALERTAS", totalAlertas);
 
         window.location.href = "./dash_componentes.html";
 
