@@ -445,8 +445,23 @@
         return Math.max(minimo, Math.min(maximo, valor));
     }
 
+    function formatarNumeroTela(valor) {
+        const numero = Number(String(valor).replace(',', '.'));
+        if (!Number.isFinite(numero)) return valor;
+        if (Math.abs(numero) < 1000) return Number.isInteger(numero) ? numero : Number(numero.toFixed(1)).toString().replace('.', ',');
+
+        const valorEmMil = numero / 1000;
+        const casasDecimais = Math.abs(valorEmMil) >= 10 || Number.isInteger(valorEmMil) ? 0 : 1;
+        const texto = valorEmMil.toLocaleString('pt-BR', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: casasDecimais
+        });
+
+        return `${texto} mil`;
+    }
+
     function valorTela(valor) {
-        return valor === null || valor === undefined || valor === '' ? '--' : valor;
+        return valor === null || valor === undefined || valor === '' ? '--' : formatarNumeroTela(valor);
     }
 
     function formatarDataHora(data) {
@@ -843,6 +858,15 @@
     function formatarNumeroSerie(valor) {
         const numero = numeroSeguro(valor);
         return Number.isInteger(numero) ? numero : Number(numero.toFixed(1));
+    }
+
+    function calcularPassoEixo(valorMaximo, quantidadeMarcacoes = 5) {
+        const maximo = Math.max(Number(valorMaximo) || 0, 1);
+        const passoBruto = maximo / quantidadeMarcacoes;
+        const potencia = 10 ** Math.floor(Math.log10(passoBruto));
+        const base = passoBruto / potencia;
+        const multiplicador = base <= 1 ? 1 : (base <= 2 ? 2 : (base <= 5 ? 5 : 10));
+        return multiplicador * potencia;
     }
 
     function quantidadeLigacoesDaLeitura(leitura) {
@@ -1610,8 +1634,8 @@
         const valoresAlertas = Array.isArray(dados.alertas) ? dados.alertas : (Array.isArray(dados.valores) ? dados.valores : []);
         const valoresLigacoes = Array.isArray(dados.ligacoes) ? dados.ligacoes : [];
         const maiorValorDoGrafico = Math.max(...valoresAlertas, ...valoresLigacoes, 0);
-        const limiteLinha = maiorValorDoGrafico <= 10 ? 10 : Math.ceil((maiorValorDoGrafico + 1) / 5) * 5;
-        const passoLinha = limiteLinha <= 10 ? 2 : 5;
+        const passoLinha = maiorValorDoGrafico <= 10 ? 2 : calcularPassoEixo(maiorValorDoGrafico);
+        const limiteLinha = maiorValorDoGrafico <= 10 ? 10 : Math.ceil(maiorValorDoGrafico / passoLinha) * passoLinha;
 
         graficos.linha = new Chart(canvas, {
             type: 'line',
@@ -1652,7 +1676,12 @@
                         min: 0,
                         max: limiteLinha,
                         grid: { display: false },
-                        ticks: { color: '#41547a', stepSize: passoLinha, font: { size: 10 } }
+                        ticks: {
+                            color: '#41547a',
+                            stepSize: passoLinha,
+                            callback: valor => formatarNumeroTela(valor),
+                            font: { size: 10 }
+                        }
                     },
                     x: {
                         grid: { display: false },
@@ -1670,7 +1699,8 @@
 
         const componentesDoGrafico = Array.isArray(componentes) ? componentes : [];
         const maiorValorDoGrafico = Math.max(...componentesDoGrafico.map(item => item.alertas), 1);
-        const limiteComponentes = maiorValorDoGrafico <= 10 ? 10 : Math.ceil((maiorValorDoGrafico + 1) / 5) * 5;
+        const passoComponentes = maiorValorDoGrafico <= 10 ? 2 : calcularPassoEixo(maiorValorDoGrafico);
+        const limiteComponentes = maiorValorDoGrafico <= 10 ? 10 : Math.ceil(maiorValorDoGrafico / passoComponentes) * passoComponentes;
         graficos.componentes = new Chart(canvas, {
             type: 'bar',
             data: {
@@ -1697,7 +1727,12 @@
                         max: limiteComponentes,
                         grid: { color: 'rgba(255, 255, 255, 0.5)', lineWidth: 1 },
                         border: { display: false },
-                        ticks: { color: 'rgba(255, 255, 255, 0.42)', stepSize: limiteComponentes <= 10 ? 2 : 5, font: { size: 9 } }
+                        ticks: {
+                            color: 'rgba(255, 255, 255, 0.42)',
+                            stepSize: passoComponentes,
+                            callback: valor => formatarNumeroTela(valor),
+                            font: { size: 9 }
+                        }
                     },
                     y: {
                         grid: { display: false },
