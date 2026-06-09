@@ -254,12 +254,12 @@
                     classeAdicional = "card-erro"
                     nvAlerta = "Crítico"
                     seguranca = "Comprometida"
+                    corTexto = "sec-bad"
 
                 } else if (server.nivelAlerta >= 2) {
 
                     classeAdicional = "card-atencao"
                     nvAlerta = "Atenção"
-                    corTexto = "sec-bad"
 
                 }
 
@@ -312,8 +312,10 @@
                 atencao.textContent = totalAlerta
                 totalHard.textContent = totalCrit + totalAlerta
 
+                console.log(server.endereco_mac)
+
                 box.innerHTML +=
-                    `<div onclick="redirecionar('${server.endereco_mac}','${server.alias}','${server.nivelAlerta}','${server.totalCriticos}','${server.totalAlertas}')">
+                    `<div onclick="redirecionar('${server.endereco_mac}','${server.alias}','${server.nivelAlerta}','${totalCrit}','${totalAlerta}','${server.id_servidor}')">
                                     <div class="card ${classeAdicional}">
                                         <div class="header">
                                             <strong>${server.alias}</strong>
@@ -368,13 +370,14 @@
 
     }
 
-    function redirecionar(mac,alias,nivelAlerta,totalCriticos,totalAlertas) {
+    function redirecionar(mac,alias,nivelAlerta,totalCriticos,totalAlertas,idServidor) {
 
         sessionStorage.setItem("MAC", mac);
         sessionStorage.setItem("ALIAS", alias);
         sessionStorage.setItem("NV_ALERTA", nivelAlerta);
         sessionStorage.setItem("TOTAL_CRITICOS", totalCriticos);
         sessionStorage.setItem("TOTAL_ALERTAS", totalAlertas);
+        sessionStorage.setItem("ID_SERVIDOR", idServidor);
 
         window.location.href = "./dash_componentes.html";
 

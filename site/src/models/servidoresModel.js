@@ -46,6 +46,15 @@ function buscar_limites(id) {
     console.log("Executando a instrução SQL: \n" + instrucaoSql);
     return database.executar(instrucaoSql);
 }
+
+function buscar_limites_ordenacao(id){
+
+    console.log("ACESSEI O MODEL DA UNIDADE \n \n\t\t >> Se aqui der erro de 'Error: connect ECONNREFUSED',\n \t\t >> verifique suas credenciais de acesso ao banco\n \t\t >> e se o servidor de seu BD está rodando corretamente. \n\n function cadastrar_Unidade(): ")
+    var instrucaoSql = `select * from componente_servidor where id_servidor = ${id};`;
+    console.log("Executando a instrução SQL: \n" +   instrucaoSql);
+    return database.executar(instrucaoSql);
+}
+
 function cadastrar_componentes_servidor(mac) {
     const macLimpo = limparValorSql(mac);
     const valores = componentesPadraoCadastro.map(componente => `
@@ -88,6 +97,7 @@ module.exports = {
     cadastrar_servidor,
     buscar_servidores,
     buscar_limites,
+    buscar_limites_ordenacao,
     cadastrar_componentes_servidor,
     listar_servidores
 }

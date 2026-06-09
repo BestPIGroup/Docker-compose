@@ -108,9 +108,46 @@ function buscar_limites(req,res){
 
 }
 
+function buscar_limites_ordenacao(req,res){
+
+    var id = req.body.id;
+    
+    if(id == undefined){
+
+        res.status(400).send("mac inexiste")
+
+    }else{
+
+        servidoresModel.buscar_limites_ordenacao(id)
+        .then(
+
+            function (resultado){
+
+                console.log("dsklfnsdfbsdfnsdkjfsdkjfsdfjksdf");
+                res.json(resultado);
+
+            }
+
+        )
+        .catch(
+
+            function(erro){
+
+                console.log("Erro na busca dos limites: ", erro);
+                res.status(500).json(erro.sqlMessage);
+
+            }            
+
+        )
+
+    }
+
+}
+
 module.exports = {
     cadastrar_servidor,
     buscar_servidores,
     buscar_limites,
+    buscar_limites_ordenacao,
     listar_servidores
 }

@@ -31,14 +31,6 @@
 
         </div>
 
-        <div class=kpi-rede>
-
-            <Span style="font-size: large; text-align: center;">taxa de crescimento de tráfego</Span>
-            <Span id="taxaCrescimento" style="font-size: x-large; font-weight: bolder;">11%</Span>
-            <span style="font-size: small;">últimos 15 minutos</span>
-
-        </div>
-
     </div>
 
     <div class="grid-graficos">
@@ -113,7 +105,6 @@
 
     async function carregarGraficosRede(lista) {
 
-        lista.reverse();
         limites = await buscarLimites();
         console.log(limites)
 
@@ -123,11 +114,9 @@
         textoPacks = document.getElementById("textoPorporcaoPacks");
         KpiPacoteEnvio = document.getElementById("PacoteMedioEnvio");
         KpiPacoteRecebimento = document.getElementById("PacoteMedioRecebimento");
-        KpiTaxa = document.getElementById("taxaCrescimento");
-
         for (i = 0; i < 7;) {
 
-            dados[0].push(lista[i][2].slice(11,16));
+            dados[0].push(lista[i][2].slice(11, 16));
             dados[1].push(lista[i][13]);
             dados[2].push(lista[i][14]);
             dados[3].push(lista[i][15]);
@@ -209,7 +198,6 @@
 
         KpiPacoteEnvio.textContent = (somaVelEnvio / somaPacksEnvio).toFixed(2) + " Kb"
         KpiPacoteRecebimento.textContent = (somaVelRecebimento / somaPacksRecebimento).toFixed(2) + " Kb"
-        KpiTaxa.textContent = (((QminAtual - QminAnterior) / QminAnterior) * 100).toFixed(2) + " %"
 
 
         const ctxRedeEnvio = document.getElementById('grafico-rede-envio');
@@ -755,6 +743,7 @@
     function buscarDadosRede() {
 
         var mac = sessionStorage.MAC;
+        console.log(mac)
         var linhas = 7;
 
         return fetch("conexaoS3/buscar_registros", {
@@ -800,7 +789,7 @@
                 if (i == 0 || i == 1 || i == 3 || i == 4) {
 
                     Charts[i].data.labels.shift();
-                    Charts[i].data.labels.push(lista[0][2].slice(11,16));
+                    Charts[i].data.labels.push(lista[0][2].slice(11, 16));
 
                     if (i == 0) {
 
@@ -908,11 +897,9 @@
 
             KpiPacoteEnvio = document.getElementById("PacoteMedioEnvio");
             KpiPacoteRecebimento = document.getElementById("PacoteMedioRecebimento");
-            KpiTaxa = document.getElementById("taxaCrescimento");
-
+            
             KpiPacoteEnvio.textContent = (somaVelEnvio / somaPacksEnvio).toFixed(2) + " Kb"
             KpiPacoteRecebimento.textContent = (somaVelRecebimento / somaPacksRecebimento).toFixed(2) + " Kb"
-            KpiTaxa.textContent = (((QminAtual - QminAnterior) / QminAnterior) * 100).toFixed(2) + " %"
 
         });
 
@@ -934,9 +921,9 @@
         })
 
             .then(function (resposta) {
-                
+
                 return resposta.json();
-            
+
             });
 
     }

@@ -134,12 +134,13 @@
     <script>
         const servidor = JSON.parse(sessionStorage.getItem("servidor"));
 
-        // if (!servidor || !servidor.mac) {
-        //     alert("Nenhum servidor selecionado. Você será redirecionado.");
-        //     window.location.href = "servidores.html";
-        // }
+        if (!servidor || !servidor.mac) {
+            alert("Nenhum servidor selecionado. Você será redirecionado.");
+            window.location.href = "servidores.html";
+        }
 
-        const macServidor = servidor.MAC;
+        const macServidor = servidor.mac;
+        const idServidor = servidor.id_servidor;   
 
         let limiteCPU = null;
         let limiteCS = null;
@@ -239,7 +240,7 @@
         }
 
         async function buscarLimites() {
-            if (!macServidor) {
+            if (!idServidor) {
                 console.warn('ID do servidor não disponível. Limites não serão exibidos.');
                 return;
             }
@@ -247,7 +248,7 @@
                 const resp = await fetch('/dash_cpu/buscarLimites', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: macServidor })
+                    body: JSON.stringify({ id: idServidor })
                 });
                 if (resp.ok) {
                     const limites = await resp.json();

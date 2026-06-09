@@ -10,7 +10,7 @@
     width: 90%;
     height: 18vh;
     display: flex;
-    justify-content: space-between;
+    justify-content: space-evenly;
 }
 
 .kpi-rede{

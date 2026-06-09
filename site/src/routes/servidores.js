@@ -18,4 +18,12 @@ router.post("/buscar_limites", function(req,res){
     servidoresController.buscar_limites(req,res);
 })
 
+router.post("/buscar_limites_ordenacao", function(req,res){
+    servidoresController.buscar_limites_ordenacao(req,res);
+})
+
+router.post("/buscar_limites", function(req,res){
+    servidoresController.buscar_limites(req,res);
+})
+
 module.exports = router;

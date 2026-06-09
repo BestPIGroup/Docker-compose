@@ -55,10 +55,9 @@ async function buscarRegistros(mac, linhas) {
     }
 }
 
-function buscarLimites(mac) {
+function buscarLimites(id) {
     console.log("ACESSEI O MODEL DA UNIDADE ...");
-    var instrucaoSql = `SELECT * FROM componente_servidor WHERE servidor.endereco_mac = ${mac} AND (id_componente = 1 OR id_componente = 3)
-    JOIN servidor on componente_servidor.id_servidor=servidor.id_servidor;`;
+    var instrucaoSql = `SELECT * FROM componente_servidor WHERE id_servidor = ${id} AND (id_componente = 1 OR id_componente = 3);`;
     console.log("Executando a instrução SQL: \n" + instrucaoSql);
     return database.executar(instrucaoSql);
 }
