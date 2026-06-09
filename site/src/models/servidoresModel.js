@@ -2,7 +2,7 @@ const database = require("../database/config");
 
 const componentesPadraoCadastro = [
     { id: 1, limite: 85 },
-    { id: 3, limite: 85 },
+    { id: 3, limite: 850000 },
     { id: 6, limite: 80 },
     { id: 7, limite: 100 },
     { id: 8, limite: 100 },
@@ -39,11 +39,11 @@ function buscar_servidores(unidade) {
 
 }
 
-function buscar_limites(id){
+function buscar_limites(id) {
 
     console.log("ACESSEI O MODEL DA UNIDADE \n \n\t\t >> Se aqui der erro de 'Error: connect ECONNREFUSED',\n \t\t >> verifique suas credenciais de acesso ao banco\n \t\t >> e se o servidor de seu BD está rodando corretamente. \n\n function cadastrar_Unidade(): ")
     var instrucaoSql = `select * from componente_servidor where id_servidor = ${id} and (id_componente = 1 or id_componente = 6 or id_componente = 9 or id_componente = 12 or id_componente = 13);`;
-    console.log("Executando a instrução SQL: \n" +   instrucaoSql);
+    console.log("Executando a instrução SQL: \n" + instrucaoSql);
     return database.executar(instrucaoSql);
 }
 function cadastrar_componentes_servidor(mac) {
@@ -91,3 +91,4 @@ module.exports = {
     cadastrar_componentes_servidor,
     listar_servidores
 }
+

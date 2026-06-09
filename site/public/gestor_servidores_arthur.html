@@ -13,7 +13,9 @@
 <body>
     <header class="sidebar">
         <div class="logo" href="index.html">
-            <img src="./assets/LogoArgosIcon.png">
+            <a href="./index.html">
+                <img src="./assets/LogoArgosIcon.png">
+            </a>
         </div>
         <ul class="listaOpcoes">
             <li>
@@ -204,6 +206,27 @@
             </div>
             <div class="modal-body-alertas">
                 <div class="linha-superior">
+                    <section class="alert-card timeline-card">
+                        <div class="timeline-metrics">
+                            <div class="timeline-metric-panel timeline-alertas">
+                                <div class="alert-card-header timeline-heading">
+                                    <h3>Número de alertas ao longo do dia</h3>
+                                </div>
+                                <div class="trend-grid" id="trendResumo"></div>
+                            </div>
+                            <span class="timeline-divider" aria-hidden="true"></span>
+                            <div class="timeline-metric-panel timeline-ligacoes">
+                                <div class="alert-card-header timeline-heading">
+                                    <h3>Número de ligações ao longo do dia</h3>
+                                    <span class="alert-icon calendar-icon"></span>
+                                </div>
+                                <div class="trend-grid" id="trendResumoLigacoes"></div>
+                            </div>
+                        </div>
+                        <div class="line-chart-wrap">
+                            <canvas id="graficoLinha"></canvas>
+                        </div>
+                    </section>
                     <section class="alert-card rosquinha-card">
                         <div class="rosquinha-copy">
                             <h3>Percentual de Alertas</h3>
@@ -214,16 +237,6 @@
                             </div>
                         </div>
                         <div class="rosquinha-stats" id="resumoMedidor"></div>
-                    </section>
-                    <section class="alert-card timeline-card">
-                        <div class="alert-card-header">
-                            <h3>Número de alertas ao longo do dia</h3>
-                            <span class="alert-icon calendar-icon"></span>
-                        </div>
-                        <div class="trend-grid" id="trendResumo"></div>
-                        <div class="line-chart-wrap">
-                            <canvas id="graficoLinha"></canvas>
-                        </div>
                     </section>
                     <section class="alert-card components-card">
                         <div class="alert-card-header">
@@ -320,7 +333,8 @@
         'net_errors',
         'total_arquivos_abertos',
         'mediana_net_sent',
-        'mediana_net_recv'
+        'mediana_net_recv',
+        'ligacoes'
     ];
 
     const componentesPermitidos = {
@@ -702,7 +716,8 @@
             tituloDia: '',
             medidor: { percentual: null, alertas: null, leituras: null },
             tendencias: [],
-            linha: { labels: [], valores: [] },
+            tendenciasLigacoes: [],
+            linha: { labels: [], valores: [], alertas: [], ligacoes: [] },
             componentes: [],
             dias: [],
             resumoDia: [],
@@ -818,6 +833,27 @@
 
     function totalMensagens(registros) {
         return (Array.isArray(registros) ? registros : []).reduce((total, registro) => total + mensagensValidas(registro).length, 0);
+    }
+
+    function numeroSeguro(valor) {
+        const numero = Number(String(valor ?? 0).replace(',', '.'));
+        return Number.isFinite(numero) ? numero : 0;
+    }
+
+    function formatarNumeroSerie(valor) {
+        const numero = numeroSeguro(valor);
+        return Number.isInteger(numero) ? numero : Number(numero.toFixed(1));
+    }
+
+    function quantidadeLigacoesDaLeitura(leitura) {
+        const campos = leitura?.campos || {};
+        return numeroSeguro(
+            leitura?.ligacoes ??
+            campos.ligacoes ??
+            campos.Ligacoes ??
+            campos['Ligações'] ??
+            campos['ligações']
+        );
     }
 
     function contarComponentes(registros) {
@@ -949,12 +985,66 @@
         return grupos;
     }
 
-    function montarLinhaDoPeriodo(registros, periodo) {
-        const grupos = gruposLinha(registros, periodo);
+    function encontrarGrupoDaLeitura(grupos, data) {
+        return grupos.find(grupo => {
+            if (grupo.inicio && grupo.fim) return data >= grupo.inicio && data < grupo.fim;
+            return String(grupo.chave) === String(data.getHours());
+        });
+    }
+
+    function somarLigacoesPorGrupos(leituras, gruposBase) {
+        const grupos = gruposBase.map(grupo => ({ ...grupo, ligacoes: 0 }));
+
+        (Array.isArray(leituras) ? leituras : []).forEach(leitura => {
+            const data = dataDoRegistro(leitura);
+            if (!data) return;
+            const grupo = encontrarGrupoDaLeitura(grupos, data);
+            if (grupo) grupo.ligacoes += quantidadeLigacoesDaLeitura(leitura);
+        });
+
+        return grupos;
+    }
+
+    function montarGruposLinhaDoPeriodo(registros, leituras, periodo) {
+        return somarLigacoesPorGrupos(leituras, gruposLinha(registros, periodo));
+    }
+
+    function montarLinhaAPartirDeGrupos(grupos) {
         return {
             labels: grupos.map(grupo => grupo.label),
-            valores: grupos.map(grupo => grupo.valor)
+            valores: grupos.map(grupo => grupo.valor),
+            alertas: grupos.map(grupo => grupo.valor),
+            ligacoes: grupos.map(grupo => formatarNumeroSerie(grupo.ligacoes))
         };
+    }
+
+    function indiceReferenciaDosGrupos(grupos, periodo, campo) {
+        const agora = new Date();
+        if (periodo.tipo === 'dia' && agora >= periodo.inicio && agora < periodo.fim) {
+            return limitarNumero(agora.getHours(), 0, grupos.length - 1);
+        }
+
+        for (let indice = grupos.length - 1; indice >= 0; indice--) {
+            if (numeroSeguro(grupos[indice]?.[campo]) > 0) return indice;
+        }
+
+        return Math.max(grupos.length - 1, 0);
+    }
+
+    function montarTendenciasDosGrupos(grupos, campo, periodo) {
+        if (!Array.isArray(grupos) || grupos.length === 0) return [];
+
+        const indiceAtual = indiceReferenciaDosGrupos(grupos, periodo, campo);
+        const valorAnterior = indiceAtual > 0 ? numeroSeguro(grupos[indiceAtual - 1]?.[campo]) : 0;
+        const valorAtual = numeroSeguro(grupos[indiceAtual]?.[campo]);
+        const diferenca = valorAtual - valorAnterior;
+        const ehPeriodoDeHoras = periodo.tipo === 'dia' && periodo.fim - periodo.inicio <= 2 * 24 * 60 * 60 * 1000;
+
+        return [
+            { rotulo: ehPeriodoDeHoras ? 'Última hora:' : 'Período anterior:', nome: '', valor: formatarNumeroSerie(valorAnterior), tom: 'neutral' },
+            { rotulo: ehPeriodoDeHoras ? 'Essa hora:' : 'Esse período:', nome: '', valor: formatarNumeroSerie(valorAtual), tom: 'neutral' },
+            { rotulo: ehPeriodoDeHoras ? 'Próxima hora:' : 'Variação:', nome: diferenca > 0 ? 'Aumento' : (diferenca < 0 ? 'Reduziu' : ''), valor: formatarNumeroSerie(Math.abs(diferenca)), direcao: diferenca > 0 ? 'up' : (diferenca < 0 ? 'down' : ''), tom: diferenca > 0 ? 'red' : (diferenca < 0 ? 'green' : 'neutral') }
+        ];
     }
 
     function montarComparacaoDoPeriodo(registros, periodo) {
@@ -1015,17 +1105,20 @@
         const leiturasFiltradas = registrosDoPeriodo(leituras, periodo);
         const temAlertas = Array.isArray(registros) && registros.length > 0;
         const temLeituras = Array.isArray(leituras) && leituras.length > 0;
-        const totalDeAlertas = temAlertas ? totalMensagens(registrosFiltrados) : null;
         const totalDeLeituras = temLeituras ? leiturasFiltradas.length : null;
+        const totalDeAlertas = temAlertas ? totalMensagens(registrosFiltrados) : (temLeituras ? 0 : null);
         const percentual = totalDeLeituras > 0 ? limitarNumero(Math.round((totalDeAlertas / totalDeLeituras) * 100), 0, 100) : null;
         const alertasPeriodo = montarListaAlertasDoPeriodo(registrosFiltrados);
         const alertasUltimaHora = alertasDosUltimosMinutos(montarListaAlertasDoPeriodo(registros), 60);
+        const gruposGrafico = montarGruposLinhaDoPeriodo(registrosFiltrados, leiturasFiltradas, periodo);
+        const linha = temAlertas || temLeituras ? montarLinhaAPartirDeGrupos(gruposGrafico) : { labels: [], valores: [], alertas: [], ligacoes: [] };
 
         return montarDadosPorServidor(nomeServidor, {
             tituloDia: periodo.titulo,
             medidor: { percentual, alertas: totalDeAlertas, leituras: totalDeLeituras },
-            tendencias: temAlertas ? montarTendenciasDoPeriodo(registros, periodo) : [],
-            linha: temAlertas ? montarLinhaDoPeriodo(registrosFiltrados, periodo) : { labels: [], valores: [] },
+            tendencias: temAlertas || temLeituras ? montarTendenciasDosGrupos(gruposGrafico, 'valor', periodo) : [],
+            tendenciasLigacoes: temAlertas || temLeituras ? montarTendenciasDosGrupos(gruposGrafico, 'ligacoes', periodo) : [],
+            linha,
             componentes: temAlertas ? montarComponentesDoPeriodo(registrosFiltrados) : [],
             dias: temAlertas ? montarComparacaoDoPeriodo(registros, periodo) : [],
             resumoDia: temAlertas ? resumoDoPeriodo(registros, periodo) : [],
@@ -1050,7 +1143,8 @@
             status: metricas.status || dadosBaseServidor.status || null,
             medidor: dadosBaseServidor.medidor || { percentual: null, alertas: null, leituras: null },
             tendencias: Array.isArray(dadosBaseServidor.tendencias) ? dadosBaseServidor.tendencias : [],
-            linha: dadosBaseServidor.linha || { labels: [], valores: [] },
+            tendenciasLigacoes: Array.isArray(dadosBaseServidor.tendenciasLigacoes) ? dadosBaseServidor.tendenciasLigacoes : [],
+            linha: dadosBaseServidor.linha || { labels: [], valores: [], alertas: [], ligacoes: [] },
             componentes: Array.isArray(dadosBaseServidor.componentes) ? dadosBaseServidor.componentes : [],
             dias: Array.isArray(dadosBaseServidor.dias) ? dadosBaseServidor.dias : [],
             resumoDia: Array.isArray(dadosBaseServidor.resumoDia) ? dadosBaseServidor.resumoDia : [],
@@ -1108,10 +1202,16 @@
         });
     }
 
-    function renderizarTendencias(tendencias) {
-        const container = pegar('trendResumo');
+    function renderizarTendencias(tendencias, idContainer = 'trendResumo') {
+        const container = pegar(idContainer);
+        if (!container) return;
         container.innerHTML = '';
-        tendencias.forEach(item => {
+        const tendenciasDoPainel = Array.isArray(tendencias) && tendencias.length > 0 ? tendencias : [
+            { rotulo: 'Última hora:', valor: null, tom: 'neutral' },
+            { rotulo: 'Essa hora:', valor: null, tom: 'neutral' },
+            { rotulo: 'Próxima hora:', valor: null, tom: 'neutral' }
+        ];
+        tendenciasDoPainel.forEach(item => {
             const nome = item.nome ? `<strong>${item.nome}</strong>` : '';
             const seta = item.direcao === 'up' ? '▲' : (item.direcao === 'down' ? '▼' : '');
             const setaHtml = seta ? `<i class="trend-seta">${seta}</i>` : '';
@@ -1222,6 +1322,7 @@
         colocarTexto('labelPercentualAlertas', dados.medidor.percentual === null || dados.medidor.percentual === undefined ? '--' : `${dados.medidor.percentual}%`);
         renderizarResumoMedidor(dados.medidor);
         renderizarTendencias(dados.tendencias);
+        renderizarTendencias(dados.tendenciasLigacoes, 'trendResumoLigacoes');
         renderizarComponentes(dados.componentes);
         renderizarDias(dados);
         renderizarListaAlertas(dados.alertas);
@@ -1262,6 +1363,7 @@
                 data: campos.data,
                 hora: campos.hora,
                 timestamp: timestamp || `${campos.data} ${campos.hora}`,
+                ligacoes: quantidadeLigacoesDaLeitura({ ...(Array.isArray(item) ? {} : item), campos }),
                 campos,
                 valores: Array.isArray(item) ? item : []
             };
@@ -1277,6 +1379,7 @@
             data: dataHora.data,
             hora: dataHora.hora,
             timestamp,
+            ligacoes: quantidadeLigacoesDaLeitura({ ...(Array.isArray(item) ? {} : item), campos }),
             campos,
             valores: Array.isArray(item) ? item : []
         };
@@ -1301,7 +1404,8 @@
             tituloDia: '',
             medidor: { percentual: null, alertas: registros.length > 0 ? totalDeAlertas : null, leituras: null },
             tendencias: [],
-            linha: { labels: [], valores: [] },
+            tendenciasLigacoes: [],
+            linha: { labels: [], valores: [], alertas: [], ligacoes: [] },
             componentes: montarComponentesDoPeriodo(registros),
             dias: [],
             resumoDia: [],
@@ -1503,17 +1607,19 @@
         const canvas = pegar('graficoLinha');
         if (!canvas) return;
         destruirGrafico('linha');
-        const valoresDoGrafico = Array.isArray(dados.valores) ? dados.valores : [];
-        const maiorValorDoGrafico = Math.max(...valoresDoGrafico, 0);
+        const valoresAlertas = Array.isArray(dados.alertas) ? dados.alertas : (Array.isArray(dados.valores) ? dados.valores : []);
+        const valoresLigacoes = Array.isArray(dados.ligacoes) ? dados.ligacoes : [];
+        const maiorValorDoGrafico = Math.max(...valoresAlertas, ...valoresLigacoes, 0);
         const limiteLinha = maiorValorDoGrafico <= 10 ? 10 : Math.ceil((maiorValorDoGrafico + 1) / 5) * 5;
         const passoLinha = limiteLinha <= 10 ? 2 : 5;
 
         graficos.linha = new Chart(canvas, {
             type: 'line',
             data: {
-                labels: dados.labels,
+                labels: Array.isArray(dados.labels) ? dados.labels : [],
                 datasets: [{
-                    data: valoresDoGrafico,
+                    label: 'Alertas',
+                    data: valoresAlertas,
                     borderColor: '#ff3434',
                     backgroundColor: 'transparent',
                     borderWidth: 2,
@@ -1521,6 +1627,18 @@
                     pointHoverRadius: 4,
                     pointBackgroundColor: '#ffffff',
                     pointBorderColor: '#ff3434',
+                    pointBorderWidth: 2,
+                    tension: 0
+                }, {
+                    label: 'Ligações',
+                    data: valoresLigacoes,
+                    borderColor: '#ffffff',
+                    backgroundColor: 'transparent',
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    pointHoverRadius: 4,
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: '#ffffff',
                     pointBorderWidth: 2,
                     tension: 0
                 }]

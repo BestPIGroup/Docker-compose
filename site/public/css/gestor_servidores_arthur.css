@@ -246,6 +246,13 @@ input {
     font-weight: 700;
     line-height: 1;
     cursor: pointer;
+    transition: color 0.18s ease, text-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.btn-fechar-alerta:hover {
+    color: #ffffff;
+    text-shadow: 0 7px 12px rgba(255, 52, 52, 0.95);
+    transform: translateY(-2px);
 }
 
 .box .retangulo {
@@ -509,10 +516,13 @@ input {
 .modal-fechar-btn {
     color: rgba(255, 255, 255, 0.55);
     font-size: 18px;
+    transition: color 0.18s ease, text-shadow 0.18s ease, transform 0.18s ease;
 }
 
 .modal-fechar-btn:hover {
     color: var(--cor-vermelho);
+    text-shadow: 0 7px 12px rgba(255, 52, 52, 0.95);
+    transform: translateY(-2px);
 }
 
 .modal-editar-body {
@@ -883,6 +893,13 @@ input {
     font-size: 38px;
     font-weight: 800;
     line-height: 1;
+    transition: color 0.18s ease, text-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.btn-fechar-modal-x:hover {
+    color: #ffffff;
+    text-shadow: 0 8px 16px rgba(255, 52, 52, 0.95);
+    transform: translateY(-2px);
 }
 
 .modal-body-alertas {
@@ -890,19 +907,21 @@ input {
     min-height: 0;
     padding: 16px 13px 12px;
     display: grid;
+    grid-template-rows: auto minmax(0, 252px);
     gap: 17px;
-    overflow-y: auto;
+    overflow: hidden;
     background: var(--cor-azul-profundo);
 }
 
 .linha-superior {
     display: grid;
-    grid-template-columns: 28% 39% 1fr;
+    grid-template-columns: minmax(360px, 1.35fr) minmax(260px, 0.78fr) minmax(280px, 0.9fr);
     align-items: stretch;
     gap: 16px;
 }
 
 .linha-inferior {
+    min-height: 0;
     display: grid;
     grid-template-columns: 1fr 1fr;
     align-items: stretch;
@@ -1083,12 +1102,51 @@ input {
 
 .timeline-card {
     padding: 0 24px 17px;
+    display: flex;
+    flex-direction: column;
+}
+
+.timeline-metrics {
+    min-height: 120px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 4px minmax(0, 1fr);
+    align-items: stretch;
+    gap: 20px;
+}
+
+.timeline-metric-panel {
+    min-width: 0;
+    padding-top: 4px;
+}
+
+.timeline-heading {
+    height: 31px;
+    padding: 0 0 0 2px;
+}
+
+.timeline-heading h3 {
+    font-size: 14px;
+}
+
+.timeline-alertas .timeline-heading h3 {
+    color: var(--cor-vermelho);
+}
+
+.timeline-ligacoes .timeline-heading h3 {
+    color: #ffffff;
+}
+
+.timeline-divider {
+    width: 4px;
+    min-height: 100%;
+    border-radius: 4px;
+    background: rgba(210, 226, 255, 0.84);
 }
 
 .trend-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
+    gap: 14px;
     margin: 7px 0 12px;
 }
 
@@ -1104,8 +1162,8 @@ input {
 }
 
 .trend-card {
-    min-height: 74px;
-    padding: 7px 6px;
+    min-height: 58px;
+    padding: 6px 5px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1117,7 +1175,7 @@ input {
 .trend-card strong {
     width: 100%;
     display: block;
-    font-size: 12px;
+    font-size: 11px;
     line-height: 1;
 }
 
@@ -1127,24 +1185,29 @@ input {
 
 .trend-card b {
     display: inline-flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 3px;
+    max-width: 100%;
     font-size: 0;
     font-style: normal;
     line-height: 1;
 }
 
 .trend-card b em {
-    font-size: 46px;
+    max-width: 100%;
+    overflow: visible;
+    font-size: 22px;
     font-style: normal;
-    line-height: 40px;
+    line-height: 24px;
+    white-space: nowrap;
 }
 
 .trend-seta {
-    margin-top: 3px;
+    margin-top: 0;
     display: inline-block;
-    font-size: 21px;
+    flex: 0 0 auto;
+    font-size: 13px;
     font-style: normal;
     line-height: 1;
 }
@@ -1154,8 +1217,9 @@ input {
 .trend-neutral { color: #ffffff; }
 
 .line-chart-wrap {
-    height: 142px;
+    height: 150px;
     padding: 5px 8px 1px;
+    margin-top: 2px;
 }
 
 #graficoLinha,
@@ -1221,8 +1285,10 @@ input {
 
 .daily-card,
 .feed-card {
-    min-height: 252px;
+    height: 252px;
+    min-height: 0;
     padding: 0 12px 12px;
+    overflow: hidden;
 }
 
 .daily-card {
@@ -1237,14 +1303,17 @@ input {
 
 .daily-bars {
     flex: 1;
+    min-height: 0;
     display: grid;
     gap: 10px;
     padding: 14px 12px;
+    overflow-y: auto;
+    align-content: start;
 }
 
 .daily-bars-compact {
-    align-content: space-evenly;
-    gap: 0;
+    align-content: start;
+    gap: 10px;
 }
 
 .daily-row {
@@ -1296,10 +1365,11 @@ input {
 .daily-base { color: #ffffff; opacity: 0.8; }
 
 .daily-summary {
+    flex: 0 0 auto;
     display: flex;
     justify-content: center;
     gap: 28px;
-    margin-top: 12px;
+    margin-top: 8px;
 }
 
 .summary-pill {
@@ -1333,7 +1403,7 @@ input {
 .feed-list {
     flex: 1;
     min-height: 0;
-    height: auto;
+    height: 0;
     display: flex;
     flex-direction: column;
     gap: 0;
@@ -1343,6 +1413,7 @@ input {
 }
 
 .feed-filtros {
+    flex: 0 0 auto;
     display: flex;
     justify-content: center;
     gap: 8px;
@@ -1397,11 +1468,13 @@ input {
 }
 
 .feed-list::-webkit-scrollbar,
+.daily-bars::-webkit-scrollbar,
 .modal-body-alertas::-webkit-scrollbar {
     width: 5px;
 }
 
 .feed-list::-webkit-scrollbar-thumb,
+.daily-bars::-webkit-scrollbar-thumb,
 .modal-body-alertas::-webkit-scrollbar-thumb {
     border-radius: 5px;
     background: rgba(255, 255, 255, 0.22);
@@ -1427,6 +1500,15 @@ input {
     .linha-superior,
     .linha-inferior {
         grid-template-columns: 1fr;
+    }
+
+    .timeline-metrics {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .timeline-divider {
+        display: none;
     }
 
     .modal-header-alertas {
