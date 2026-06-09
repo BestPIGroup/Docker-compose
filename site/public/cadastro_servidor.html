@@ -13,10 +13,10 @@
 
     <header>
         <div class="nav-desktop">
-            <a href="./gestor_servidores.html" style="font-weight: bold;">Voltar</a>
+            <a href="./gestor_servidores_arthur.html" style="font-weight: bold;">Voltar</a>
         </div>
         <div class="nav-mobile">
-            <a href="./gestor_servidores.html" style="font-weight: bold;">Voltar</a>
+            <a href="./gestor_servidores_arthur.html" style="font-weight: bold;">Voltar</a>
         </div>
         <div class="nav2">
             <p> Olá, <span id="nome_usuario"></span>!</p>
@@ -147,7 +147,7 @@
                 .then(function (dados) {
                     cardErro.style.display = "flex";
                     mensagem_erro.innerHTML = '<p>Cadastro do Servidor realizado com sucesso! Redirecionando para tela de servidores.</p><img src="/assets/tube-spinner.svg" alt="" style="height: 40px; width: 40px">';
-                    setTimeout(() => { window.location = "gestor_servidores.html"; }, 4000);
+                    setTimeout(() => { window.location = "gestor_servidores_arthur.html"; }, 4000);
                 })
                 .catch(function (erro) {
                     console.log("erro catch:", erro);
