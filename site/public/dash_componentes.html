@@ -292,8 +292,9 @@
 
         for (var i = 0; i < 7;) {
 
-            console.log(dados[i][2])
-            rotuloDeHoras.push(dados[i][2].slice(11, 16))
+            timestamp = dados[i][2]
+            console.log(timestamp)
+            rotuloDeHoras.push(timestamp.slice(11, 16))
 
             if (dados.length > 1) {
 
