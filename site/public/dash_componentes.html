@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="./css/dash_componentes.css">
     <link rel="icon" href="./assets/LogoArgos.png">
 </head>
+
 <body onload="carregarGraficos()">
 
     <dialog id="modalGrafico" class="modal-overlay">
@@ -126,13 +127,40 @@
 
     var todosDados = {};
 
-    function carregarGraficos() {
+    async function carregarGraficos() {
 
+        /*        
+        kpiServidor = document.getElementById("kpi_servidor")
+        kpiCrit = document.getElementById("kpi_crit")
+        kpiAlerta = document.getElementById("kpi_alerta")
         kpiServidor.textContent = sessionStorage.ALIAS;
         kpiCrit.textContent = sessionStorage.TOTAL_CRITICOS;
-        kpiAlerta.textContent = sessionStorage.TOTAL_CRITICOS;
+        kpialerta.textContent = sessionStorage.TOTAL_CRITICOS;
+        */
 
-        const componentes = [
+        dados = await buscarDadosS3(sessionStorage.MAC);
+        dados.reverse();
+
+        limites = await buscarLimites(sessionStorage.ID_SERVIDOR);
+        console.log(limites);
+
+        statusCPU = "ok"
+        statusRAM = "ok"
+        statusDISCO = "ok"
+        statusREDE = "ok"
+        statusPROCS = "ok"
+
+        console.log(dados)
+
+        ultimoIndice = dados.length - 1;
+
+        if (ultimoIndice < 0) {
+
+            ultimoIndice = 0;
+
+        }
+
+        componentes = [
             {
                 nome: "CPU",
                 status: obterStatus(dados[ultimoIndice][6], Number(limites[0].limite_componente) * 0.8, Number(limites[0].limite_componente)),
