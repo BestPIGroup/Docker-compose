@@ -804,7 +804,7 @@
     const dadosPainelAlertas = {
         padrao: {
             tituloDia: '',
-            medidor: { percentual: null, alertas: null, leituras: null },
+            medidor: { percentual: null, alertas: null, leituras: null, ligacoes: null },
             tendencias: [],
             tendenciasLigacoes: [],
             linha: { labels: [], valores: [], alertas: [], ligacoes: [] },
@@ -953,6 +953,12 @@
             campos['Ligações'] ??
             campos['ligações']
         );
+    }
+
+    function somarLigacoesDasLeituras(leituras) {
+        return (Array.isArray(leituras) ? leituras : []).reduce((total, leitura) => {
+            return total + quantidadeLigacoesDaLeitura(leitura);
+        }, 0);
     }
 
     function contarComponentes(registros) {
@@ -1209,6 +1215,7 @@
         const temAlertas = Array.isArray(registros) && registros.length > 0;
         const temLeituras = Array.isArray(leituras) && leituras.length > 0;
         const totalDeLeituras = temLeituras ? leiturasFiltradas.length : null;
+        const totalDeLigacoes = temLeituras ? Math.round(somarLigacoesDasLeituras(leiturasFiltradas)) : null;
         const totalDeAlertas = temAlertas ? totalMensagens(registrosFiltrados) : (temLeituras ? 0 : null);
         const percentual = totalDeLeituras > 0 ? limitarNumero(Math.round((totalDeAlertas / totalDeLeituras) * 100), 0, 100) : null;
         const alertasPeriodo = montarListaAlertasDoPeriodo(registrosFiltrados);
@@ -1218,7 +1225,7 @@
 
         return montarDadosPorServidor(nomeServidor, {
             tituloDia: periodo.titulo,
-            medidor: { percentual, alertas: totalDeAlertas, leituras: totalDeLeituras },
+            medidor: { percentual, alertas: totalDeAlertas, leituras: totalDeLeituras, ligacoes: totalDeLigacoes },
             tendencias: temAlertas || temLeituras ? montarTendenciasDosGrupos(gruposGrafico, 'valor', periodo) : [],
             tendenciasLigacoes: temAlertas || temLeituras ? montarTendenciasDosGrupos(gruposGrafico, 'ligacoes', periodo) : [],
             linha,
@@ -1299,7 +1306,8 @@
         container.innerHTML = '';
         [
             { rotulo: 'Número de alertas', valor: resumo.alertas },
-            { rotulo: 'Total de leituras', valor: resumo.leituras }
+            { rotulo: 'Total de leituras', valor: resumo.leituras },
+            { rotulo: 'Total de ligações', valor: resumo.ligacoes }
         ].forEach(item => {
             container.appendChild(criarElemento('div', 'rosquinha-stat', `<span>${item.rotulo}</span><strong>${valorTela(item.valor)}</strong>`));
         });
@@ -1488,16 +1496,22 @@
         };
     }
 
+    function registrosDaRespostaS3(dadosS3) {
+        if (Array.isArray(dadosS3)) return dadosS3;
+        if (Array.isArray(dadosS3?.registros)) return dadosS3.registros;
+        if (Array.isArray(dadosS3?.dados)) return dadosS3.dados;
+        if (Array.isArray(dadosS3?.resultado)) return dadosS3.resultado;
+        return [];
+    }
+
     function normalizarLeiturasS3(dadosS3) {
-        const registros = Array.isArray(dadosS3?.registros)
-            ? dadosS3.registros
-            : (Array.isArray(dadosS3) ? dadosS3 : []);
+        const registros = registrosDaRespostaS3(dadosS3);
 
         return registros.map(montarLeituraDoCsvClient).filter(Boolean);
     }
 
     function montarPainelComAlertasS3(nomeServidor, respostaS3) {
-        const registros = Array.isArray(respostaS3?.registros) ? respostaS3.registros : [];
+        const registros = registrosDaRespostaS3(respostaS3);
         const alertas = montarListaAlertasDoPeriodo(registros);
         const totalDeAlertas = alertas.length;
 
@@ -1505,7 +1519,7 @@
         dadosPainelAlertas.servidores[nomeServidor].registros = registros;
         dadosPainelAlertas.servidores[nomeServidor].base = {
             tituloDia: '',
-            medidor: { percentual: null, alertas: registros.length > 0 ? totalDeAlertas : null, leituras: null },
+            medidor: { percentual: null, alertas: registros.length > 0 ? totalDeAlertas : null, leituras: null, ligacoes: null },
             tendencias: [],
             tendenciasLigacoes: [],
             linha: { labels: [], valores: [], alertas: [], ligacoes: [] },
@@ -1539,7 +1553,7 @@
     }
 
     function atualizarMetricasDoServidor(nomeServidor, respostaS3) {
-        const contagem = contarAlertasDoServidor(respostaS3?.registros);
+        const contagem = contarAlertasDoServidor(registrosDaRespostaS3(respostaS3));
         const status = contagem.cyber > 0 ? 'CRÍTICO' : (contagem.hardware > 0 ? 'ATENÇÃO' : 'NORMAL');
 
         metricasDosServidores[nomeServidor] = {
@@ -1555,10 +1569,11 @@
         if (!mac) return null;
 
         try {
-            const dadosS3 = await buscarJson('/alertasS3/buscar_leituras', {
+            const dadosS3 = await buscarJson('/conexaoS3/buscar_registros', {
                 MacServer: mac,
                 QtdLinhas: quantidadeDeLeiturasS3
             });
+            console.log(`JSON de leituras da rota conexaoS3 (${nomeServidor}):`, dadosS3);
             const leituras = normalizarLeiturasS3(dadosS3);
             if (!dadosPainelAlertas.servidores[nomeServidor]) dadosPainelAlertas.servidores[nomeServidor] = {};
             dadosPainelAlertas.servidores[nomeServidor].leituras = leituras;
