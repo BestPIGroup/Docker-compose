@@ -202,10 +202,11 @@
 
     const status = calcularStatusServidor(historico);
 
-    const elementoStatus = document.getElementById("kpi-status-servidor").textContent = sessionStorage.STATUS;
+    const elementoStatus = document.getElementById("kpi-status-servidor");
     const cardStatus = document.getElementById("card-status-servidor");
 
-    elementoStatus.innerHTML = status.texto;
+    // elementoStatus.innerHTML = status.texto;
+    elementoStatus.textContent = sessionStorage.STATUS;
     elementoStatus.style.color = status.cor;
 
     cardStatus.style.borderColor = status.cor;
