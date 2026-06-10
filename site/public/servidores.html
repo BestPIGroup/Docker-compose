@@ -171,54 +171,45 @@
 
                     console.log(server)
 
-                    if (server.limites[0].limite_componente >= server.ultimoRegistro[3]) {
+                    if (server.limites[0].limite_componente <= server.ultimoRegistro[3]) {
 
                         server.nivelAlerta += 2;
-                        server.totalCriticos ++;
-
-
-                    } else if (server.limites[0].limite_componente >= server.ultimoRegistro[3] * 0.8) {
+                   
+                    } else if (server.limites[0].limite_componente <= server.ultimoRegistro[3] * 0.8) {
 
                         server.nivelAlerta++;
-                        server.totalAlertas ++;
-
+                   
                     }
 
-                    if (server.limites[1].limite_componente >= server.ultimoRegistro[9]) {
+                    if (server.limites[1].limite_componente <= server.ultimoRegistro[9]) {
 
                         server.nivelAlerta += 2;
-                        server.totalCriticos++;
-
-                    } else if (server.limites[1].limite_componente >= server.ultimoRegistro[9] * 0.8) {
+                   
+                    } else if (server.limites[1].limite_componente <= server.ultimoRegistro[9] * 0.8) {
 
                         server.nivelAlerta++;
-                        server.totalAlertas++;
-
+                   
                     }
 
-                    if (server.limites[2].limite_componente >= server.ultimoRegistro[11]) {
+                    if (server.limites[2].limite_componente <= server.ultimoRegistro[11]) {
 
                         server.nivelAlerta += 2;
-                        server.totalCriticos ++;
-
-                    } else if (server.limites[2].limite_componente >= server.ultimoRegistro[11] * 0.8) {
+                   
+                    } else if (server.limites[2].limite_componente <= server.ultimoRegistro[11] * 0.8) {
 
                         server.nivelAlerta++;
-                        server.totalAlertas ++;
-
+                   
                     }
 
                     const pacotes = Number(server.ultimoRegistro[15]) + Number(server.ultimoRegistro[16]);
 
-                    if (server.limites[3].limite_componente >= pacotes) {
+                    if (server.limites[3].limite_componente <= pacotes) {
 
                         server.nivelAlerta += 2;
-                        server.totalCriticos++;
 
-                    } else if (server.limites[3].limite_componente >= pacotes * 0.8) {
+                    } else if (server.limites[3].limite_componente <= pacotes * 0.8) {
 
                         server.nivelAlerta++;
-                        server.totalAlertas ++;
 
                     }
 
@@ -234,9 +225,6 @@
 
             servers.forEach(server => {
 
-                totalCrit += server.totalCriticos
-                totalAlerta += server.totalAlertas
-
                 console.log(server)
 
                 classeAdicional = ""
@@ -250,11 +238,13 @@
                     nvAlerta = "Crítico"
                     seguranca = "Comprometida"
                     corTexto = "sec-bad"
+                    totalCrit ++;
 
                 } else if (server.nivelAlerta >= 2) {
 
                     classeAdicional = "card-atencao"
                     nvAlerta = "Atenção"
+                    totalAlerta++;
 
                 }
 
