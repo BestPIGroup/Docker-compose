@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Argos | Funcionários</title>
+    <title>Argos | Relatórios</title>
     <script src="./js/sessao.js"></script>
     <link rel="stylesheet" href="./css/relatorios.css">
     <link rel="icon" href="./assets/LogoArgos.png">
@@ -64,15 +64,19 @@
             </a>
         </div>
     </header>
-    </header>
 
     <div class="conteudo">
         <div class="box">
             <div class="retangulo">
                 <p>Relatórios</p>
-                <button class="btn-adicionar">
-                    Baixar Relatório geral
-                </button>
+                <div class="acoes-relatorios">
+                    <button class="btn-adicionar" id="btn_atualizar_relatorios" type="button">
+                        Recarregar relatórios
+                    </button>
+                    <button class="btn-adicionar btn-relatorio-geral" id="btn_baixar_relatorio_geral" type="button">
+                        Baixar relatório geral
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -85,61 +89,173 @@
                         <th>Download</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="tbody_relatorios">
                     <tr>
-                        <td>30/04/2026</td>
-                        <td>Geral</td>
-                        <td><button class="btn-editar">Baixar</button></td>
-                    </tr>
-                    <tr>
-                        <td>29/04/2026</td>
-                        <td>Servidor 2</td>
-                        <td><button class="btn-editar">Baixar</button></td>
-                    </tr>
-                    <tr>
-                        <td>22/04/2026</td>
-                        <td>Servidor 1</td>
-                        <td><button class="btn-editar">Baixar</button></td>
-                    </tr>
-                    <tr>
-                        <td>21/04/2026</td>
-                        <td>Geral</td>
-                        <td><button class="btn-editar">Baixar</button></td>
-                    </tr>
-                    <tr>
-                        <td>27/03/2026</td>
-                        <td>Servidor 3</td>
-                        <td><button class="btn-editar">Baixar</button></td>
-                    </tr>
-                    <tr>
-                        <td>23/03/2026</td>
-                        <td>Geral</td>
-                        <td><button class="btn-editar">Baixar</button></td>
-                    </tr>
-                    <tr>
-                        <td>22/03/2026</td>
-                        <td>Servidor 4</td>
-                        <td><button class="btn-editar">Baixar</button></td>
-                    </tr>
-                    <tr>
-                        <td>19/03/2026</td>
-                        <td>Servidor 1</td>
-                        <td><button class="btn-editar">Baixar</button></td>
-                    </tr>
-                    <tr>
-                        <td>18/03/2026</td>
-                        <td>Geral</td>
-                        <td><button class="btn-editar">Baixar</button></td>
-                    </tr>
-                    <tr>
-                        <td>16/03/2026</td>
-                        <td>Servidor 2</td>
-                        <td><button class="btn-editar">Baixar</button></td>
+                        <td colspan="3" class="linha-estado">Carregando relatórios...</td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </div>
+
+    <script>
+        const tbodyRelatorios = document.getElementById("tbody_relatorios");
+        const botaoAtualizarRelatorios = document.getElementById("btn_atualizar_relatorios");
+        const botaoBaixarRelatorioGeral = document.getElementById("btn_baixar_relatorio_geral");
+        let relatoriosAtuais = [];
+
+        function escaparHTML(valor) {
+            return String(valor ?? "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function renderizarEstado(mensagem) {
+            tbodyRelatorios.innerHTML = `
+                <tr>
+                    <td colspan="3" class="linha-estado">${escaparHTML(mensagem)}</td>
+                </tr>
+            `;
+        }
+
+        function montarLinhaRelatorio(relatorio) {
+            return `
+                <tr>
+                    <td>${escaparHTML(relatorio.data)}</td>
+                    <td>
+                        <span class="tipo-relatorio">${escaparHTML(relatorio.tipo)}</span>
+                        <span class="nome-arquivo">${escaparHTML(relatorio.nomeArquivo)}</span>
+                    </td>
+                    <td>
+                        <a class="btn-editar" href="${escaparHTML(relatorio.downloadUrl)}">Baixar</a>
+                    </td>
+                </tr>
+            `;
+        }
+
+        function dataHojeRelatorio() {
+            const partes = new Intl.DateTimeFormat("en-CA", {
+                timeZone: "America/Sao_Paulo",
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit"
+            }).formatToParts(new Date()).reduce((objeto, parte) => {
+                objeto[parte.type] = parte.value;
+                return objeto;
+            }, {});
+
+            return `${partes.day}/${partes.month}/${partes.year}`;
+        }
+
+        function obterRelatorioGeralHoje(relatorios) {
+            const hoje = dataHojeRelatorio();
+
+            return (relatorios || []).find(relatorio => {
+                return relatorio.data === hoje && /_diario\.[^.]+$/i.test(relatorio.nomeArquivo || "");
+            });
+        }
+
+        function renderizarRelatorios(relatorios) {
+            relatoriosAtuais = Array.isArray(relatorios) ? relatorios : [];
+
+            if (!Array.isArray(relatorios) || relatorios.length === 0) {
+                renderizarEstado("Nenhum relatório encontrado.");
+                return;
+            }
+
+            tbodyRelatorios.innerHTML = relatorios.map(montarLinhaRelatorio).join("");
+        }
+
+        async function buscarRelatorios() {
+            const resposta = await fetch("/relatoriosS3/listar", { cache: "no-store" });
+
+            if (!resposta.ok) {
+                throw new Error(`Erro HTTP ${resposta.status}`);
+            }
+
+            return resposta.json();
+        }
+
+        async function carregarRelatorios(opcoes = {}) {
+            const mostrarCarregando = opcoes.mostrarCarregando !== false;
+            botaoAtualizarRelatorios.disabled = true;
+            if (mostrarCarregando) renderizarEstado("Carregando relatórios...");
+
+            try {
+                const dados = await buscarRelatorios();
+                renderizarRelatorios(dados.relatorios);
+                return dados;
+            } catch (erro) {
+                console.warn("Nao foi possivel carregar os relatorios:", erro);
+                if (mostrarCarregando) renderizarEstado("Não foi possível carregar os relatórios.");
+                throw erro;
+            } finally {
+                botaoAtualizarRelatorios.disabled = false;
+            }
+        }
+
+        function esperar(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function aguardarRelatorioGeralAtualizado(atualizadoAnterior) {
+            for (let tentativa = 0; tentativa < 8; tentativa++) {
+                if (tentativa > 0) await esperar(3000);
+
+                const dados = await carregarRelatorios({
+                    mostrarCarregando: tentativa === 0
+                });
+                const relatorioGeral = obterRelatorioGeralHoje(dados.relatorios);
+
+                if (relatorioGeral && relatorioGeral.atualizadoEm !== atualizadoAnterior) {
+                    return relatorioGeral;
+                }
+            }
+
+            return null;
+        }
+
+        async function gerarRelatorioGeral() {
+            const textoOriginal = botaoBaixarRelatorioGeral.textContent;
+            const relatorioAnterior = obterRelatorioGeralHoje(relatoriosAtuais);
+
+            botaoBaixarRelatorioGeral.disabled = true;
+            botaoBaixarRelatorioGeral.textContent = "Gerando...";
+
+            try {
+                const resposta = await fetch("/relatoriosS3/gerar-relatorio-geral", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        idUnidade: sessionStorage.getItem("ID_UNIDADE"),
+                        idUsuario: sessionStorage.getItem("ID_USUARIO"),
+                        nomeUsuario: sessionStorage.getItem("NOME_USUARIO")
+                    })
+                });
+
+                if (!resposta.ok) {
+                    throw new Error(`Erro HTTP ${resposta.status}`);
+                }
+
+                await aguardarRelatorioGeralAtualizado(relatorioAnterior?.atualizadoEm || null);
+            } catch (erro) {
+                console.warn("Nao foi possivel gerar o relatorio geral:", erro);
+                alert("Não foi possível solicitar a geração do relatório geral.");
+            } finally {
+                botaoBaixarRelatorioGeral.disabled = false;
+                botaoBaixarRelatorioGeral.textContent = textoOriginal;
+            }
+        }
+
+        botaoAtualizarRelatorios.addEventListener("click", () => {
+            carregarRelatorios().catch(() => {});
+        });
+        botaoBaixarRelatorioGeral.addEventListener("click", gerarRelatorioGeral);
+        carregarRelatorios().catch(() => {});
+    </script>
 </body>
 
 </html>

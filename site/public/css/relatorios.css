@@ -12,6 +12,13 @@ body {
     color: white;
 }
 
+html,
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
 .sidebar {
     background: linear-gradient(180deg, #0b2553, #0b1e34);
     display: flex;
@@ -156,6 +163,10 @@ body {
 
 .conteudo {
     padding: 160px 40px 40px 110px;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .box .retangulo {
@@ -163,19 +174,30 @@ body {
     top: 80px;
     left: 90px;
     width: calc(100% - 110px);
-    height: 60px;
+    min-height: 60px;
     background-color: #0b2553;
     border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 12px;
     z-index: 10;
+    padding: 8px 10px 8px 0;
 }
 
 .box .retangulo p {
     margin-left: 20px;
     font-weight: bolder;
     font-size: 24px;
+    flex-shrink: 0;
+}
+
+.acoes-relatorios {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
 .btn-adicionar {
@@ -184,11 +206,11 @@ body {
     border: none;
     padding: 12px 24px;
     border-radius: 10px;
-    margin-right: 10px;
     font-weight: bold;
     font-size: 16px;
     cursor: pointer;
     transition: 0.3s;
+    white-space: nowrap;
 }
 
 .btn-adicionar:hover {
@@ -196,12 +218,28 @@ body {
     transform: scale(1.05);
 }
 
+.btn-adicionar:disabled {
+    cursor: wait;
+    opacity: 0.7;
+    transform: none;
+}
+
+.btn-relatorio-geral {
+    background-color: #1659b7;
+}
+
+.btn-relatorio-geral:hover {
+    background-color: #1d6edc;
+}
+
 .container-lista {
     background-color: #102244;
     border-radius: 10px;
     padding: 20px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-    overflow-x: auto;
+    overflow: auto;
+    flex: 1;
+    min-height: 0;
 }
 
 .tabela-funcionarios {
@@ -216,6 +254,10 @@ body {
     color: #86929b;
     font-size: 14px;
     text-transform: uppercase;
+    background-color: #102244;
+    position: sticky;
+    top: 0;
+    z-index: 1;
 }
 
 .tabela-funcionarios td {
@@ -243,10 +285,29 @@ body {
     cursor: pointer;
     font-weight: bold;
     transition: 0.3s;
+    display: inline-block;
 }
 
 .btn-editar:hover {
     background-color: #12921c;
+}
+
+.tipo-relatorio {
+    display: block;
+    font-weight: bold;
+}
+
+.nome-arquivo {
+    color: #86929b;
+    display: block;
+    font-size: 13px;
+    margin-top: 4px;
+    overflow-wrap: anywhere;
+}
+
+.linha-estado {
+    color: #86929b;
+    text-align: center;
 }
 
 @media (max-width: 768px) {
@@ -258,6 +319,42 @@ body {
         bottom: 0;
     }
     .listaOpcoes { flex-direction: row; }
-    .conteudo { padding: 120px 20px 80px 20px; }
-    .box .retangulo { left: 20px; width: calc(100% - 40px); }
+    .conteudo {
+        padding: 120px 20px 80px 20px;
+        height: 100vh;
+    }
+    .box .retangulo {
+        left: 20px;
+        width: calc(100% - 40px);
+    }
+
+    .box .retangulo p {
+        font-size: 20px;
+    }
+
+    .acoes-relatorios {
+        gap: 8px;
+    }
+
+    .btn-adicionar {
+        font-size: 14px;
+        padding: 10px 14px;
+    }
+}
+
+@media (max-width: 520px) {
+    .box .retangulo {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 10px;
+    }
+
+    .box .retangulo p {
+        margin-left: 0;
+    }
+
+    .acoes-relatorios {
+        justify-content: flex-start;
+        width: 100%;
+    }
 }
