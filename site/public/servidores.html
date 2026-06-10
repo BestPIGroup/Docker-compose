@@ -78,10 +78,6 @@
                     <img src="./assets/hardwareWhite.png" alt="">
                     Alertas de Hardware<h2 id="alert">3</h2>
                 </div>
-                <div class="kpi">
-                    <img src="./assets/unlockWhite.png" alt="">
-                    Ciberameaças<h2 id="threats">7</h2>
-                </div>
             </div>
             <div class="retangulo">
                 <p>Servidores</p>
@@ -231,20 +227,23 @@
                 nvAlerta = "Normal"
                 seguranca = "Normal"
                 corTexto = "sec-ok"
-
+                StatusCriticidade = `Normal`
+                
                 if (server.nivelAlerta >= 4) {
-
+                    
                     classeAdicional = "card-erro"
                     nvAlerta = "Crítico"
                     seguranca = "Comprometida"
                     corTexto = "sec-bad"
                     totalCrit ++;
-
+                    StatusCriticidade = `Critico`
+                    
                 } else if (server.nivelAlerta >= 2) {
-
+                    
                     classeAdicional = "card-atencao"
                     nvAlerta = "Atenção"
                     totalAlerta++;
+                    StatusCriticidade = `Alerta`
 
                 }
 
@@ -300,7 +299,7 @@
                 console.log(server.endereco_mac)
 
                 box.innerHTML +=
-                    `<div onclick="redirecionar('${server.endereco_mac}','${server.alias}','${server.nivelAlerta}','${totalCrit}','${totalAlerta}','${server.id_servidor}')">
+                    `<div onclick="redirecionar('${server.endereco_mac}','${server.alias}','${server.nivelAlerta}','${totalCrit}','${totalAlerta}','${server.id_servidor}','${StatusCriticidade}')">
                                     <div class="card ${classeAdicional}">
                                         <div class="header">
                                             <strong>${server.alias}</strong>
@@ -355,7 +354,7 @@
 
     }
 
-    function redirecionar(mac,alias,nivelAlerta,totalCriticos,totalAlertas,idServidor) {
+    function redirecionar(mac,alias,nivelAlerta,totalCriticos,totalAlertas,idServidor,status) {
 
         sessionStorage.setItem("MAC", mac);
         sessionStorage.setItem("ALIAS", alias);
@@ -363,6 +362,7 @@
         sessionStorage.setItem("TOTAL_CRITICOS", totalCriticos);
         sessionStorage.setItem("TOTAL_ALERTAS", totalAlertas);
         sessionStorage.setItem("ID_SERVIDOR", idServidor);
+        sessionStorage.setItem("STATUS", status);
 
         window.location.href = "./dash_componentes.html";
 
