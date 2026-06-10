@@ -180,195 +180,260 @@
     }
 
     function atualizarKPI(ultimo, historico) {
-    document.getElementById("server-name").innerHTML = sessionStorage.ALIAS;
+        document.getElementById("server-name").innerHTML = sessionStorage.ALIAS;
 
-    document.getElementById("kpi-maximo-processos").innerHTML =
-        Math.max(...historico.map(linha => Number(linha.totalProcessos)));
+        document.getElementById("kpi-maximo-processos").innerHTML =
+            Math.max(...historico.map(linha => Number(linha.totalProcessos)));
 
-    const deltaContexto = calcularDeltaContexto(historico);
+        const deltaContexto = buscarUltimoDeltaValido(historico);
 
-    document.getElementById("kpi-context-switches").innerHTML =
-        deltaContexto.toLocaleString("pt-BR");
+        document.getElementById("kpi-context-switches").innerHTML =
+            deltaContexto.toLocaleString("pt-BR");
 
-    const trocasPorSegundo = calcularTrocasPorSegundo(historico);
+        const trocasPorSegundo = calcularTrocasPorSegundo(historico);
 
-    document.getElementById("kpi-contexto-segundo").innerHTML =
-        trocasPorSegundo.toLocaleString("pt-BR") + "/s";
+        document.getElementById("kpi-contexto-segundo").innerHTML =
+    buscarUltimaTaxaValida(historico).toLocaleString("pt-BR") + "/s";
 
-    
+
         const horaUltimaCaptura = ultimo.timestamp.split(" ")[1].substring(0, 5);
-            document.getElementById("kpi-ultima-captura").innerHTML = ultimo.timestamp;
+        document.getElementById("kpi-ultima-captura").innerHTML = ultimo.timestamp;
 
 
-    const status = calcularStatusServidor(historico);
+        const status = calcularStatusServidor(historico);
 
-    const elementoStatus = document.getElementById("kpi-status-servidor");
-    const cardStatus = document.getElementById("card-status-servidor");
+        const elementoStatus = document.getElementById("kpi-status-servidor");
+        const cardStatus = document.getElementById("card-status-servidor");
 
-    // elementoStatus.innerHTML = status.texto;
-    elementoStatus.textContent = sessionStorage.STATUS;
-    elementoStatus.style.color = status.cor;
+        // elementoStatus.innerHTML = status.texto;
+        elementoStatus.textContent = sessionStorage.STATUS;
+        elementoStatus.style.color = status.cor;
 
-    cardStatus.style.borderColor = status.cor;
-}
-
-function converterTimestamp(timestamp) {
-    const partes = timestamp.split(" ");
-    const data = partes[0];
-    const hora = partes[1];
-
-    const [dia, mes, ano] = data.split("/");
-    const [h, min, seg] = hora.split(":");
-
-    return new Date(ano, mes - 1, dia, h, min, seg);
-}
-
-function ordenarPorTempo(historico) {
-    return [...historico].sort(function (a, b) {
-        return converterTimestamp(a.timestamp) - converterTimestamp(b.timestamp);
-    });
-}
-
-  function calcularTrocasPorSegundo(dados) {
-    if (!dados || dados.length < 2) {
-        return 0;
+        cardStatus.style.borderColor = status.cor;
     }
 
-    const ordenado = ordenarPorTempo(dados);
+    function converterTimestamp(timestamp) {
+        const partes = timestamp.split(" ");
+        const data = partes[0];
+        const hora = partes[1];
 
-    const anterior = ordenado[ordenado.length - 2];
-    const atual = ordenado[ordenado.length - 1];
+        const [dia, mes, ano] = data.split("/");
+        const [h, min, seg] = hora.split(":");
 
-    const delta =
-        Number(atual.cpuCtxSwitches) -
-        Number(anterior.cpuCtxSwitches);
-
-    const segundos =
-        (converterTimestamp(atual.timestamp) -
-         converterTimestamp(anterior.timestamp)) / 1000;
-
-    if (segundos <= 0) {
-        return 0;
+        return new Date(ano, mes - 1, dia, h, min, seg);
     }
 
-    return Math.round(Math.max(0, delta) / segundos);
+    function ordenarPorTempo(historico) {
+        return [...historico].sort(function (a, b) {
+            return converterTimestamp(a.timestamp) - converterTimestamp(b.timestamp);
+        });
+    }
+
+    function calcularTrocasPorSegundo(dados) {
+        if (!dados || dados.length < 2) {
+            return 0;
+        }
+
+        const ordenado = ordenarPorTempo(dados);
+
+        const anterior = ordenado[ordenado.length - 2];
+        const atual = ordenado[ordenado.length - 1];
+
+        const delta =
+            Number(atual.cpuCtxSwitches) -
+            Number(anterior.cpuCtxSwitches);
+
+        const segundos =
+            (converterTimestamp(atual.timestamp) -
+                converterTimestamp(anterior.timestamp)) / 1000;
+
+        if (segundos <= 0) {
+            return 0;
+        }
+
+        return Math.round(Math.max(0, delta) / segundos);
+    }
+
+    function calcularDeltaContexto(dados) {
+        if (!dados || dados.length < 2) {
+            return 0;
+        }
+
+        const ordenado = ordenarPorTempo(dados);
+
+        const anterior = ordenado[ordenado.length - 2];
+        const atual = ordenado[ordenado.length - 1];
+
+        const delta =
+            Number(atual.cpuCtxSwitches) -
+            Number(anterior.cpuCtxSwitches);
+
+        return Math.max(0, delta);
+    }
+
+    function buscarUltimoDeltaValido(historico) {
+    const historicoOrdenado = ordenarPorTempo(historico);
+
+    for (let i = historicoOrdenado.length - 1; i > 0; i--) {
+
+        const atual = historicoOrdenado[i];
+        const anterior = historicoOrdenado[i - 1];
+
+        const delta =
+            Number(atual.cpuCtxSwitches) -
+            Number(anterior.cpuCtxSwitches);
+
+        if (delta > 0) {
+            return delta;
+        }
+    }
+
+    return 0;
 }
 
-function calcularDeltaContexto(dados) {
-    if (!dados || dados.length < 2) {
-        return 0;
+function buscarUltimaTaxaValida(historico) {
+    const historicoOrdenado = ordenarPorTempo(historico);
+
+    for (let i = historicoOrdenado.length - 1; i > 0; i--) {
+
+        const atual = historicoOrdenado[i];
+        const anterior = historicoOrdenado[i - 1];
+
+        const delta =
+            Number(atual.cpuCtxSwitches) -
+            Number(anterior.cpuCtxSwitches);
+
+        if (delta > 0) {
+
+            const segundos =
+                (converterTimestamp(atual.timestamp) -
+                 converterTimestamp(anterior.timestamp)) / 1000;
+
+            return Math.round(delta / segundos);
+        }
     }
 
-    const ordenado = ordenarPorTempo(dados);
-
-    const anterior = ordenado[ordenado.length - 2];
-    const atual = ordenado[ordenado.length - 1];
-
-    const delta =
-        Number(atual.cpuCtxSwitches) -
-        Number(anterior.cpuCtxSwitches);
-
-    return Math.max(0, delta);
+    return 0;
 }
 
     function criarGraficoProcessos(historico) {
-        const labels = historico.map(item => {
-            const hora = item.timestamp.split(" ")[1];
-            return hora.substring(0, 5);
-        });
+    const historicoOrdenado = ordenarPorTempo(historico);
 
-        const valores = historico.map(linha => Number(linha.totalProcessos)).reverse();
+    const labels = historicoOrdenado.map(item => {
+        const hora = item.timestamp.split(" ")[1];
+        return hora.substring(0, 5);
+    });
 
-        const ctx = document.getElementById("myChart").getContext("2d");
+    const valores = historicoOrdenado.map(linha => Number(linha.totalProcessos));
 
-        if (graficoProcessos) {
-            graficoProcessos.destroy();
-        }
+    const ctx = document.getElementById("myChart").getContext("2d");
 
-        graficoProcessos = new Chart(ctx, {
-            type: "line",
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: "Total de processos",
-                    data: valores,
-                    borderColor: "#00FF00",
-                    backgroundColor: "rgba(0,255,0,0.2)",
-                    pointBackgroundColor: "#00FF00",
-                    pointBorderColor: "#00FF00",
-                    borderWidth: 2,
-                    tension: 0.3,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: "#FFFFFF"
+    if (graficoProcessos) {
+        graficoProcessos.destroy();
+    }
+
+    graficoProcessos = new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: labels,
+            datasets: [{
+                label: "Total de processos",
+                data: valores,
+
+                borderColor: "#00FF00",
+                backgroundColor: "rgba(0,255,0,0.2)",
+                pointBackgroundColor: "#00FF00",
+                pointBorderColor: "#00FF00",
+
+                borderWidth: 2,
+                tension: 0.3,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: "#FFFFFF",
+                        font: {
+                            size: 14,
+                            weight: "bold"
                         }
-                    },
-                    annotation: {
-                        annotations: {
-                            limiteAtencao: {
-                                type: "line",
-                                yMin: 5000,
-                                yMax: 5000,
-                                borderColor: "#F1C40F",
-                                borderWidth: 2,
-                                borderDash: [6, 6],
-                                label: {
-                                    display: true,
-                                    content: "Atenção",
-                                    color: "#FFFFFF",
-                                    backgroundColor: "#F1C40F",
-                                    position: "end"
-                                },
+                    }
+                },
+                annotation: {
+                    annotations: {
+                        limiteAtencao: {
+                            type: "line",
+                            yMin: 5000,
+                            yMax: 5000,
 
+                            borderColor: "#F1C40F",
+                            borderWidth: 2,
+                            borderDash: [6, 6],
+
+                            label: {
+                                display: true,
+                                content: "Atenção",
+                                color: "#FFFFFF",
+                                backgroundColor: "#F1C40F",
+                                position: "end",
+                                padding: 2,
                                 font: {
-                                    size: 9
+                                    size: 8,
+                                    weight: "normal"
                                 }
-                            },
-                            limiteCritico: {
-                                type: "line",
-                                yMin: 6000,
-                                yMax: 6000,
-                                borderColor: "#E74C3C",
-                                borderWidth: 2,
-                                borderDash: [6, 6],
-                                label: {
-                                    display: true,
-                                    content: "Crítico",
-                                    color: "#FFFFFF",
-                                    backgroundColor: "#E74C3C",
-                                    position: "end"
-                                },
+                            }
+                        },
+
+                        limiteCritico: {
+                            type: "line",
+                            yMin: 6000,
+                            yMax: 6000,
+
+                            borderColor: "#E74C3C",
+                            borderWidth: 2,
+                            borderDash: [6, 6],
+
+                            label: {
+                                display: true,
+                                content: "Crítico",
+                                color: "#FFFFFF",
+                                backgroundColor: "#E74C3C",
+                                position: "end",
+                                padding: 2,
                                 font: {
-                                    size: 9
+                                    size: 8,
+                                    weight: "normal"
                                 }
                             }
                         }
                     }
-                },
-                scales: {
-                    x: {
-                        ticks: {
-                            color: "#FFFFFF"
-                        }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        color: "#FFFFFF"
                     },
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            color: "#FFFFFF"
-                        }
+                    grid: {
+                        color: "rgba(255,255,255,0.08)"
                     }
                 },
-
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: "#FFFFFF"
+                    },
+                    grid: {
+                        color: "rgba(255,255,255,0.08)"
+                    }
+                }
             }
-        });
-    }
-
+        }
+    });
+}
 
     function criarGraficoContexto(historico) {
         const historicoOrdenado = ordenarPorTempo(historico);
@@ -703,62 +768,62 @@ function calcularDeltaContexto(dados) {
     const LIMITE_CONTEXTO_CRITICO = 150000;
 
     function calcularStatusServidor(historico) {
-    const historicoOrdenado = [...historico].reverse();
+        const historicoOrdenado = ordenarPorTempo(historico);
 
-    const valoresProcessos = historicoOrdenado.map(item =>
-        Number(item.totalProcessos)
-    );
-
-    const valoresContexto = [];
-
-    for (let i = 1; i < historicoOrdenado.length; i++) {
-        const atual = historicoOrdenado[i];
-        const anterior = historicoOrdenado[i - 1];
-
-        const delta = Math.max(
-            0,
-            Number(atual.cpuCtxSwitches) -
-            Number(anterior.cpuCtxSwitches)
+        const valoresProcessos = historicoOrdenado.map(item =>
+            Number(item.totalProcessos)
         );
 
-        valoresContexto.push(delta);
-    }
+        const valoresContexto = [];
 
-    const passouCriticoProcessos = valoresProcessos.some(valor =>
-        valor >= LIMITE_PROCESSOS_CRITICO
-    );
+        for (let i = 1; i < historicoOrdenado.length; i++) {
+            const atual = historicoOrdenado[i];
+            const anterior = historicoOrdenado[i - 1];
 
-    const passouCriticoContexto = valoresContexto.some(valor =>
-        valor >= LIMITE_CONTEXTO_CRITICO
-    );
+            const delta = Math.max(
+                0,
+                Number(atual.cpuCtxSwitches) -
+                Number(anterior.cpuCtxSwitches)
+            );
 
-    if (passouCriticoProcessos || passouCriticoContexto) {
+            valoresContexto.push(delta);
+        }
+
+        const passouCriticoProcessos = valoresProcessos.some(valor =>
+            valor >= LIMITE_PROCESSOS_CRITICO
+        );
+
+        const passouCriticoContexto = valoresContexto.some(valor =>
+            valor >= LIMITE_CONTEXTO_CRITICO
+        );
+
+        if (passouCriticoProcessos || passouCriticoContexto) {
+            return {
+                texto: "Crítico",
+                cor: "#E74C3C"
+            };
+        }
+
+        const passouAtencaoProcessos = valoresProcessos.some(valor =>
+            valor >= LIMITE_PROCESSOS_ATENCAO
+        );
+
+        const passouAtencaoContexto = valoresContexto.some(valor =>
+            valor >= LIMITE_CONTEXTO_ATENCAO
+        );
+
+        if (passouAtencaoProcessos || passouAtencaoContexto) {
+            return {
+                texto: "Atenção",
+                cor: "#F1C40F"
+            };
+        }
+
         return {
-            texto: "Crítico",
-            cor: "#E74C3C"
+            texto: "Normal",
+            cor: "#2ECC71"
         };
     }
-
-    const passouAtencaoProcessos = valoresProcessos.some(valor =>
-        valor >= LIMITE_PROCESSOS_ATENCAO
-    );
-
-    const passouAtencaoContexto = valoresContexto.some(valor =>
-        valor >= LIMITE_CONTEXTO_ATENCAO
-    );
-
-    if (passouAtencaoProcessos || passouAtencaoContexto) {
-        return {
-            texto: "Atenção",
-            cor: "#F1C40F"
-        };
-    }
-
-    return {
-        texto: "Normal",
-        cor: "#2ECC71"
-    };
-}
 
 
     let intervaloDashboard = null;
