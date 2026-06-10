@@ -240,7 +240,7 @@
 <script>
 
     // var macServidor = "bc:cd:99:c2:86:34"; //mac_address mockado
-    var macServidor = sessionStorage.MAC; 
+    var macServidor = sessionStorage.MAC;
     // var aliasServidor = "miyuki";
     var aliasServidor = sessionStorage.ALIAS;
 
@@ -398,19 +398,25 @@
 
         document.getElementById("kpi-servidor").textContent = sessionStorage.ALIAS;
 
-        document.getElementById("badge-status").textContent = sessionStorage.STATUS;
         
+        const badgeStatus = document.getElementById("badge-status");
+
+        badgeStatus.textContent = sessionStorage.STATUS;
+
         var statusAtual = sessionStorage.STATUS;
 
         if (statusAtual == "CRÍTICO") {
-            
-            badgeStatus.className = "badge-critico"
+
+            badgeStatus.className = "badge-critico";
+
         } else if (statusAtual == "ATENÇÃO") {
-            
-            badgeStatus.className = "badge-atencao"
+
+            badgeStatus.className = "badge-atencao";
+
         } else {
-            
-            badgeStatus.className = "badge-normal"
+
+            badgeStatus.className = "badge-normal";
+
         }
 
         document.getElementById("ultimaAtualizacao").textContent = servidor.timestamp;
