@@ -41,6 +41,7 @@ app.use("/dashProcessos", dashProcessosRouter);
 app.use("/dash_cpu", dash_cpuRouter);
 app.use("/ransomware", ransomwareRouter);
 app.use("/alertasS3", alertasS3Router);
+app.use("/relatorios", relatoriosS3Router);
 app.use("/relatoriosS3", relatoriosS3Router);
 app.use("/limitesComponentes", limitesComponentesRouter);
 app.use("/dash_ram", dash_ramRouter)

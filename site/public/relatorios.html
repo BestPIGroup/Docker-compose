@@ -102,6 +102,7 @@
         const tbodyRelatorios = document.getElementById("tbody_relatorios");
         const botaoAtualizarRelatorios = document.getElementById("btn_atualizar_relatorios");
         const botaoBaixarRelatorioGeral = document.getElementById("btn_baixar_relatorio_geral");
+        const rotaRelatorios = "/relatorios";
         let relatoriosAtuais = [];
 
         function escaparHTML(valor) {
@@ -170,7 +171,7 @@
         }
 
         async function buscarRelatorios() {
-            const resposta = await fetch("/relatoriosS3/listar", { cache: "no-store" });
+            const resposta = await fetch(`${rotaRelatorios}/listar`, { cache: "no-store" });
 
             if (!resposta.ok) {
                 throw new Error(`Erro HTTP ${resposta.status}`);
@@ -201,35 +202,32 @@
             return new Promise(resolve => setTimeout(resolve, ms));
         }
 
-        async function aguardarRelatorioGeralAtualizado(atualizadoAnterior) {
-            for (let tentativa = 0; tentativa < 8; tentativa++) {
-                if (tentativa > 0) await esperar(3000);
+        async function buscarPdfRelatorioGeral(identificador, solicitadoEm) {
+            const identificadorParam = identificador ? `&identificador=${encodeURIComponent(identificador)}` : "";
+            const geradoDepoisDeParam = solicitadoEm ? `&geradoDepoisDe=${encodeURIComponent(solicitadoEm)}` : "";
+            const resposta = await fetch(`${rotaRelatorios}/download-geral-atual?json=1${identificadorParam}${geradoDepoisDeParam}`, {
+                cache: "no-store"
+            });
 
-                const dados = await carregarRelatorios({
-                    mostrarCarregando: tentativa === 0
-                });
-                const relatorioGeral = obterRelatorioGeralHoje(dados.relatorios);
+            if (resposta.ok) return resposta.json();
+            if (resposta.status === 404) throw new Error("Relatório geral ainda não foi encontrado no S3.");
 
-                if (relatorioGeral && relatorioGeral.atualizadoEm !== atualizadoAnterior) {
-                    return relatorioGeral;
-                }
-            }
-
-            return null;
+            throw new Error(await resposta.text());
         }
 
         async function gerarRelatorioGeral() {
             const textoOriginal = botaoBaixarRelatorioGeral.textContent;
-            const relatorioAnterior = obterRelatorioGeralHoje(relatoriosAtuais);
+            const identificador = sessionStorage.getItem("ID_UNIDADE") || sessionStorage.getItem("fk_unidade") || "";
 
             botaoBaixarRelatorioGeral.disabled = true;
             botaoBaixarRelatorioGeral.textContent = "Gerando...";
 
             try {
-                const resposta = await fetch("/relatoriosS3/gerar-relatorio-geral", {
+                const resposta = await fetch(`${rotaRelatorios}/gerar-relatorio-geral`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
+                        identificador,
                         idUnidade: sessionStorage.getItem("ID_UNIDADE"),
                         idUsuario: sessionStorage.getItem("ID_USUARIO"),
                         nomeUsuario: sessionStorage.getItem("NOME_USUARIO")
@@ -240,7 +238,16 @@
                     throw new Error(`Erro HTTP ${resposta.status}`);
                 }
 
-                await aguardarRelatorioGeralAtualizado(relatorioAnterior?.atualizadoEm || null);
+                const solicitacaoRelatorio = await resposta.json();
+                await esperar(10000);
+
+                const relatorioDisponivel = await buscarPdfRelatorioGeral(
+                    identificador,
+                    solicitacaoRelatorio?.resultado?.solicitadoEm
+                );
+
+                window.location.href = relatorioDisponivel.downloadUrl;
+                carregarRelatorios({ mostrarCarregando: false }).catch(() => {});
             } catch (erro) {
                 console.warn("Nao foi possivel gerar o relatorio geral:", erro);
                 alert("Não foi possível solicitar a geração do relatório geral.");

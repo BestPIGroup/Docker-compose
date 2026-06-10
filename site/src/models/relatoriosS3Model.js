@@ -1,6 +1,7 @@
 const AWS = require("aws-sdk");
 
 const PREFIXO_RELATORIOS = "relatorios/";
+const PREFIXO_GATILHOS_RELATORIOS_SERVIDOR_PADRAO = "triggerRelatorio/";
 const EXPIRACAO_DOWNLOAD_SEGUNDOS = 60;
 const TIME_ZONE = "America/Sao_Paulo";
 
@@ -36,6 +37,31 @@ function obterBucketRelatorios() {
     }
 
     return bucket;
+}
+
+function normalizarPrefixoS3(prefixo, padrao) {
+    const texto = String(prefixo || padrao || "").trim();
+    if (!texto) return "";
+
+    return texto.endsWith("/") ? texto : `${texto}/`;
+}
+
+function obterPrefixoGatilhosRelatorioServidor() {
+    return normalizarPrefixoS3(
+        process.env.AWS_RELATORIO_SERVIDOR_TRIGGER_PREFIX
+            || process.env.AWS_RELATORIOS_TRIGGER_PREFIX
+            || process.env.AWS_RELATORIOS_GATILHO_PREFIX,
+        PREFIXO_GATILHOS_RELATORIOS_SERVIDOR_PADRAO
+    );
+}
+
+function obterPrefixoGatilhosRelatorioGeral() {
+    return normalizarPrefixoS3(
+        process.env.AWS_RELATORIO_GERAL_TRIGGER_PREFIX
+            || process.env.AWS_RELATORIOS_TRIGGER_PREFIX
+            || process.env.AWS_RELATORIOS_GATILHO_PREFIX,
+        PREFIXO_GATILHOS_RELATORIOS_SERVIDOR_PADRAO
+    );
 }
 
 function obterNomeLambdaRelatorioGeral() {
@@ -112,6 +138,28 @@ function limparMacParaArquivo(macAddress) {
         .replace(/\s+/g, "");
 }
 
+function limparMacParaGatilho(macAddress) {
+    const mac = String(macAddress || "").trim();
+    if (!mac) throw new Error("MAC do servidor nao informado");
+
+    return mac
+        .replace(/[\\/]/g, "-")
+        .replace(/\s+/g, "");
+}
+
+function limparIdentificadorParaGatilho(identificador) {
+    const texto = String(identificador || "").trim();
+    if (!texto) throw new Error("Identificador do relatorio geral nao informado");
+
+    return texto
+        .replace(/[\\/]/g, "-")
+        .replace(/\s+/g, "");
+}
+
+function normalizarMacParaComparacao(macAddress) {
+    return String(macAddress || "").trim().replace(/-/g, ":").toLowerCase();
+}
+
 function extrairDadosDoNome(nomeArquivo) {
     const match = String(nomeArquivo || "").match(/^(\d{2})-(\d{2})-(\d{4})_(.+?)(?:\.[^.]+)?$/);
     if (!match) return null;
@@ -178,7 +226,7 @@ function montarRelatorio(objeto) {
         identificador: dadosNome.identificador,
         tamanhoBytes: objeto.Size || 0,
         atualizadoEm: objeto.LastModified ? objeto.LastModified.toISOString() : null,
-        downloadUrl: `/relatoriosS3/download?key=${encodeURIComponent(key)}`
+        downloadUrl: `/relatorios/download?key=${encodeURIComponent(key)}`
     };
 }
 
@@ -268,22 +316,87 @@ async function objetoExiste(s3, bucket, key) {
     }
 }
 
-async function buscarKeyRelatorioGeralAtual(s3, bucket) {
-    const keyConfigurada = montarKeyRelatorioGeralAtual();
+async function buscarDadosObjeto(s3, bucket, key) {
+    try {
+        return await s3.headObject({ Bucket: bucket, Key: key }).promise();
+    } catch (erro) {
+        if (erro?.code === "NotFound" || erro?.code === "NoSuchKey" || erro?.statusCode === 404) {
+            return null;
+        }
 
-    if (keyConfigurada && await objetoExiste(s3, bucket, keyConfigurada)) {
+        throw erro;
+    }
+}
+
+function timestampFiltroRelatorio(valor) {
+    if (!valor) return null;
+
+    const timestamp = new Date(valor).getTime();
+    if (Number.isNaN(timestamp)) return null;
+
+    return Math.floor(timestamp / 1000) * 1000;
+}
+
+function relatorioFoiGeradoDepois(relatorio, geradoDepoisDeMs) {
+    if (!geradoDepoisDeMs) return true;
+    if (!relatorio?.atualizadoEm) return false;
+
+    const atualizadoEmMs = new Date(relatorio.atualizadoEm).getTime();
+    return !Number.isNaN(atualizadoEmMs) && atualizadoEmMs >= geradoDepoisDeMs;
+}
+
+function relatorioPertenceAoMac(relatorio, macAddress) {
+    if (!relatorio) return false;
+
+    const macArquivo = limparMacParaArquivo(macAddress).toLowerCase();
+    const macComparacao = normalizarMacParaComparacao(macAddress);
+    const nomeSemExtensao = removerExtensao(relatorio.nomeArquivo).toLowerCase();
+    const identificador = normalizarMacParaComparacao(relatorio.identificador);
+
+    return !/_diario\.[^.]+$/i.test(relatorio.nomeArquivo)
+        && (
+            nomeSemExtensao.endsWith(`_${macArquivo}`)
+            || identificador === macComparacao
+        );
+}
+
+function normalizarIdentificadorRelatorio(valor) {
+    return String(valor || "").trim().toLowerCase();
+}
+
+function relatorioGeralPertenceAoIdentificador(relatorio, identificador) {
+    if (!relatorio || !/_diario\.[^.]+$/i.test(relatorio.nomeArquivo)) return false;
+    if (!identificador) return true;
+
+    return normalizarIdentificadorRelatorio(relatorio.identificador)
+        === normalizarIdentificadorRelatorio(identificador);
+}
+
+async function buscarKeyRelatorioGeralAtual(s3, bucket, opcoes = {}) {
+    const identificador = opcoes.identificador || null;
+    const geradoDepoisDeMs = timestampFiltroRelatorio(opcoes.geradoDepoisDe);
+    const keyConfigurada = montarKeyRelatorioGeralAtual(identificador);
+    const objetoConfigurado = keyConfigurada ? await buscarDadosObjeto(s3, bucket, keyConfigurada) : null;
+
+    if (objetoConfigurado && relatorioFoiGeradoDepois({
+        atualizadoEm: objetoConfigurado.LastModified ? objetoConfigurado.LastModified.toISOString() : null
+    }, geradoDepoisDeMs)) {
         return validarChaveRelatorioGeral(keyConfigurada);
     }
 
     const dataHoje = formatarDataArquivo(dataAtualSaoPaulo());
     const objetos = await listarObjetosRelatorios(s3, bucket);
-    const relatorioGeralHoje = objetos
+    const relatorioGeral = objetos
         .map(montarRelatorio)
         .filter(relatorio => {
             if (!relatorio) return false;
 
-            return relatorio.nomeArquivo.startsWith(`${dataHoje}_`)
-                && /_diario\.[^.]+$/i.test(relatorio.nomeArquivo);
+            const relatorioDoEscopo = geradoDepoisDeMs
+                ? relatorioGeralPertenceAoIdentificador(relatorio, identificador)
+                : relatorio.nomeArquivo.startsWith(`${dataHoje}_`)
+                    && relatorioGeralPertenceAoIdentificador(relatorio, identificador);
+
+            return relatorioDoEscopo && relatorioFoiGeradoDepois(relatorio, geradoDepoisDeMs);
         })
         .sort((a, b) => {
             const atualizadoA = a.atualizadoEm ? new Date(a.atualizadoEm).getTime() : 0;
@@ -293,31 +406,30 @@ async function buscarKeyRelatorioGeralAtual(s3, bucket) {
             return a.nomeArquivo.localeCompare(b.nomeArquivo);
         })[0];
 
-    if (!relatorioGeralHoje) {
+    if (!relatorioGeral) {
         throw new Error("Relatorio geral nao encontrado");
     }
 
-    return relatorioGeralHoje.key;
+    return relatorioGeral.key;
 }
 
-async function buscarKeyRelatorioServidorAtual(s3, bucket, macAddress) {
+async function buscarKeyRelatorioServidorAtual(s3, bucket, macAddress, opcoes = {}) {
     const keyEsperada = montarKeyRelatorioServidorAtual(macAddress);
+    const geradoDepoisDeMs = timestampFiltroRelatorio(opcoes.geradoDepoisDe);
+    const objetoEsperado = await buscarDadosObjeto(s3, bucket, keyEsperada);
 
-    if (await objetoExiste(s3, bucket, keyEsperada)) {
+    if (objetoEsperado && relatorioFoiGeradoDepois({
+        atualizadoEm: objetoEsperado.LastModified ? objetoEsperado.LastModified.toISOString() : null
+    }, geradoDepoisDeMs)) {
         return validarChaveRelatorio(keyEsperada);
     }
 
-    const dataHoje = formatarDataArquivo(dataAtualSaoPaulo());
-    const macArquivo = limparMacParaArquivo(macAddress).toLowerCase();
     const objetos = await listarObjetosRelatorios(s3, bucket);
-    const relatorioServidorHoje = objetos
+    const relatorioServidor = objetos
         .map(montarRelatorio)
         .filter(relatorio => {
-            if (!relatorio) return false;
-
-            return relatorio.nomeArquivo.startsWith(`${dataHoje}_`)
-                && !/_diario\.[^.]+$/i.test(relatorio.nomeArquivo)
-                && removerExtensao(relatorio.nomeArquivo).toLowerCase().endsWith(`_${macArquivo}`);
+            return relatorioPertenceAoMac(relatorio, macAddress)
+                && relatorioFoiGeradoDepois(relatorio, geradoDepoisDeMs);
         })
         .sort((a, b) => {
             const atualizadoA = a.atualizadoEm ? new Date(a.atualizadoEm).getTime() : 0;
@@ -327,16 +439,24 @@ async function buscarKeyRelatorioServidorAtual(s3, bucket, macAddress) {
             return a.nomeArquivo.localeCompare(b.nomeArquivo);
         })[0];
 
-    if (!relatorioServidorHoje) {
+    if (!relatorioServidor) {
         throw new Error("Relatorio de servidor nao encontrado");
     }
 
-    return relatorioServidorHoje.key;
+    return relatorioServidor.key;
 }
 
 function montarPayloadRelatorioGeral(dados = {}) {
     const dataAtual = dataAtualSaoPaulo();
     const idUnidade = dados.idUnidade || dados.ID_UNIDADE || dados.fkUnidade || null;
+    const identificador = dados.identificador
+        || dados.numeroIdentificador
+        || dados.idUnidade
+        || dados.ID_UNIDADE
+        || dados.fkUnidade
+        || process.env.AWS_RELATORIO_GERAL_ID
+        || process.env.AWS_CODIGO_UNIDADE
+        || null;
 
     return {
         acao: "gerar_relatorio_geral",
@@ -344,7 +464,8 @@ function montarPayloadRelatorioGeral(dados = {}) {
         data: formatarDataArquivo(dataAtual),
         bucket: obterBucketRelatorios(),
         prefixo: PREFIXO_RELATORIOS,
-        keyDestino: montarKeyRelatorioGeralAtual(idUnidade),
+        keyDestino: montarKeyRelatorioGeralAtual(identificador),
+        identificador,
         idUnidade,
         idUsuario: dados.idUsuario || dados.ID_USUARIO || null,
         nomeUsuario: dados.nomeUsuario || dados.NOME_USUARIO || null
@@ -368,6 +489,8 @@ function montarPayloadRelatorioServidor(dados = {}) {
         prefixo: PREFIXO_RELATORIOS,
         keyDestino: montarKeyRelatorioServidorAtual(macAddress),
         macAddress,
+        macAddressServidor: macAddress,
+        macServidor: macAddress,
         mac: macAddress,
         MacServer: macAddress,
         gerarAlerta: dados.gerarAlerta !== false,
@@ -375,6 +498,70 @@ function montarPayloadRelatorioServidor(dados = {}) {
         idUsuario: dados.idUsuario || dados.ID_USUARIO || null,
         nomeUsuario: dados.nomeUsuario || dados.NOME_USUARIO || null,
         nomeServidor: dados.nomeServidor || dados.alias || null
+    };
+}
+
+function montarKeyGatilhoRelatorioServidor(macAddress) {
+    return `${obterPrefixoGatilhosRelatorioServidor()}${limparMacParaGatilho(macAddress)}.json`;
+}
+
+function montarKeyGatilhoRelatorioGeral(identificador) {
+    return `${obterPrefixoGatilhosRelatorioGeral()}geral_${limparIdentificadorParaGatilho(identificador)}.json`;
+}
+
+async function solicitarGeracaoRelatorioGeralPorS3(dados = {}) {
+    const s3 = configurarS3();
+    const bucket = obterBucketRelatorios();
+    const payload = montarPayloadRelatorioGeral(dados);
+    const keyGatilho = montarKeyGatilhoRelatorioGeral(payload.identificador);
+    const solicitadoEm = new Date().toISOString();
+
+    await s3.putObject({
+        Bucket: bucket,
+        Key: keyGatilho,
+        Body: "{}",
+        ContentType: "application/json",
+        Metadata: {
+            identificador: String(payload.identificador),
+            solicitadoem: solicitadoEm
+        }
+    }).promise();
+
+    return {
+        bucket,
+        keyGatilho,
+        prefixoGatilho: obterPrefixoGatilhosRelatorioGeral(),
+        identificador: payload.identificador,
+        keyDestinoEsperada: payload.keyDestino,
+        solicitadoEm
+    };
+}
+
+async function solicitarGeracaoRelatorioServidorPorS3(dados = {}) {
+    const s3 = configurarS3();
+    const bucket = obterBucketRelatorios();
+    const payload = montarPayloadRelatorioServidor(dados);
+    const keyGatilho = montarKeyGatilhoRelatorioServidor(payload.macAddress);
+    const solicitadoEm = new Date().toISOString();
+
+    await s3.putObject({
+        Bucket: bucket,
+        Key: keyGatilho,
+        Body: "{}",
+        ContentType: "application/json",
+        Metadata: {
+            macaddress: payload.macAddress,
+            solicitadoem: solicitadoEm
+        }
+    }).promise();
+
+    return {
+        bucket,
+        keyGatilho,
+        prefixoGatilho: obterPrefixoGatilhosRelatorioServidor(),
+        macAddress: payload.macAddress,
+        keyDestinoEsperada: payload.keyDestino,
+        solicitadoEm
     };
 }
 
@@ -457,10 +644,10 @@ async function gerarUrlDownload(key) {
     });
 }
 
-async function gerarUrlDownloadRelatorioGeralAtual() {
+async function gerarUrlDownloadRelatorioGeralAtual(opcoes = {}) {
     const s3 = configurarS3();
     const bucket = obterBucketRelatorios();
-    const chave = await buscarKeyRelatorioGeralAtual(s3, bucket);
+    const chave = await buscarKeyRelatorioGeralAtual(s3, bucket, opcoes);
     const nomeArquivo = obterNomeArquivo(chave).replace(/"/g, "");
 
     return s3.getSignedUrlPromise("getObject", {
@@ -471,23 +658,25 @@ async function gerarUrlDownloadRelatorioGeralAtual() {
     });
 }
 
-async function gerarUrlDownloadRelatorioServidorAtual(macAddress) {
+async function gerarUrlDownloadRelatorioServidorAtual(macAddress, opcoes = {}) {
     const s3 = configurarS3();
     const bucket = obterBucketRelatorios();
-    const chave = await buscarKeyRelatorioServidorAtual(s3, bucket, macAddress);
+    const chave = await buscarKeyRelatorioServidorAtual(s3, bucket, macAddress, opcoes);
     const nomeArquivo = obterNomeArquivo(chave).replace(/"/g, "");
 
     return s3.getSignedUrlPromise("getObject", {
         Bucket: bucket,
         Key: chave,
         Expires: EXPIRACAO_DOWNLOAD_SEGUNDOS,
-        ResponseContentDisposition: `inline; filename="${nomeArquivo}"`,
+        ResponseContentDisposition: `attachment; filename="${nomeArquivo}"`,
         ResponseContentType: "application/pdf"
     });
 }
 
 module.exports = {
     listarRelatorios,
+    solicitarGeracaoRelatorioGeralPorS3,
+    solicitarGeracaoRelatorioServidorPorS3,
     acionarGeracaoRelatorioGeral,
     acionarGeracaoRelatorioServidor,
     gerarUrlDownload,
