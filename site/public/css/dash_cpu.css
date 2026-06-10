@@ -187,6 +187,62 @@ body {
     color: #ffffff;
 }
 
+/* ========== KPI DO SERVIDOR ========== */
+.kpi-servidor {
+    position: relative;
+    overflow: hidden;
+}
+
+.kpi-servidor::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 4px;
+    background-color: #3ed64b;
+    transition: background-color 0.3s ease;
+}
+
+.kpi-servidor.status-normal::before {
+    background-color: #3ed64b;
+}
+.kpi-servidor.status-atencao::before {
+    background-color: #f5a623;
+}
+.kpi-servidor.status-critico::before {
+    background-color: #ff3b3b;
+}
+
+#nome-servidor-valor {
+    font-size: 32px;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.2;
+    margin-bottom: 4px;
+}
+
+.badge-normal, .badge-atencao, .badge-critico {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 6px;
+    white-space: nowrap;
+    text-transform: uppercase;
+}
+.badge-normal {
+    background: rgba(9, 160, 16, 0.15);
+    color: #3ed64b;
+}
+.badge-atencao {
+    background: rgba(250, 204, 21, 0.15);
+    color: #f5a623;
+}
+.badge-critico {
+    background: rgba(224, 35, 10, 0.15);
+    color: #ff3b3b;
+}
+
 .graficos {
     display: grid;
     grid-template-columns: repeat(2, 1fr);

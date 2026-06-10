@@ -28,6 +28,7 @@ function buscarRegistros(req, res) {
             resultado.reverse();
 
             const labels = [];
+            const labelsHora = [];
             const cpuPercent = [];
             const ctxSwitches = [];
             const topProcessCpu = [];
@@ -36,8 +37,8 @@ function buscarRegistros(req, res) {
 
             resultado.forEach((row, index) => {
                 const ts = row.timestamp;
-                const hora = ts ? ts.substring(11, 16) : "";
-                labels.push(hora);
+                labels.push(ts || "");
+                labelsHora.push(ts ? ts.substring(11, 16) : "");
 
                 const cpu = row.cpuPercent || 0;
                 cpuPercent.push(cpu);
@@ -61,31 +62,6 @@ function buscarRegistros(req, res) {
                 }
             });
 
-            const alertasCpu = resultado.filter(r => r.cpuAlerta === 'Alerta').length;
-
-            let ultimoAlertaMinutos = null;
-            for (let i = resultado.length - 1; i >= 0; i--) {
-                if (resultado[i].cpuAlerta === 'Alerta') {
-                    const timestampAlerta = resultado[i].timestamp;
-                    const partes = timestampAlerta.split(' ');
-                    if (partes.length === 2) {
-                        const dataPartes = partes[0].split('/');
-                        const horaPartes = partes[1].split(':');
-                        const dia = parseInt(dataPartes[0], 10);
-                        const mes = parseInt(dataPartes[1], 10) - 1;
-                        const ano = parseInt(dataPartes[2], 10);
-                        const hora = parseInt(horaPartes[0], 10);
-                        const minuto = parseInt(horaPartes[1], 10);
-                        const segundo = parseInt(horaPartes[2], 10);
-                        const dataAlerta = new Date(ano, mes, dia, hora, minuto, segundo);
-                        const agora = new Date();
-                        const diffMs = agora - dataAlerta;
-                        ultimoAlertaMinutos = Math.floor(diffMs / 60000);
-                    }
-                    break;
-                }
-            }
-
             const slice30min = arr => arr.slice(-6);
             const pico30cpu = slice30min(cpuPercent).length > 0 ? Math.max(...slice30min(cpuPercent)) : 0;
             const pico30cs = slice30min(ctxSwitches).length > 0 ? Math.max(...slice30min(ctxSwitches)) : 0;
@@ -98,6 +74,7 @@ function buscarRegistros(req, res) {
 
             res.json({
                 labels,
+                labels_hora: labelsHora,
                 cpu_percent: cpuPercent,
                 ctx_switches: ctxSwitches,
                 top_process_cpu: topProcessCpu,
@@ -112,12 +89,6 @@ function buscarRegistros(req, res) {
                     cpu: media3hCpu,
                     cs: media3hCs,
                     processos: media3hProc
-                },
-                alertas_cpu: {
-                    quantidade: alertasCpu
-                },
-                ultimo_alerta: {
-                    minutos: ultimoAlertaMinutos
                 },
                 timestamp_servidor: resultado.length > 0 ? resultado[resultado.length - 1].timestamp : ""
             });
