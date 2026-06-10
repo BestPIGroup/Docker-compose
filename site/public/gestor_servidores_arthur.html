@@ -305,6 +305,7 @@
     const tempoAtualizacaoCards = 60 * 1000;
     const tempoAtualizacaoModal = 5 * 60 * 1000;
     const quantidadeDeLeiturasS3 = 200000;
+    const rotaRelatorios = '/relatorios';
 
     const colunasDoCsvClient = [
         'idMac',
@@ -429,21 +430,17 @@
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    async function aguardarPdfRelatorioServidor(mac) {
+    async function buscarPdfRelatorioServidor(mac, solicitadoEm) {
         const macParam = encodeURIComponent(mac);
+        const geradoDepoisDeParam = solicitadoEm ? `&geradoDepoisDe=${encodeURIComponent(solicitadoEm)}` : '';
+        const resposta = await fetch(`${rotaRelatorios}/download-servidor-atual?macAddress=${macParam}&json=1${geradoDepoisDeParam}`, {
+            cache: 'no-store'
+        });
 
-        for (let tentativa = 0; tentativa < 10; tentativa++) {
-            const resposta = await fetch(`/relatoriosS3/download-servidor-atual?macAddress=${macParam}&json=1`, {
-                cache: 'no-store'
-            });
+        if (resposta.ok) return resposta.json();
+        if (resposta.status === 404) throw new Error('Relatório do servidor ainda não foi encontrado no S3.');
 
-            if (resposta.ok) return resposta.json();
-            if (resposta.status !== 404) throw new Error(await resposta.text());
-
-            await esperar(2000);
-        }
-
-        throw new Error('Relatório do servidor ainda não foi encontrado no S3.');
+        throw new Error(await resposta.text());
     }
 
     async function baixarRelatorioServidor(nomeServidor, mac, botao) {
@@ -465,7 +462,7 @@
         }
 
         try {
-            await buscarJson('/relatoriosS3/gerar-relatorio-servidor', {
+            const solicitacaoRelatorio = await buscarJson(`${rotaRelatorios}/gerar-relatorio-servidor`, {
                 macAddress: mac,
                 tipoRelatorio: 'servidor',
                 nomeServidor,
@@ -474,8 +471,14 @@
                 nomeUsuario: sessionStorage.getItem('NOME_USUARIO')
             });
 
-            await aguardarPdfRelatorioServidor(mac);
-            const urlRelatorio = `/relatoriosS3/download-servidor-atual?macAddress=${encodeURIComponent(mac)}`;
+            await esperar(10000);
+
+            const relatorioDisponivel = await buscarPdfRelatorioServidor(
+                mac,
+                solicitacaoRelatorio?.resultado?.solicitadoEm
+            );
+            const urlRelatorio = relatorioDisponivel.downloadUrl
+                || `${rotaRelatorios}/download-servidor-atual?macAddress=${encodeURIComponent(mac)}`;
 
             if (abaRelatorio) {
                 abaRelatorio.location.href = urlRelatorio;
