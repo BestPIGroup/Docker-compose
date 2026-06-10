@@ -29,7 +29,7 @@
 
                 <div class="titulo-servidor">
                     <h2 id="servidorAcesso">Servidor</h2>
-                    <span class="badge-atencao">Atenção</span>
+                    <span id="badge-atencao" class="badge-atencao">Atenção</span>
                 </div>
             </div>
 
@@ -157,7 +157,7 @@
 
 </html>
 <script>
-    document.getElementById("kpi-servidor").textContent = sessionStorage.ALIAS;
+    document.getElementById("servidorAcesso").textContent = sessionStorage.ALIAS;
 
     document.getElementById("badge-atencao").textContent = sessionStorage.STATUS
 
