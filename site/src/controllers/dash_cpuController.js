@@ -129,27 +129,29 @@ function buscarRegistros(req, res) {
 }
 
 function buscarLimites(req, res) {
-    var id = req.body.id;
+    var mac = req.body.MacServer;
 
-    if (!id) {
-        return res.status(400).send("ID do servidor não fornecido");
+    if (!mac) {
+        return res.status(400).send("MAC do servidor não fornecido");
     }
 
-    dash_cpuModel.buscarLimites(id)
+    dash_cpuModel.buscarLimitesPorMac(mac)
         .then(function (resultado) {
             const limites = {};
             resultado.forEach(row => {
-                if (row.id_componente == 1) {        
-                    limites.cpu = Number(row.limite_componente);         
-                } else if (row.id_componente == 3) {  
-                    limites.cs = Number(row.limite_componente);
+                const componenteId = row.id_componente;
+                const valorLimite = Number(row.limite_componente);
+                if (componenteId == 1) {
+                    limites.cpu = valorLimite;
+                } else if (componenteId == 3) {
+                    limites.cs = valorLimite;
                 }
             });
-            res.json(limites);   
+            res.json(limites);
         })
         .catch(function (erro) {
-            console.log("Erro na busca dos limites: ", erro);
-            res.status(500).json({ erro: erro.sqlMessage || "Erro interno" });
+            console.error("Erro ao buscar limites:", erro);
+            res.status(500).json({ erro: erro.message || "Erro interno" });
         });
 }
 
