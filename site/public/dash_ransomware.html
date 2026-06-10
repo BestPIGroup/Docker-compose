@@ -396,20 +396,20 @@
         var medianRam = mediana(historico, "virtual_memory_usage");
         var medianEscrita = mediana(historico, "disk_write_kbps");
 
-        document.getElementById("kpi-servidor").textContent = aliasServidor;
+        document.getElementById("kpi-servidor").textContent = sessionStorage.ALIAS;
 
-        var badgeStatus = document.getElementById("badge-status");
+        document.getElementById("badge-status").textContent = sessionStorage.STATUS;
 
-        if (servidor.nivel == "ALTO") {
-            document.getElementById("badge-status").textContent = "CRÍTICO";
-            badgeStatus.className = "badge-critico"
-        } else if (servidor.nivel == "MEDIO") {
-            document.getElementById("badge-status").textContent = "ATENÇÃO";
-            badgeStatus.className = "badge-atencao"
-        } else {
-            document.getElementById("badge-status").textContent = "NORMAL";
-            badgeStatus.className = "badge-normal"
-        }
+        // if (servidor.nivel == "ALTO") {
+        //     document.getElementById("badge-status").textContent = "CRÍTICO";
+        //     badgeStatus.className = "badge-critico"
+        // } else if (servidor.nivel == "MEDIO") {
+        //     document.getElementById("badge-status").textContent = "ATENÇÃO";
+        //     badgeStatus.className = "badge-atencao"
+        // } else {
+        //     document.getElementById("badge-status").textContent = "NORMAL";
+        //     badgeStatus.className = "badge-normal"
+        // }
 
         document.getElementById("ultimaAtualizacao").textContent = servidor.timestamp;
 
