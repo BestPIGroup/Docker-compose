@@ -378,6 +378,12 @@
             const cartao = document.createElement("div");
             cartao.className = "card-componente";
 
+            console.log(
+                componente.nome,
+                componente.valorAtencao,
+                componente.valorCritico
+            );
+
             if (componente.nome == "Rede") {
                 cartao.setAttribute("data-arquivo", "dash_rede.html"); // <--------- COLOCAR .html do Murilo
                 cartao.setAttribute("role", "button");
