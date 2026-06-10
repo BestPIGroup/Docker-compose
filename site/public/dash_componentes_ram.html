@@ -202,8 +202,8 @@
         document.getElementById("maior-valor-ram").innerHTML = maiorValor.toFixed(2) + "%";
         document.getElementById("percentual-ram").innerHTML = ultimo.virtualMemoryUsage.toFixed(2) + "%";
 
-        document.getElementById("legenda-uso").innerHTML = "Em uso — " + ultimo.virtualMemoryUsage + "%";
-        document.getElementById("legenda-livre").innerHTML = "Livre — " + (100 - ultimo.virtualMemoryUsage) + "%";
+        document.getElementById("legenda-uso").innerHTML = "Em uso — " + ultimo.virtualMemoryUsage.toFixed(2) + "%";
+        document.getElementById("legenda-livre").innerHTML = "Livre — " + (100 - ultimo.virtualMemoryUsage.toFixed(2)) + "%";
 
         document.querySelector(".kpi-detecta p").innerHTML =
             "Coleta detectada às " + coletaMaior.timestamp;
@@ -226,7 +226,7 @@
                 datasets: [{
                     label: "Uso de memória",
                     data: [uso, livre],
-                    backgroundColor: ["#FFFFFF", "#8AC3FF"],
+                    backgroundColor: ["#dc3030", "#3d49f0"],
                     hoverOffset: 4
                 }]
             },
