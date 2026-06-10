@@ -134,13 +134,7 @@
     <script>
         const servidor = JSON.parse(sessionStorage.getItem("servidor"));
 
-        if (!servidor || !servidor.mac) {
-            alert("Nenhum servidor selecionado. Você será redirecionado.");
-            window.location.href = "servidores.html";
-        }
-
         const macServidor = servidor.mac;
-        const idServidor = servidor.id_servidor;   
 
         let limiteCPU = null;
         let limiteCS = null;
@@ -157,7 +151,7 @@
         let graficos = [];
 
         function getClasseCPU(valor) {
-            const limite = limiteCPU || 80; 
+            const limite = limiteCPU || 80;
             const percentual = (valor / limite) * 100;
             if (percentual <= 50) return 'uso-verde';
             if (percentual <= 75) return 'uso-amarelo';
@@ -166,7 +160,7 @@
         }
 
         function getClasseCS(valor) {
-            const limite = limiteCS || 850; 
+            const limite = limiteCS || 85;
             const percentual = (valor / limite) * 100;
             if (percentual <= 50) return 'uso-verde';
             if (percentual <= 75) return 'uso-amarelo';
@@ -240,23 +234,16 @@
         }
 
         async function buscarLimites() {
-            if (!idServidor) {
-                console.warn('ID do servidor não disponível. Limites não serão exibidos.');
-                return;
-            }
             try {
                 const resp = await fetch('/dash_cpu/buscarLimites', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: idServidor })
+                    body: JSON.stringify({ MacServer: macServidor })
                 });
                 if (resp.ok) {
                     const limites = await resp.json();
                     limiteCPU = limites.cpu;
                     limiteCS = limites.cs;
-                    console.log('Limites carregados:', limites);
-                } else {
-                    console.error('Erro ao buscar limites:', resp.status);
                 }
             } catch (e) {
                 console.warn('Falha ao obter limites:', e);
