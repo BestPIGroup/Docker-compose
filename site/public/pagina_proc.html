@@ -212,52 +212,64 @@
     cardStatus.style.borderColor = status.cor;
 }
 
-    function converterTimestamp(timestamp) {
-        const partes = timestamp.split(" ");
-        const data = partes[0];
-        const hora = partes[1];
+function converterTimestamp(timestamp) {
+    const partes = timestamp.split(" ");
+    const data = partes[0];
+    const hora = partes[1];
 
-        const [dia, mes, ano] = data.split("/");
-        const [h, min, seg] = hora.split(":");
+    const [dia, mes, ano] = data.split("/");
+    const [h, min, seg] = hora.split(":");
 
-        return new Date(ano, mes - 1, dia, h, min, seg);
+    return new Date(ano, mes - 1, dia, h, min, seg);
+}
+
+function ordenarPorTempo(historico) {
+    return [...historico].sort(function (a, b) {
+        return converterTimestamp(a.timestamp) - converterTimestamp(b.timestamp);
+    });
+}
+
+  function calcularTrocasPorSegundo(dados) {
+    if (!dados || dados.length < 2) {
+        return 0;
     }
 
-    function calcularTrocasPorSegundo(dados) {
-        if (!dados || dados.length < 2) {
-            return 0;
-        }
+    const ordenado = ordenarPorTempo(dados);
 
-        const atual = dados[0];
-        const anterior = dados[1];
+    const anterior = ordenado[ordenado.length - 2];
+    const atual = ordenado[ordenado.length - 1];
 
-        const delta = Number(atual.cpuCtxSwitches) - Number(anterior.cpuCtxSwitches);
+    const delta =
+        Number(atual.cpuCtxSwitches) -
+        Number(anterior.cpuCtxSwitches);
 
-        const dataAtual = converterTimestamp(atual.timestamp);
-        const dataAnterior = converterTimestamp(anterior.timestamp);
+    const segundos =
+        (converterTimestamp(atual.timestamp) -
+         converterTimestamp(anterior.timestamp)) / 1000;
 
-        const segundos = (dataAtual - dataAnterior) / 1000;
-
-        if (segundos <= 0) {
-            return 0;
-        }
-
-        return Math.round(delta / segundos);
+    if (segundos <= 0) {
+        return 0;
     }
 
-    function calcularDeltaContexto(dados) {
-        if (!dados || dados.length < 2) {
-            return 0;
-        }
+    return Math.round(Math.max(0, delta) / segundos);
+}
 
-        const atual = dados[0];
-        const anterior = dados[1];
-
-        const valorAtual = Number(atual.cpuCtxSwitches);
-        const valorAnterior = Number(anterior.cpuCtxSwitches);
-
-        return valorAtual - valorAnterior;
+function calcularDeltaContexto(dados) {
+    if (!dados || dados.length < 2) {
+        return 0;
     }
+
+    const ordenado = ordenarPorTempo(dados);
+
+    const anterior = ordenado[ordenado.length - 2];
+    const atual = ordenado[ordenado.length - 1];
+
+    const delta =
+        Number(atual.cpuCtxSwitches) -
+        Number(anterior.cpuCtxSwitches);
+
+    return Math.max(0, delta);
+}
 
     function criarGraficoProcessos(historico) {
         const labels = historico.map(item => {
@@ -359,7 +371,7 @@
 
 
     function criarGraficoContexto(historico) {
-        const historicoOrdenado = [...historico].reverse();
+        const historicoOrdenado = ordenarPorTempo(historico);
 
         const labels = [];
         const valores = [];
