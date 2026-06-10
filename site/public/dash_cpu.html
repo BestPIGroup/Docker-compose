@@ -134,6 +134,7 @@
     <script>
         const MAC_SERVIDOR = sessionStorage.getItem("MAC")
         const NOME_SERVIDOR = sessionStorage.getItem("ALIAS")
+        var STATUS_SERVIDOR = sessionStorage.getItem("STATUS")
 
         let limiteCPU = null;
         let limiteCS = null;
@@ -344,13 +345,12 @@
 
             document.getElementById('nome-servidor-valor').textContent = NOME_SERVIDOR.toUpperCase();
 
-            const percCPU = (atualCpu / (limiteCPU || 80)) * 100;
             let statusTexto, badgeClasse, statusKpiClasse;
-            if (percCPU > 100) {
+            if (STATUS_SERVIDOR > 100) {
                 statusTexto = 'CRÍTICO';
                 badgeClasse = 'badge-critico';
                 statusKpiClasse = 'status-critico';
-            } else if (percCPU > 75) {
+            } else if (STATUS_SERVIDOR > 75) {
                 statusTexto = 'ATENÇÃO';
                 badgeClasse = 'badge-atencao';
                 statusKpiClasse = 'status-atencao';
