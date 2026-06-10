@@ -23,44 +23,39 @@
                 <img src="./assets/server2.png">
 
                 <div class="servidor-topo-info">
-                    <h2>Servidor 3</h2>
-                    <span class="status-topo">Atenção</span>
+                    <h2 id="server-name">Servidor 3</h2>
                 </div>
 
             </div>
 
             <!-- KPIS -->
             <div class="kpis-dashboard">
-                
-                <div class="kpi-card">
-                    <p>Usuário</p>
-                    <h3 id="server-user">_</h3>
-                </div>
 
-                <div class="kpi-card critico">
-                    <p>Servidores Críticos</p>
-                    <h3 id="server-critico">3</h3>
+                <div class="kpi-card" id="card-status-servidor">
+                    <p>Status do Servidor</p>
+                    <h3 id="kpi-status-servidor">_</h3>
                 </div>
-
-                <div class="kpi-card alerta">
-                    <p>Servidores em Alerta</p>
-                    <h3 id="server-alerta">3</h3>
-                </div>
-
-                <div class="kpi-card">
-                    <p>Total de Processos</p>
-                    <h3 id="kpi-total-processos">402</h3>
-                </div>
-
                 <div class="kpi-card">
                     <p>Máximo de Processos</p>
-                    <h3 id="kpi-maximo-processos">530</h3>
+                    <h3 id="kpi-maximo-processos">_</h3>
                 </div>
 
                 <div class="kpi-card">
-                    <p>Usuários Logados</p>
-                    <h3 id="kpi-usuarios-logados">2</h3>
+                    <p>Trocas desde a última coleta</p>
+                    <h3 id="kpi-context-switches">_</h3>
                 </div>
+
+                <div class="kpi-card">
+                    <p>Trocas por Segundo</p>
+                    <h3 id="kpi-contexto-segundo">_</h3>
+                </div>
+
+                <div class="kpi-card">
+                    <p>Horário da última captura</p>
+                    <h3 id="kpi-ultima-captura"></h3>
+                </div>
+
+
 
             </div>
 
@@ -86,7 +81,7 @@
 
 
                 <div class="graficos"></div>
-                 <h3>TROCAS DE CONTEXTO</h3>
+                <h3>TROCAS DE CONTEXTO</h3>
                 <canvas id="grafico-contexto"></canvas>
 
 
@@ -124,7 +119,7 @@
                     </thead>
 
                     <tbody id="corpo-tabela-arquivos"></tbody>
-                        
+
                 </table>
 
             </div>
@@ -139,213 +134,468 @@
 
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script
+    src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.0.1/dist/chartjs-plugin-annotation.min.js"></script>
 
 <script>
 
-let graficoProcessos = null;
+    let graficoProcessos = null;
 
-let graficoContexto = null;
+    let graficoContexto = null;
 
-function carregarGraficos() {
-    fetch("/dashProcessos/buscar_registros", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            MacServer: sessionStorage.MAC,
-            QtdLinhas: 10
+    function carregarGraficos() {
+        fetch("/dashProcessos/buscar_registros", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                MacServer: sessionStorage.MAC,
+                QtdLinhas: 10
+            })
         })
-    })
-    .then(resposta => resposta.json())
-    .then(dados => {
-        console.log(dados);
+            .then(resposta => resposta.json())
+            .then(dados => {
+                console.log(dados);
 
-        if (!dados || dados.length === 0) {
-            console.log("Nenhum dado encontrado para esse MAC.");
-            return;
-        }
+                if (!dados || dados.length === 0) {
+                    console.log("Nenhum dado encontrado para esse MAC.");
+                    return;
+                }
 
-        const ultimo = dados[0];
+                const ultimo = dados[0];
+                const historicoGrafico = dados.slice();
 
-        atualizarKPI(ultimo, dados);
-        criarGraficoProcessos(dados);
-        criarGraficoContexto(dados);
-        renderizarTabelaProcessos(dados);
-        renderizarTabelaArquivosSimulados();
-    })
-    .catch(erro => {
-        console.log("Erro ao carregar dashboard:", erro);
-    });
-}
 
-function atualizarKPI(ultimo, historico) {
-    document.getElementById("server-user").innerHTML = ultimo.usuario;
-    document.getElementById("kpi-total-processos").innerHTML = ultimo.totalProcessos;
+
+                atualizarKPI(ultimo, dados);
+                criarGraficoProcessos(historicoGrafico);
+                criarGraficoContexto(historicoGrafico);
+                renderizarTabelaProcessos(dados);
+                renderizarTabelaArquivosSimulados();
+            })
+            .catch(erro => {
+                console.log("Erro ao carregar dashboard:", erro);
+            });
+    }
+
+    function atualizarKPI(ultimo, historico) {
+    document.getElementById("server-name").innerHTML = ultimo.usuario;
 
     document.getElementById("kpi-maximo-processos").innerHTML =
         Math.max(...historico.map(linha => Number(linha.totalProcessos)));
 
-    document.getElementById("kpi-usuarios-logados").innerHTML = ultimo.usuariosLogados;
+    const deltaContexto = calcularDeltaContexto(historico);
+
+    document.getElementById("kpi-context-switches").innerHTML =
+        deltaContexto.toLocaleString("pt-BR");
+
+    const trocasPorSegundo = calcularTrocasPorSegundo(historico);
+
+    document.getElementById("kpi-contexto-segundo").innerHTML =
+        trocasPorSegundo.toLocaleString("pt-BR") + "/s";
+
+    
+        const horaUltimaCaptura = ultimo.timestamp.split(" ")[1].substring(0, 5);
+            document.getElementById("kpi-ultima-captura").innerHTML = ultimo.timestamp;
+
+
+    const status = calcularStatusServidor(historico);
+
+    const elementoStatus = document.getElementById("kpi-status-servidor");
+    const cardStatus = document.getElementById("card-status-servidor");
+
+    elementoStatus.innerHTML = status.texto;
+    elementoStatus.style.color = status.cor;
+
+    cardStatus.style.borderColor = status.cor;
 }
 
-function criarGraficoProcessos(historico) {
-    const labels = historico.map(item => {
-    const hora = item.timestamp.split(" ")[1];
-    return hora.substring(0, 5);
-});
-    const valores = historico.map(linha => Number(linha.totalProcessos)).reverse();
+    function converterTimestamp(timestamp) {
+        const partes = timestamp.split(" ");
+        const data = partes[0];
+        const hora = partes[1];
 
-    const ctx = document.getElementById("myChart").getContext("2d");
+        const [dia, mes, ano] = data.split("/");
+        const [h, min, seg] = hora.split(":");
 
-    if (graficoProcessos) {
-        graficoProcessos.destroy();
+        return new Date(ano, mes - 1, dia, h, min, seg);
     }
 
-    graficoProcessos = new Chart(ctx, {
-        type: "line",
-        data: {
-            labels: labels,
-            datasets: [{
-                label: "Total de processos",
-                data: valores,
-                borderWidth: 2,
-                tension: 0.3
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
+    function calcularTrocasPorSegundo(dados) {
+        if (!dados || dados.length < 2) {
+            return 0;
         }
-    });
-}
 
-function criarGraficoContexto(historico) {
-    const labels = historico.map(item => {
-    const hora = item.timestamp.split(" ")[1];
-    return hora.substring(0, 5);
-});
-    const valores = historico.map(linha => Number(linha.cpuCtxSwitches)).reverse();
+        const atual = dados[0];
+        const anterior = dados[1];
 
-    const ctx = document.getElementById("grafico-contexto").getContext("2d");
+        const delta = Number(atual.cpuCtxSwitches) - Number(anterior.cpuCtxSwitches);
 
-    if (graficoContexto) {
-        graficoContexto.destroy();
+        const dataAtual = converterTimestamp(atual.timestamp);
+        const dataAnterior = converterTimestamp(anterior.timestamp);
+
+        const segundos = (dataAtual - dataAnterior) / 1000;
+
+        if (segundos <= 0) {
+            return 0;
+        }
+
+        return Math.round(delta / segundos);
     }
 
-    graficoContexto = new Chart(ctx, {
-        type: "line",
-        data: {
-            labels: labels,
-            datasets: [{
-                label: "Trocas de contexto",
-                data: valores,
-                borderWidth: 2,
-                tension: 0.3
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
+    function calcularDeltaContexto(dados) {
+        if (!dados || dados.length < 2) {
+            return 0;
         }
-    });
-}
 
+        const atual = dados[0];
+        const anterior = dados[1];
 
-function renderizarTabelaProcessos(historico) {
-    const corpo = document.getElementById("corpo-tabela-processos");
-    corpo.innerHTML = "";
+        const valorAtual = Number(atual.cpuCtxSwitches);
+        const valorAnterior = Number(anterior.cpuCtxSwitches);
 
-    const contagem = {};
+        return valorAtual - valorAnterior;
+    }
 
-    historico.forEach(function (linha) {
-        const processosTexto = linha.top3ProcessosCpu;
-
-        if (!processosTexto) return;
-
-        const processos = processosTexto
-            .replaceAll("[[", "")
-            .replaceAll("]]", "")
-            .split("], [");
-
-        processos.forEach(function (processo) {
-            const dados = processo
-                .replaceAll("[", "")
-                .replaceAll("]", "")
-                .replaceAll("'", "")
-                .split(",");
-
-            const pid = dados[0]?.trim();
-            const nome = dados[1]?.trim();
-
-            if (!nome) return;
-
-            if (!contagem[nome]) {
-                contagem[nome] = {
-                    pid: pid,
-                    nome: nome,
-                    quantidade: 0
-                };
-            }
-
-            contagem[nome].quantidade++;
+    function criarGraficoProcessos(historico) {
+        const labels = historico.map(item => {
+            const hora = item.timestamp.split(" ")[1];
+            return hora.substring(0, 5);
         });
-    });
 
-    const top5 = Object.values(contagem)
-        .sort((a, b) => b.quantidade - a.quantidade)
-        .slice(0, 5);
+        const valores = historico.map(linha => Number(linha.totalProcessos)).reverse();
 
-    top5.forEach(function (processo) {
-        corpo.innerHTML += `
+        const ctx = document.getElementById("myChart").getContext("2d");
+
+        if (graficoProcessos) {
+            graficoProcessos.destroy();
+        }
+
+        graficoProcessos = new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Total de processos",
+                    data: valores,
+                    borderColor: "#00FF00",
+                    backgroundColor: "rgba(0,255,0,0.2)",
+                    pointBackgroundColor: "#00FF00",
+                    pointBorderColor: "#00FF00",
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: "#FFFFFF"
+                        }
+                    },
+                    annotation: {
+                        annotations: {
+                            limiteAtencao: {
+                                type: "line",
+                                yMin: 5000,
+                                yMax: 5000,
+                                borderColor: "#F1C40F",
+                                borderWidth: 2,
+                                borderDash: [6, 6],
+                                label: {
+                                    display: true,
+                                    content: "Atenção",
+                                    color: "#FFFFFF",
+                                    backgroundColor: "#F1C40F",
+                                    position: "end"
+                                },
+
+                                font: {
+                                    size: 9
+                                }
+                            },
+                            limiteCritico: {
+                                type: "line",
+                                yMin: 6000,
+                                yMax: 6000,
+                                borderColor: "#E74C3C",
+                                borderWidth: 2,
+                                borderDash: [6, 6],
+                                label: {
+                                    display: true,
+                                    content: "Crítico",
+                                    color: "#FFFFFF",
+                                    backgroundColor: "#E74C3C",
+                                    position: "end"
+                                },
+                                font: {
+                                    size: 9
+                                }
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            color: "#FFFFFF"
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: "#FFFFFF"
+                        }
+                    }
+                },
+
+            }
+        });
+    }
+
+
+    function criarGraficoContexto(historico) {
+        const historicoOrdenado = [...historico].reverse();
+
+        const labels = [];
+        const valores = [];
+
+        for (let i = 1; i < historicoOrdenado.length; i++) {
+            const atual = historicoOrdenado[i];
+            const anterior = historicoOrdenado[i - 1];
+
+            const hora = atual.timestamp.split(" ")[1].substring(0, 5);
+
+            const delta = Math.max(
+                0,
+                Number(atual.cpuCtxSwitches) -
+                Number(anterior.cpuCtxSwitches)
+            );
+
+            labels.push(hora);
+            valores.push(delta);
+        }
+
+        const ctx = document
+            .getElementById("grafico-contexto")
+            .getContext("2d");
+
+        if (graficoContexto) {
+            graficoContexto.destroy();
+        }
+
+        graficoContexto = new Chart(ctx, {
+            type: "line",
+
+            data: {
+                labels: labels,
+
+                datasets: [{
+                    label: "Trocas de Contexto",
+                    data: valores,
+
+                    fill: true,
+
+                    borderColor: "#F1C40F",
+                    backgroundColor: "rgba(241,196,15,0.15)",
+
+                    pointBackgroundColor: "#F1C40F",
+                    pointBorderColor: "#F1C40F",
+
+                    borderWidth: 2,
+                    tension: 0.4
+                }]
+            },
+
+            options: {
+                responsive: true,
+
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: "#FFFFFF",
+                            font: {
+                                size: 14,
+                                weight: "bold"
+                            }
+                        }
+                    },
+
+                    annotation: {
+                        annotations: {
+
+                            limiteAtencao: {
+                                type: "line",
+                                yMin: 100000,
+                                yMax: 100000,
+
+                                borderColor: "#F1C40F",
+                                borderWidth: 2,
+                                borderDash: [6, 6],
+
+                                label: {
+                                    display: true,
+                                    content: "Atenção",
+
+                                    color: "#FFFFFF",
+                                    backgroundColor: "#F1C40F",
+
+                                    position: "end",
+
+                                    padding: 2,
+
+                                    font: {
+                                        size: 8,
+                                        weight: "normal"
+                                    }
+                                }
+                            },
+
+                            limiteCritico: {
+                                type: "line",
+                                yMin: 150000,
+                                yMax: 150000,
+
+                                borderColor: "#E74C3C",
+                                borderWidth: 2,
+                                borderDash: [6, 6],
+
+                                label: {
+                                    display: true,
+                                    content: "Crítico",
+
+                                    color: "#FFFFFF",
+                                    backgroundColor: "#E74C3C",
+
+                                    position: "end",
+
+                                    padding: 2,
+
+                                    font: {
+                                        size: 8,
+                                        weight: "normal"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+
+                scales: {
+                    x: {
+                        ticks: {
+                            color: "#FFFFFF"
+                        },
+                        grid: {
+                            color: "rgba(255,255,255,0.08)"
+                        }
+                    },
+
+                    y: {
+                        beginAtZero: true,
+
+                        ticks: {
+                            color: "#FFFFFF"
+                        },
+
+                        grid: {
+                            color: "rgba(255,255,255,0.08)"
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function renderizarTabelaProcessos(historico) {
+        const corpo = document.getElementById("corpo-tabela-processos");
+        corpo.innerHTML = "";
+
+        const contagem = {};
+
+        historico.forEach(function (linha) {
+            const processosTexto = linha.top3ProcessosCpu;
+
+            if (!processosTexto) return;
+
+            const processos = processosTexto
+                .replaceAll("[[", "")
+                .replaceAll("]]", "")
+                .split("], [");
+
+            processos.forEach(function (processo) {
+                const dados = processo
+                    .replaceAll("[", "")
+                    .replaceAll("]", "")
+                    .replaceAll("'", "")
+                    .split(",");
+
+                const pid = dados[0]?.trim();
+                const nome = dados[1]?.trim();
+
+                if (!nome) return;
+
+                if (!contagem[nome]) {
+                    contagem[nome] = {
+                        pid: pid,
+                        nome: nome,
+                        quantidade: 0
+                    };
+                }
+
+                contagem[nome].quantidade++;
+            });
+        });
+
+        const top5 = Object.values(contagem)
+            .sort((a, b) => b.quantidade - a.quantidade)
+            .slice(0, 5);
+
+        top5.forEach(function (processo) {
+            corpo.innerHTML += `
             <tr>
                 <td>${processo.pid}</td>
                 <td>${processo.nome}</td>
                 <td>${processo.quantidade}</td>
             </tr>
         `;
-    });
-}
+        });
+    }
 
-const arquivosSimulados = [
-    ["chrome.exe", "C:\\Users\\Admin\\Downloads\\relatorio.pdf"],
-    ["python.exe", "C:\\Projetos\\Argos\\monitoramento.py"],
-    ["mysqld.exe", "C:\\ProgramData\\MySQL\\data\\argos.ibd"],
-    ["java.exe", "C:\\SPTech\\ProjetoArgos\\app.jar"],
-    ["Code.exe", "C:\\Users\\Gamer\\Desktop\\Argos\\pagina_proc.html"],
-    ["node.exe", "C:\\Users\\Gamer\\Desktop\\Argos\\server.js"],
-    ["explorer.exe", "C:\\Users\\Gamer\\Documents\\planilha.xlsx"]
-];
+    const arquivosSimulados = [
+        ["chrome.exe", "C:\\Users\\Admin\\Downloads\\relatorio.pdf"],
+        ["python.exe", "C:\\Projetos\\Argos\\monitoramento.py"],
+        ["mysqld.exe", "C:\\ProgramData\\MySQL\\data\\argos.ibd"],
+        ["java.exe", "C:\\SPTech\\ProjetoArgos\\app.jar"],
+        ["Code.exe", "C:\\Users\\Gamer\\Desktop\\Argos\\pagina_proc.html"],
+        ["node.exe", "C:\\Users\\Gamer\\Desktop\\Argos\\server.js"],
+        ["explorer.exe", "C:\\Users\\Gamer\\Documents\\planilha.xlsx"]
+    ];
 
-function renderizarTabelaArquivosSimulados() {
-    const corpo = document.getElementById("corpo-tabela-arquivos");
+    function renderizarTabelaArquivosSimulados() {
+        const corpo = document.getElementById("corpo-tabela-arquivos");
 
-    corpo.innerHTML = "";
+        corpo.innerHTML = "";
 
-    const embaralhados = arquivosSimulados
-        .sort(() => Math.random() - 0.5)
-        .slice(0, 5);
+        const embaralhados = arquivosSimulados
+            .sort(() => Math.random() - 0.5)
+            .slice(0, 5);
 
-    embaralhados.forEach(item => {
-        corpo.innerHTML += `
+        embaralhados.forEach(item => {
+            corpo.innerHTML += `
             <tr>
                 <td>${item[0]}</td>
                 <td>${item[1]}</td>
             </tr>
         `;
-    });
-}
-    
+        });
+    }
 
-    function criarGraficos(historico, limites){
+
+    function criarGraficos(historico, limites) {
 
         graficosCriados.forEach(function (grafico) {
             grafico.destroy();
@@ -393,7 +643,7 @@ function renderizarTabelaArquivosSimulados() {
 
             var valores = [];
 
-            historico.forEach(function (linha){
+            historico.forEach(function (linha) {
 
                 labels.push(linha.timestamp);
 
@@ -412,10 +662,10 @@ function renderizarTabelaArquivosSimulados() {
 
                     datasets: [
                         {
-                        label: componente.nome,
+                            label: componente.nome,
                             data: valores,
                             borderColor: componente.cor,
-                            backgroundColor: "rgba(255,255,255,0.05)",
+                            backgroundColor: "rgba(245, 73, 39,0.05)",
                             fill: true,
                             tension: 0.3,
                             borderWidth: 2,
@@ -433,14 +683,78 @@ function renderizarTabelaArquivosSimulados() {
         })
     }
 
+    const LIMITE_PROCESSOS_ATENCAO = 5000;
+    const LIMITE_PROCESSOS_CRITICO = 6000;
 
-let intervaloDashboard = null;
+    const LIMITE_CONTEXTO_ATENCAO = 100000;
+    const LIMITE_CONTEXTO_CRITICO = 150000;
 
-function iniciarDashboard() {
-    carregarGraficos();
+    function calcularStatusServidor(historico) {
+    const historicoOrdenado = [...historico].reverse();
 
-    intervaloDashboard = setInterval(function () {
-        carregarGraficos();
-    }, 10000);
+    const valoresProcessos = historicoOrdenado.map(item =>
+        Number(item.totalProcessos)
+    );
+
+    const valoresContexto = [];
+
+    for (let i = 1; i < historicoOrdenado.length; i++) {
+        const atual = historicoOrdenado[i];
+        const anterior = historicoOrdenado[i - 1];
+
+        const delta = Math.max(
+            0,
+            Number(atual.cpuCtxSwitches) -
+            Number(anterior.cpuCtxSwitches)
+        );
+
+        valoresContexto.push(delta);
+    }
+
+    const passouCriticoProcessos = valoresProcessos.some(valor =>
+        valor >= LIMITE_PROCESSOS_CRITICO
+    );
+
+    const passouCriticoContexto = valoresContexto.some(valor =>
+        valor >= LIMITE_CONTEXTO_CRITICO
+    );
+
+    if (passouCriticoProcessos || passouCriticoContexto) {
+        return {
+            texto: "Crítico",
+            cor: "#E74C3C"
+        };
+    }
+
+    const passouAtencaoProcessos = valoresProcessos.some(valor =>
+        valor >= LIMITE_PROCESSOS_ATENCAO
+    );
+
+    const passouAtencaoContexto = valoresContexto.some(valor =>
+        valor >= LIMITE_CONTEXTO_ATENCAO
+    );
+
+    if (passouAtencaoProcessos || passouAtencaoContexto) {
+        return {
+            texto: "Atenção",
+            cor: "#F1C40F"
+        };
+    }
+
+    return {
+        texto: "Normal",
+        cor: "#2ECC71"
+    };
 }
+
+
+    let intervaloDashboard = null;
+
+    function iniciarDashboard() {
+        carregarGraficos();
+
+        intervaloDashboard = setInterval(function () {
+            carregarGraficos();
+        }, 10000);
+    }
 </script>
