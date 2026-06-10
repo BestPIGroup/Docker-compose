@@ -398,7 +398,9 @@
 
         document.getElementById("kpi-servidor").textContent = sessionStorage.ALIAS;
 
-        var statusAtual = document.getElementById("badge-status").textContent = sessionStorage.STATUS;
+        document.getElementById("badge-status").textContent = sessionStorage.STATUS;
+        
+        var statusAtual = sessionStorage.STATUS;
 
         if (statusAtual == "CRÍTICO") {
             
@@ -407,7 +409,7 @@
             
             badgeStatus.className = "badge-atencao"
         } else {
-            d
+            
             badgeStatus.className = "badge-normal"
         }
 
