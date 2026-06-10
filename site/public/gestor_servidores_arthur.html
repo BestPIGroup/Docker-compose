@@ -425,6 +425,75 @@
         document.body.style.overflow = aberto ? 'hidden' : '';
     }
 
+    function esperar(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function aguardarPdfRelatorioServidor(mac) {
+        const macParam = encodeURIComponent(mac);
+
+        for (let tentativa = 0; tentativa < 10; tentativa++) {
+            const resposta = await fetch(`/relatoriosS3/download-servidor-atual?macAddress=${macParam}&json=1`, {
+                cache: 'no-store'
+            });
+
+            if (resposta.ok) return resposta.json();
+            if (resposta.status !== 404) throw new Error(await resposta.text());
+
+            await esperar(2000);
+        }
+
+        throw new Error('Relatório do servidor ainda não foi encontrado no S3.');
+    }
+
+    async function baixarRelatorioServidor(nomeServidor, mac, botao) {
+        if (!mac) {
+            alert('Servidor sem MAC cadastrado para gerar relatório.');
+            return;
+        }
+
+        const abaRelatorio = window.open('', '_blank');
+        if (abaRelatorio) {
+            abaRelatorio.document.title = 'Gerando relatório';
+            abaRelatorio.document.body.innerHTML = '<p style="font-family: Arial, sans-serif;">Gerando relatório do servidor...</p>';
+        }
+
+        const textoOriginal = botao?.innerHTML;
+        if (botao) {
+            botao.disabled = true;
+            botao.innerHTML = '<img src="./assets/pdf.png" class="btn-icon">Gerando...';
+        }
+
+        try {
+            await buscarJson('/relatoriosS3/gerar-relatorio-servidor', {
+                macAddress: mac,
+                tipoRelatorio: 'servidor',
+                nomeServidor,
+                idUnidade: sessionStorage.getItem('ID_UNIDADE'),
+                idUsuario: sessionStorage.getItem('ID_USUARIO'),
+                nomeUsuario: sessionStorage.getItem('NOME_USUARIO')
+            });
+
+            await aguardarPdfRelatorioServidor(mac);
+            const urlRelatorio = `/relatoriosS3/download-servidor-atual?macAddress=${encodeURIComponent(mac)}`;
+
+            if (abaRelatorio) {
+                abaRelatorio.location.href = urlRelatorio;
+            } else {
+                window.open(urlRelatorio, '_blank');
+            }
+        } catch (erro) {
+            console.warn('Não foi possível gerar ou abrir o relatório do servidor:', erro);
+            if (abaRelatorio) abaRelatorio.close();
+            alert('Não foi possível gerar o relatório deste servidor.');
+        } finally {
+            if (botao) {
+                botao.disabled = false;
+                botao.innerHTML = textoOriginal;
+            }
+        }
+    }
+
     function visualDoStatus(status) {
         return visualPorStatus[status] || visualPorStatus.NORMAL;
     }
@@ -523,16 +592,19 @@
                     </div>
                 </div>
                 <div class="div-inferior">
-                    <a href="./assets/relatorio_hardware.pdf" target="_blank">
-                        <button class="btn btn-left">
-                            <img src="./assets/pdf.png" class="btn-icon">Download de Relatório
-                        </button>
-                    </a>
+                    <button class="btn btn-left relatorio-btn" type="button">
+                        <img src="./assets/pdf.png" class="btn-icon">Download de Relatório
+                    </button>
                     <button class="btn btn-right editar-btn" type="button">
                         <img src="./assets/edit.png" class="btn-icon">Editar Servidor
                     </button>
                 </div>
             `;
+
+            card.querySelector('.relatorio-btn')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                baixarRelatorioServidor(nomeServidor, macServidor, e.currentTarget);
+            });
 
             card.querySelector('.editar-btn')?.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -540,7 +612,7 @@
             });
 
             card.addEventListener('click', (e) => {
-                if (e.target.closest('.editar-btn')) return;
+                if (e.target.closest('.editar-btn') || e.target.closest('.relatorio-btn')) return;
                 abrirModalAlertasPorCard(card);
             });
 
