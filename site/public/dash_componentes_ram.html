@@ -157,11 +157,10 @@
 
 </html>
 <script>
-    var macServidor = sessionStorage.MAC;
-    // var aliasServidor = "miyuki";
-    var aliasServidor = sessionStorage.ALIAS;
+    document.getElementById("kpi-servidor").textContent = sessionStorage.ALIAS;
 
-    document.getElementById("kpi-servidor").textContent = aliasServidor;
+    document.getElementById("badge-atencao").textContent = sessionStorage.STATUS
+
 
 
     var todosDados = {};
