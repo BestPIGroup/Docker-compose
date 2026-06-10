@@ -467,7 +467,7 @@
 
         });
 
-        textoVel.textContent = Math.round(VelocidadeEnvio) + "/" + Math.round(VelocidadeRecebimento)
+        textoVel.textContent = Math.round(VelocidadeRecebimento) + "/" + Math.round(VelocidadeEnvio)
 
         const ChartPacotesEnvio = new Chart(ctxPacotesEnvio, {
             type: 'line',
@@ -730,7 +730,7 @@
 
         });
 
-        textoPacks.textContent = Math.round(PacotesEnviados) + "/" + Math.round(PacotesRecebidos)
+        textoPacks.textContent = Math.round(PacotesRecebidos) + "/" + Math.round(PacotesEnviados)
 
         listaCharts = [ChartRedeEnvio, ChartRedeRecebimento, ChartRedeProporcao, ChartPacotesEnvio, ChartPacotesRecebimento, ChartPacotesProporcao]
 
@@ -823,13 +823,13 @@
 
                         Charts[i].data.datasets[0].data = [dados[0][13], dados[0][14]];
                         textoVel = document.getElementById("textoPorporcaoVel");
-                        textoVel.textContent = Math.round(dados[0][13]) + "/" + Math.round(dados[0][14])
+                        textoVel.textContent = Math.round(dados[0][14]) + "/" + Math.round(dados[0][13])
 
                     } else if (i == 5) {
 
                         Charts[i].data.datasets[0].data = [dados[0][15], dados[0][16]];
                         textoPacks = document.getElementById("textoPorporcaoVel");
-                        textoPacks.textContent = Math.round(dados[0][15]) + "/" + Math.round(dados[0][16])
+                        textoPacks.textContent = Math.round(dados[0][16]) + "/" + Math.round(dados[0][15])
 
                     }
 
