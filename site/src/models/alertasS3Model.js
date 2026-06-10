@@ -277,6 +277,10 @@ async function buscarRegistrosAlertas(mac, linhas, filtros) {
         Key: process.env.AWS_BUCKET_ALERTS_KEY
     }).promise();
 
+    console.log("Total de linhas no arquivo:", linhas.length);
+    console.log("Primeiras 3 linhas:", linhas.slice(0, 3));
+    console.log("MAC buscado:", mac);
+    console.log("Resposta bruta do bucket (alertas):", resposta);
     const conteudo = resposta.Body.toString("utf-8");
     const registros = filtrarPorPeriodo(filtrarLinhasDoServidor(conteudo, mac, linhas, montarRegistroDaLinha), filtros);
     const resultado = montarResultado(mac, registros, true);
