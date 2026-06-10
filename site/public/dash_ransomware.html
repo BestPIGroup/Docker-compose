@@ -400,16 +400,16 @@
 
         document.getElementById("badge-status").textContent = sessionStorage.STATUS;
 
-        // if (servidor.nivel == "ALTO") {
-        //     document.getElementById("badge-status").textContent = "CRÍTICO";
-        //     badgeStatus.className = "badge-critico"
-        // } else if (servidor.nivel == "MEDIO") {
-        //     document.getElementById("badge-status").textContent = "ATENÇÃO";
-        //     badgeStatus.className = "badge-atencao"
-        // } else {
-        //     document.getElementById("badge-status").textContent = "NORMAL";
-        //     badgeStatus.className = "badge-normal"
-        // }
+        if (servidor.nivel == "ALTO") {
+            document.getElementById("badge-status").textContent = "CRÍTICO";
+            badgeStatus.className = "badge-critico"
+        } else if (servidor.nivel == "MEDIO") {
+            document.getElementById("badge-status").textContent = "ATENÇÃO";
+            badgeStatus.className = "badge-atencao"
+        } else {
+            document.getElementById("badge-status").textContent = "NORMAL";
+            badgeStatus.className = "badge-normal"
+        }
 
         document.getElementById("ultimaAtualizacao").textContent = servidor.timestamp;
 
