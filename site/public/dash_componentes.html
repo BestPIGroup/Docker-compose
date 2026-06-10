@@ -89,12 +89,6 @@
                     <img src="./assets/warningOrange.png" alt="">
                     Estado de Alerta<h2 id="kpi_alerta">1</h2>
                 </div>
-                <div class="kpi kpi-alerta-sino" id="card-alerta-sino">
-                    <button class="btn-fechar-alerta"
-                        onclick="document.getElementById('card-alerta-sino').style.display='none'">✕</button>
-                    <img src="./assets/bellWhite.png" alt="">
-                    Alerta novo!<h2 id="kpi_sino">CPU</h2>
-                </div>
             </div>
             <div class="retangulo">
                 <a href="servidores.html">
@@ -105,10 +99,6 @@
         </div>
         <div class="dashboard-layout">
             <div class="campo"></div>
-            <div class="correlacoes-painel">
-                <div class="correlacoes-titulo">Diagnóstico de Correlação de Componentes</div>
-                <div class="correlacoes-lista" id="correlacoes-lista"></div>
-            </div>
         </div>
     </div>
 
@@ -138,6 +128,8 @@
         kpialerta.textContent = sessionStorage.TOTAL_CRITICOS;
         */
 
+        kpiServidor.textContent = sessionStorage.ALIAS;
+
         dados = await buscarDadosS3(sessionStorage.MAC);
         dados.reverse();
 
@@ -147,7 +139,7 @@
         statusCPU = "ok"
         statusRAM = "ok"
         statusDISCO = "ok"
-        statusREDE = "ok"   
+        statusREDE = "ok"
         statusPROCS = "ok"
 
         console.log(dados)
@@ -294,7 +286,7 @@
 
             timestamp = dados[i]
             console.log(timestamp)
-            rotuloDeHoras.push(timestamp[2].slice(11,16))
+            rotuloDeHoras.push(timestamp[2].slice(11, 16))
 
             if (dados.length > 1) {
 
@@ -312,6 +304,20 @@
             const ordem = { crit: 0, atencao: 1, ok: 2 };
             return ordem[a.status] - ordem[b.status];
         });
+
+        let totalCriticos = 0;
+        let totalAlertas = 0;
+
+        componentes.forEach(componente => {
+            if (componente.status === "crit") {
+                totalCriticos++;
+            } else if (componente.status === "atencao") {
+                totalAlertas++;
+            }
+        });
+
+        kpiCrit.textContent = totalCriticos;
+        kpiAlerta.textContent = totalAlertas;
 
         componentes.forEach((componente, indice) => {
 
@@ -538,9 +544,6 @@
             console.log(limites[0])
 
         });
-
-        gerarCorrelacoes(todosDados);
-
 
     }
 
