@@ -398,16 +398,16 @@
 
         document.getElementById("kpi-servidor").textContent = sessionStorage.ALIAS;
 
-        document.getElementById("badge-status").textContent = sessionStorage.STATUS;
+        var statusAtual = document.getElementById("badge-status").textContent = sessionStorage.STATUS;
 
-        if (servidor.nivel == "ALTO") {
-            document.getElementById("badge-status").textContent = "CRÍTICO";
+        if (statusAtual == "CRÍTICO") {
+            
             badgeStatus.className = "badge-critico"
-        } else if (servidor.nivel == "MEDIO") {
-            document.getElementById("badge-status").textContent = "ATENÇÃO";
+        } else if (statusAtual == "ATENÇÃO") {
+            
             badgeStatus.className = "badge-atencao"
         } else {
-            document.getElementById("badge-status").textContent = "NORMAL";
+            d
             badgeStatus.className = "badge-normal"
         }
 
