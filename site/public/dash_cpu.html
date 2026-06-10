@@ -346,11 +346,11 @@
             document.getElementById('nome-servidor-valor').textContent = NOME_SERVIDOR.toUpperCase();
 
             let statusTexto, badgeClasse, statusKpiClasse;
-            if (sessionStorage.getItem("STATUS") > 100) {
+            if (sessionStorage.getItem("STATUS") == "Critico") {
                 statusTexto = 'CRÍTICO';
                 badgeClasse = 'badge-critico';
                 statusKpiClasse = 'status-critico';
-            } else if (sessionStorage.getItem("STATUS") > 75) {
+            } else if (sessionStorage.getItem("STATUS") == "Alerta") {
                 statusTexto = 'ATENÇÃO';
                 badgeClasse = 'badge-atencao';
                 statusKpiClasse = 'status-atencao';
