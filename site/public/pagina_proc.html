@@ -180,7 +180,7 @@
     }
 
     function atualizarKPI(ultimo, historico) {
-    document.getElementById("server-name").innerHTML = ultimo.usuario;
+    document.getElementById("server-name").innerHTML = sessionStorage.ALIAS;
 
     document.getElementById("kpi-maximo-processos").innerHTML =
         Math.max(...historico.map(linha => Number(linha.totalProcessos)));
@@ -202,7 +202,7 @@
 
     const status = calcularStatusServidor(historico);
 
-    const elementoStatus = document.getElementById("kpi-status-servidor");
+    const elementoStatus = document.getElementById("kpi-status-servidor").innerHTML = sessionStorage.STATUS;
     const cardStatus = document.getElementById("card-status-servidor");
 
     elementoStatus.innerHTML = status.texto;
