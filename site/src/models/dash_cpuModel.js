@@ -36,11 +36,11 @@ async function buscarRegistros(mac, linhas) {
                     idMac: rowSep[0],
                     usuario: rowSep[1],
                     timestamp: rowSep[2],
-                    cpuPercent : parseFloat(rowSep[3]) || 0,
+                    cpuPercent: parseFloat(rowSep[3]) || 0,
                     cpuCtxSwitches: Number(rowSep[5]),
                     top3ProcessosCpu: rowSep[6],
                     totalProcessos: Number(rowSep[8]),
-                    cpuAlerta: rowSep[22]?.trim() || "" 
+                    cpuAlerta: rowSep[22]?.trim() || ""
                 });
                 count++;
             }
@@ -55,14 +55,20 @@ async function buscarRegistros(mac, linhas) {
     }
 }
 
-function buscarLimites(id) {
-    console.log("ACESSEI O MODEL DA UNIDADE ...");
-    var instrucaoSql = `SELECT * FROM componente_servidor WHERE id_servidor = ${id} AND (id_componente = 1 OR id_componente = 3);`;
-    console.log("Executando a instrução SQL: \n" + instrucaoSql);
-    return database.executar(instrucaoSql);
+async function buscarLimitesPorMac(mac) {
+    const sqlServidor = `SELECT id_servidor FROM servidor WHERE endereco_mac = '${mac}'`;
+    const servidorResult = await database.executar(sqlServidor);
+
+    if (!servidorResult || servidorResult.length === 0) {
+        throw new Error("Servidor não encontrado para o MAC informado");
+    }
+
+    const idServidor = servidorResult[0].id_servidor;
+    const sqlLimites = `SELECT * FROM componente_servidor WHERE id_servidor = ${idServidor} AND (id_componente = 1 OR id_componente = 3)`;
+    return database.executar(sqlLimites);
 }
 
 module.exports = {
-    buscarLimites,
+    buscarLimitesPorMac,
     buscarRegistros
 };

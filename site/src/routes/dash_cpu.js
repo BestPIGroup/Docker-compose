@@ -6,7 +6,7 @@ router.post("/buscarRegistros", function (req, res) {
     dash_cpuController.buscarRegistros(req, res);
 });
 
-router.post("/buscarLimites", function(req, res) {
+router.post("/buscarLimites", function (req, res) {
     dash_cpuController.buscarLimites(req, res);
 });
 
