@@ -117,12 +117,12 @@
         for (i = 0; i < 7;) {
 
             dados[0].push(lista[i][2].slice(11, 16));
-            dados[1].push(lista[i][13]);
-            dados[2].push(lista[i][14]);
+            dados[1].push(Math.round(Number(lista[i][13]),2));
+            dados[2].push(Math.round(Number(lista[i][14])));
             dados[3].push(lista[i][15]);
             dados[4].push(lista[i][16]);
-            dados[5].push(lista[i][24]);
-            dados[6].push(lista[i][25]);
+            dados[5].push(Number(lista[i][24])*10);
+            dados[6].push(Number(lista[i][25])*10);
 
             if (lista.length > 1) {
 
@@ -794,16 +794,16 @@
                     if (i == 0) {
 
                         Charts[i].data.datasets[0].data.shift();
-                        Charts[i].data.datasets[0].data.push(dados[0][13]);
+                        Charts[i].data.datasets[0].data.push(Math.round(Number(dados[0][13]),2));
                         Charts[i].data.datasets[1].data.shift();
-                        Charts[i].data.datasets[1].data.push(dados[0][24]);
+                        Charts[i].data.datasets[1].data.push(Number(lista[i][24])*10);
 
                     } else if (i == 1) {
 
                         Charts[i].data.datasets[0].data.shift();
-                        Charts[i].data.datasets[0].data.push(dados[0][14]);
+                        Charts[i].data.datasets[0].data.push(Math.round(Number(dados[0][14]),2));
                         Charts[i].data.datasets[1].data.shift();
-                        Charts[i].data.datasets[1].data.push(dados[0][25]);
+                        Charts[i].data.datasets[1].data.push(Number(lista[i][24])*10);
 
                     } else if (i == 3) {
 
