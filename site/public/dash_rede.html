@@ -908,7 +908,7 @@
         }, 300000);
     }
 
-    async function buscarLimites() {
+    async function  buscarLimites() {
 
         return fetch("servidores/buscar_limites", {
             method: "POST",
@@ -916,7 +916,7 @@
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                id: sessionStorage.ID_UNIDADE
+                id: sessionStorage.ID_SERVIDOR
             })
         })
 
