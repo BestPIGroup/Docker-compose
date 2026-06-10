@@ -202,7 +202,7 @@
 
     const status = calcularStatusServidor(historico);
 
-    const elementoStatus = document.getElementById("kpi-status-servidor").innerHTML = sessionStorage.STATUS;
+    const elementoStatus = document.getElementById("kpi-status-servidor").textContent = sessionStorage.STATUS;
     const cardStatus = document.getElementById("card-status-servidor");
 
     elementoStatus.innerHTML = status.texto;
