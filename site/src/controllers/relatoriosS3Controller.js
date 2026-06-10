@@ -6,6 +6,10 @@ function responderErro(res, erro, texto) {
     res.status(500).json({ erro: texto });
 }
 
+function obterMacRelatorioServidor(dados = {}) {
+    return dados.macAddress || dados.mac || dados.MacServer || dados.MacAddress;
+}
+
 async function listarRelatorios(req, res) {
     try {
         const resultado = await relatoriosS3Model.listarRelatorios();
@@ -37,8 +41,17 @@ async function baixarRelatorio(req, res) {
 }
 
 async function baixarRelatorioGeralAtual(req, res) {
+    const identificador = req.query.identificador || req.query.idUnidade || req.query.ID_UNIDADE || req.query.fkUnidade;
+    const geradoDepoisDe = req.query.geradoDepoisDe || req.query.solicitadoEm || req.query.after;
+
     try {
-        const url = await relatoriosS3Model.gerarUrlDownloadRelatorioGeralAtual();
+        const url = await relatoriosS3Model.gerarUrlDownloadRelatorioGeralAtual({ identificador, geradoDepoisDe });
+
+        if (req.query.json === "1" || req.query.formato === "json") {
+            res.json({ downloadUrl: url });
+            return;
+        }
+
         res.redirect(url);
     } catch (erro) {
         if (erro.message === "Relatorio geral nao encontrado") {
@@ -57,13 +70,19 @@ async function baixarRelatorioGeralAtual(req, res) {
 
 async function gerarRelatorioGeral(req, res) {
     try {
-        const resultado = await relatoriosS3Model.acionarGeracaoRelatorioGeral(req.body || {});
+        const resultado = await relatoriosS3Model.solicitarGeracaoRelatorioGeralPorS3(req.body || {});
 
         res.status(202).json({
-            mensagem: "Geracao do relatorio geral solicitada",
+            mensagem: "Geracao do relatorio geral solicitada pelo S3",
+            downloadPendente: true,
             resultado
         });
     } catch (erro) {
+        if (erro.message === "Identificador do relatorio geral nao informado") {
+            res.status(400).json({ erro: "Identificador do relatorio geral nao informado" });
+            return;
+        }
+
         if (erro.message === "Lambda de relatorio geral nao configurada") {
             res.status(500).json({ erro: "Lambda de relatorio geral nao configurada" });
             return;
@@ -75,10 +94,14 @@ async function gerarRelatorioGeral(req, res) {
 
 async function gerarRelatorioServidor(req, res) {
     try {
-        const resultado = await relatoriosS3Model.acionarGeracaoRelatorioServidor(req.body || {});
+        const dados = req.body || {};
+        const macAddress = obterMacRelatorioServidor(dados);
+        const resultado = await relatoriosS3Model.solicitarGeracaoRelatorioServidorPorS3(dados);
 
         res.status(202).json({
-            mensagem: "Geracao do relatorio do servidor solicitada",
+            mensagem: "Geracao do relatorio do servidor solicitada pelo S3",
+            macAddress,
+            downloadPendente: true,
             resultado
         });
     } catch (erro) {
@@ -98,6 +121,7 @@ async function gerarRelatorioServidor(req, res) {
 
 async function baixarRelatorioServidorAtual(req, res) {
     const macAddress = req.query.macAddress || req.query.mac || req.query.MacServer;
+    const geradoDepoisDe = req.query.geradoDepoisDe || req.query.solicitadoEm || req.query.after;
 
     if (!macAddress) {
         res.status(400).send("MAC do servidor nao informado");
@@ -105,7 +129,7 @@ async function baixarRelatorioServidorAtual(req, res) {
     }
 
     try {
-        const url = await relatoriosS3Model.gerarUrlDownloadRelatorioServidorAtual(macAddress);
+        const url = await relatoriosS3Model.gerarUrlDownloadRelatorioServidorAtual(macAddress, { geradoDepoisDe });
 
         if (req.query.json === "1" || req.query.formato === "json") {
             res.json({ downloadUrl: url });
