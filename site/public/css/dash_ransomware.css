@@ -293,21 +293,21 @@ select {
 .card-risco-alto {
     background: url('../assets/ransonware/!-red.png') 10px center no-repeat, linear-gradient(rgba(95, 15, 15, 0.877) 0%, rgba(66, 23, 23, 0.863) 50%) !important;
     background-repeat: no-repeat !important;
-    background-size: auto !important;
+    background-size: 60px, cover;
     background-position: right center !important;
 }
 
 .card-estavel {
     background: url('../assets/ransonware/!-blue.png') 10px center no-repeat, linear-gradient(200deg, rgba(18, 146, 28, 1) 0%, rgba(18, 146, 28, 1) 5%, rgba(0, 91, 156, 0.27) 75%) !important;
     background-repeat: no-repeat !important;
-    background-size: auto !important;
+    background-size: 60px, cover;
     background-position: right center !important;
 }
 
 .card-atencao {
     background: url('../assets/ransonware/!-yellow.png') 10px center no-repeat, linear-gradient(200deg, rgb(146, 112, 18) 0%, rgb(146, 101, 18) 5%, rgba(0, 91, 156, 0.27) 75%) !important;
     background-repeat: no-repeat !important;
-    background-size: auto !important;
+    background-size: 60px, cover;
     background-position: right center !important;
 }
 
