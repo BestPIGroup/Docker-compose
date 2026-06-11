@@ -1599,17 +1599,34 @@
         }, { hardware: 0, cyber: 0 });
     }
 
+    function ultimaLeituraDeAlertas(registros) {
+        return [...(Array.isArray(registros) ? registros : [])].sort((a, b) => {
+            const dataA = dataDoRegistro(a);
+            const dataB = dataDoRegistro(b);
+            if (!dataA && !dataB) return 0;
+            if (!dataA) return 1;
+            if (!dataB) return -1;
+            return dataB - dataA;
+        })[0] || null;
+    }
+
     function atualizarMetricasDoServidor(nomeServidor, respostaS3, mac) {
-        const contagem = contarAlertasDoServidor(registrosDaRespostaS3(respostaS3, mac));
-        const status = contagem.cyber > 0 ? 'CRÍTICO' : (contagem.hardware > 0 ? 'ATENÇÃO' : 'NORMAL');
+        const registros = registrosDaRespostaS3(respostaS3, mac);
+        const ultimaLeitura = ultimaLeituraDeAlertas(registros);
+        const contagemTotal = contarAlertasDoServidor(registros);
+        const contagemAtual = contarAlertasDoServidor(ultimaLeitura ? [ultimaLeitura] : []);
+        const status = contagemAtual.cyber > 0 ? 'CRÍTICO' : (contagemAtual.hardware > 0 ? 'ATENÇÃO' : 'NORMAL');
 
         const metricasAtualizadas = {
             ...(metricasDosServidores[nomeServidor] || {}),
             mac,
-            hardware: contagem.hardware,
-            cyber: contagem.cyber,
+            hardware: contagemAtual.hardware,
+            cyber: contagemAtual.cyber,
+            hardwareTotal: contagemTotal.hardware,
+            cyberTotal: contagemTotal.cyber,
             status,
-            seguranca: contagem.cyber > 0 ? 'Desprotegido' : 'Íntegro'
+            seguranca: contagemAtual.cyber > 0 ? 'Desprotegido' : 'Íntegro',
+            ultimaLeituraAlertas: ultimaLeitura?.timestamp || ''
         };
 
         metricasDosServidores[nomeServidor] = metricasAtualizadas;
