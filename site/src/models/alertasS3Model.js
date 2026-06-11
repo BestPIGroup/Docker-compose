@@ -273,10 +273,12 @@ function filtrarLinhasDoServidor(conteudo, mac, linhas, montarItem) {
 }
 
 function formatarDataArquivoAlertas(data) {
+    const ano = String(data.getFullYear()).slice(-2);
+
     return [
         String(data.getDate()).padStart(2, "0"),
         String(data.getMonth() + 1).padStart(2, "0"),
-        data.getFullYear()
+        ano
     ].join("-");
 }
 
@@ -304,8 +306,11 @@ function normalizarDataArquivoAlertas(valor) {
     const dataBr = texto.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
     if (dataBr) return new Date(Number(dataBr[3]), Number(dataBr[2]) - 1, Number(dataBr[1]));
 
-    const dataArquivo = texto.match(/^(\d{2})-(\d{2})-(\d{4})/);
-    if (dataArquivo) return new Date(Number(dataArquivo[3]), Number(dataArquivo[2]) - 1, Number(dataArquivo[1]));
+    const dataArquivo = texto.match(/^(\d{2})-(\d{2})-(\d{2}|\d{4})/);
+    if (dataArquivo) {
+        const ano = dataArquivo[3].length === 2 ? Number(`20${dataArquivo[3]}`) : Number(dataArquivo[3]);
+        return new Date(ano, Number(dataArquivo[2]) - 1, Number(dataArquivo[1]));
+    }
 
     const dataConvertida = new Date(texto);
     if (!Number.isNaN(dataConvertida.getTime())) {

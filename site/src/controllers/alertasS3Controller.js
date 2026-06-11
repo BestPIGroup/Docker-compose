@@ -9,9 +9,9 @@ function montarDadosDaBusca(req) {
         mac: dados.MacServer || dados.MacServers || dados.mac,
         linhas: dados.QtdLinhas || dados.linhas,
         filtros: {
-            dataInicio: dados.dataInicio || dados.DataInicio,
-            dataFim: dados.dataFim || dados.DataFim,
-            ultimosMinutos: dados.ultimosMinutos || dados.UltimosMinutos
+            dataInicio: dados.dataInicio || dados.DataInicio || dados.datainicio,
+            dataFim: dados.dataFim || dados.DataFim || dados.datafim,
+            ultimosMinutos: dados.ultimosMinutos || dados.UltimosMinutos || dados.ultimosminutos
         }
     };
 }
