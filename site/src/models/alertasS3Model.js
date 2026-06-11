@@ -218,11 +218,53 @@ function dataDoRegistro(registro) {
     return new Date(ano, mes - 1, dia, hora, minuto, segundo);
 }
 
+function anoCompleto(ano) {
+    const texto = String(ano || "");
+    return texto.length === 2 ? Number(`20${texto}`) : Number(texto);
+}
+
+function dataLocalDoFiltro(valor, fimDoDia = false) {
+    if (!valor) return null;
+
+    const texto = String(valor).trim();
+    const horario = fimDoDia ? [23, 59, 59, 999] : [0, 0, 0, 0];
+    const dataIso = texto.match(/^(\d{4})-(\d{2})-(\d{2})(?:[T\s](\d{2}):(\d{2})(?::(\d{2}))?)?/);
+
+    if (dataIso) {
+        return new Date(
+            Number(dataIso[1]),
+            Number(dataIso[2]) - 1,
+            Number(dataIso[3]),
+            dataIso[4] ? Number(dataIso[4]) : horario[0],
+            dataIso[5] ? Number(dataIso[5]) : horario[1],
+            dataIso[6] ? Number(dataIso[6]) : horario[2],
+            dataIso[4] ? 0 : horario[3]
+        );
+    }
+
+    const dataBr = texto.match(/^(\d{2})[/-](\d{2})[/-](\d{2}|\d{4})(?:\s+(\d{2}):(\d{2})(?::(\d{2}))?)?/);
+
+    if (dataBr) {
+        return new Date(
+            anoCompleto(dataBr[3]),
+            Number(dataBr[2]) - 1,
+            Number(dataBr[1]),
+            dataBr[4] ? Number(dataBr[4]) : horario[0],
+            dataBr[5] ? Number(dataBr[5]) : horario[1],
+            dataBr[6] ? Number(dataBr[6]) : horario[2],
+            dataBr[4] ? 0 : horario[3]
+        );
+    }
+
+    const dataConvertida = new Date(texto);
+    return Number.isNaN(dataConvertida.getTime()) ? null : dataConvertida;
+}
+
 function filtrarPorPeriodo(registros, filtros) {
     if (!filtros) return registros;
 
-    let inicio = filtros.dataInicio ? new Date(filtros.dataInicio) : null;
-    let fim = filtros.dataFim ? new Date(filtros.dataFim) : null;
+    let inicio = dataLocalDoFiltro(filtros.dataInicio);
+    let fim = dataLocalDoFiltro(filtros.dataFim, true);
 
     if (Number(filtros.ultimosMinutos) > 0) {
         inicio = new Date(Date.now() - Number(filtros.ultimosMinutos) * 60 * 1000);
