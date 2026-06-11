@@ -804,7 +804,7 @@
                         Charts[i].data.datasets[0].data.shift();
                         Charts[i].data.datasets[0].data.push(Math.round(Number(dados[0][14]),2));
                         Charts[i].data.datasets[1].data.shift();
-                        Charts[i].data.datasets[1].data.push(Number(lista[i][24]));
+                        Charts[i].data.datasets[1].data.push(Number(lista[i][25]));
 
                     } else if (i == 3) {
 
@@ -824,13 +824,13 @@
 
                         Charts[i].data.datasets[0].data = [dados[0][13], dados[0][14]];
                         textoVel = document.getElementById("textoPorporcaoVel");
-                        textoVel.textContent = Math.round(dados[0][14]) + "/" + Math.round(dados[0][13])
+                        textoVel.textContent = Math.round(dados[0][13]) + "/" + Math.round(dados[0][14])
 
                     } else if (i == 5) {
 
                         Charts[i].data.datasets[0].data = [dados[0][15], dados[0][16]];
                         textoPacks = document.getElementById("textoPorporcaoVel");
-                        textoPacks.textContent = Math.round(dados[0][16]) + "/" + Math.round(dados[0][15])
+                        textoPacks.textContent = Math.round(dados[0][15]) + "/" + Math.round(dados[0][16])
 
                     }
 
