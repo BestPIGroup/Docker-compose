@@ -119,7 +119,7 @@
 
             dados[0].push(lista[i][2].slice(11, 16));
             dados[1].push(Math.round(Number(lista[i][13]),2));
-            dados[2].push(Math.round(Number(lista[i][14])));
+            dados[2].push(Math.round(Number(lista[i][14]),2));
             dados[3].push(lista[i][15]);
             dados[4].push(lista[i][16]);
             dados[5].push(Number(lista[i][24]));
@@ -197,8 +197,8 @@
 
         }
 
-        KpiPacoteEnvio.textContent = (somaVelEnvio / somaPacksEnvio).toFixed(2) + " Kb"
-        KpiPacoteRecebimento.textContent = (somaVelRecebimento / somaPacksRecebimento).toFixed(2) + " Kb"
+        KpiPacoteEnvio.textContent = (somaVelEnvio / somaPacksEnvio).toFixed(2) + " KB"
+        KpiPacoteRecebimento.textContent = (somaVelRecebimento / somaPacksRecebimento).toFixed(2) + " KB"
 
 
         const ctxRedeEnvio = document.getElementById('grafico-rede-envio');
@@ -450,7 +450,7 @@
 
                     title: {
                         display: true,
-                        text: 'Proporção de velocidade de envio e recebimento',
+                        text: 'Proporção de velocidade de Envio e Recebimento',
                         color: '#FFFFFF',
 
                         font: {
@@ -468,7 +468,7 @@
 
         });
 
-        textoVel.textContent = Math.round(VelocidadeRecebimento) + "/" + Math.round(VelocidadeEnvio)
+        textoVel.textContent = Math.round(VelocidadeEnvio) + "/" + Math.round(VelocidadeRecebimento)
 
         const ChartPacotesEnvio = new Chart(ctxPacotesEnvio, {
             type: 'line',
@@ -476,7 +476,7 @@
 
                 labels: dados[0],
                 datasets: [{
-                    label: "Pico",
+                    label: "Leitura",
                     data: dados[3],
                     borderColor: '#4A73FF',
                     backgroundColor: '#4A73FF',
@@ -573,7 +573,7 @@
 
                 labels: dados[0],
                 datasets: [{
-                    label: "Pico",
+                    label: "Leitura",
                     data: dados[4],
                     borderColor: '#4A73FF',
                     backgroundColor: '#4A73FF',
@@ -713,7 +713,7 @@
 
                     title: {
                         display: true,
-                        text: 'Proporção de pacotes enviados e recebidos',
+                        text: 'Proporção de pacotes Enviados e Recebidos',
                         color: '#FFFFFF',
 
                         font: {
@@ -731,7 +731,7 @@
 
         });
 
-        textoPacks.textContent = Math.round(PacotesRecebidos) + "/" + Math.round(PacotesEnviados)
+        textoPacks.textContent = Math.round(PacotesEnviados) + "/" + Math.round(PacotesRecebidos)
 
         listaCharts = [ChartRedeEnvio, ChartRedeRecebimento, ChartRedeProporcao, ChartPacotesEnvio, ChartPacotesRecebimento, ChartPacotesProporcao]
 
@@ -797,14 +797,14 @@
                         Charts[i].data.datasets[0].data.shift();
                         Charts[i].data.datasets[0].data.push(Math.round(Number(dados[0][13]),2));
                         Charts[i].data.datasets[1].data.shift();
-                        Charts[i].data.datasets[1].data.push(Number(lista[i][24]));
+                        Charts[i].data.datasets[1].data.push(lista[i][24]);
 
                     } else if (i == 1) {
 
                         Charts[i].data.datasets[0].data.shift();
                         Charts[i].data.datasets[0].data.push(Math.round(Number(dados[0][14]),2));
                         Charts[i].data.datasets[1].data.shift();
-                        Charts[i].data.datasets[1].data.push(Number(lista[i][25]));
+                        Charts[i].data.datasets[1].data.push(lista[i][25]);
 
                     } else if (i == 3) {
 
@@ -829,7 +829,7 @@
                     } else if (i == 5) {
 
                         Charts[i].data.datasets[0].data = [dados[0][15], dados[0][16]];
-                        textoPacks = document.getElementById("textoPorporcaoVel");
+                        textoPacks = document.getElementById("textoPorporcaoPacks");
                         textoPacks.textContent = Math.round(dados[0][15]) + "/" + Math.round(dados[0][16])
 
                     }
@@ -899,8 +899,8 @@
             KpiPacoteEnvio = document.getElementById("PacoteMedioEnvio");
             KpiPacoteRecebimento = document.getElementById("PacoteMedioRecebimento");
             
-            KpiPacoteEnvio.textContent = (somaVelEnvio / somaPacksEnvio).toFixed(2) + " Kb"
-            KpiPacoteRecebimento.textContent = (somaVelRecebimento / somaPacksRecebimento).toFixed(2) + " Kb"
+            KpiPacoteEnvio.textContent = (somaVelEnvio / somaPacksEnvio).toFixed(2) + " KB"
+            KpiPacoteRecebimento.textContent = (somaVelRecebimento / somaPacksRecebimento).toFixed(2) + " KB"
 
         });
 
