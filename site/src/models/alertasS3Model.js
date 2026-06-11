@@ -2,6 +2,10 @@ const AWS = require("aws-sdk");
 
 const alertasPorServidor = {};
 const leiturasPorServidor = {};
+const macsArquivosAlertasCompartilhados = [
+    "4c:44:5b:f2:74:61",
+    "bc:cd:99:c2:86:34"
+];
 
 const colunasClient = [
     "idMac",
@@ -268,22 +272,150 @@ function filtrarLinhasDoServidor(conteudo, mac, linhas, montarItem) {
     return registros;
 }
 
+function formatarDataArquivoAlertas(data) {
+    return [
+        String(data.getDate()).padStart(2, "0"),
+        String(data.getMonth() + 1).padStart(2, "0"),
+        data.getFullYear()
+    ].join("-");
+}
+
+function dataAtualSaoPaulo() {
+    const partes = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "America/Sao_Paulo",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+    }).formatToParts(new Date()).reduce((objeto, parte) => {
+        objeto[parte.type] = parte.value;
+        return objeto;
+    }, {});
+
+    return new Date(Number(partes.year), Number(partes.month) - 1, Number(partes.day));
+}
+
+function normalizarDataArquivoAlertas(valor) {
+    if (!valor) return dataAtualSaoPaulo();
+
+    const texto = String(valor).trim();
+    const dataIso = texto.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (dataIso) return new Date(Number(dataIso[1]), Number(dataIso[2]) - 1, Number(dataIso[3]));
+
+    const dataBr = texto.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+    if (dataBr) return new Date(Number(dataBr[3]), Number(dataBr[2]) - 1, Number(dataBr[1]));
+
+    const dataArquivo = texto.match(/^(\d{2})-(\d{2})-(\d{4})/);
+    if (dataArquivo) return new Date(Number(dataArquivo[3]), Number(dataArquivo[2]) - 1, Number(dataArquivo[1]));
+
+    const dataConvertida = new Date(texto);
+    if (!Number.isNaN(dataConvertida.getTime())) {
+        return new Date(dataConvertida.getFullYear(), dataConvertida.getMonth(), dataConvertida.getDate());
+    }
+
+    return dataAtualSaoPaulo();
+}
+
+function montarChaveAlertas(mac, filtros) {
+    const data = normalizarDataArquivoAlertas(filtros?.dataInicio || filtros?.dataFim || filtros?.data);
+    const dataFormatada = formatarDataArquivoAlertas(data);
+    return `logAlertas/${dataFormatada}_${String(mac || "").trim()}.csv`;
+}
+
+function normalizarMac(mac) {
+    return String(mac || "").trim().toLowerCase().replace(/-/g, ":");
+}
+
+function listarMacsBuscaAlertas(mac) {
+    return Array.from(new Set([
+        normalizarMac(mac),
+        ...macsArquivosAlertasCompartilhados.map(normalizarMac)
+    ].filter(Boolean)));
+}
+
+async function buscarObjetoS3SeExistir(s3, bucket, key) {
+    try {
+        return await s3.getObject({ Bucket: bucket, Key: key }).promise();
+    } catch (erro) {
+        if (erro?.code === "NoSuchKey" || erro?.name === "NoSuchKey" || erro?.statusCode === 404) return null;
+        throw erro;
+    }
+}
+
+function agruparRegistrosPorMac(registros, macs) {
+    const grupos = macs.reduce((objeto, mac) => {
+        objeto[mac] = [];
+        return objeto;
+    }, {});
+
+    registros.forEach(registro => {
+        const macRegistro = normalizarMac(registro?.mac);
+        if (!grupos[macRegistro]) grupos[macRegistro] = [];
+        grupos[macRegistro].push(registro);
+    });
+
+    return grupos;
+}
+
+function limitarRegistros(registros, linhas) {
+    const limite = Number(linhas) > 0 ? Number(linhas) : Infinity;
+    return Number.isFinite(limite) ? registros.slice(0, limite) : registros;
+}
+
+function montarResultadoAlertasPorMac(macSolicitado, registros, macs, linhas) {
+    const registrosPorMac = agruparRegistrosPorMac(registros, macs);
+    const registrosLimitadosPorMac = Object.keys(registrosPorMac).reduce((objeto, mac) => {
+        objeto[mac] = limitarRegistros(registrosPorMac[mac], linhas);
+        return objeto;
+    }, {});
+    const macNormalizado = normalizarMac(macSolicitado);
+    const registrosDoMac = registrosLimitadosPorMac[macNormalizado] || [];
+    const resultado = montarResultado(macSolicitado, registrosDoMac, true);
+
+    resultado.totalGeral = Object.values(registrosLimitadosPorMac).reduce((total, lista) => total + lista.length, 0);
+    resultado.registrosPorMac = registrosLimitadosPorMac;
+    resultado.porMac = Object.keys(registrosLimitadosPorMac).reduce((objeto, mac) => {
+        objeto[mac] = montarResultado(mac, registrosLimitadosPorMac[mac], true);
+        return objeto;
+    }, {});
+
+    return resultado;
+}
+
 async function buscarRegistrosAlertas(mac, linhas, filtros) {
     if (!mac) throw new Error("MAC do servidor não informado");
 
     const s3 = configurarS3();
-    const resposta = await s3.getObject({
-        Bucket: process.env.AWS_BUCKET_ALERTS_NAME,
-        Key: process.env.AWS_BUCKET_ALERTS_KEY
-    }).promise();
+    const bucket = process.env.AWS_BUCKET_ALERTS_NAME;
+    const macsBusca = listarMacsBuscaAlertas(mac);
+    let todosOsRegistros = [];
 
-    console.log("Total de linhas no arquivo:", linhas.length);
-    console.log("Primeiras 3 linhas:", linhas.slice(0, 3));
+    for (const macArquivo of macsBusca) {
+        const key = montarChaveAlertas(macArquivo, filtros);
+        const resposta = await buscarObjetoS3SeExistir(s3, bucket, key);
+
+        console.log("Arquivo de alertas buscado:", key, resposta ? "encontrado" : "nao encontrado");
+
+        if (!resposta) continue;
+
+        const conteudoArquivo = resposta.Body.toString("utf-8");
+        const registrosArquivo = String(conteudoArquivo || "")
+            .split(/\r?\n/)
+            .map(montarRegistroDaLinha)
+            .filter(Boolean);
+
+        todosOsRegistros = todosOsRegistros.concat(registrosArquivo);
+    }
+
     console.log("MAC buscado:", mac);
-    console.log("Resposta bruta do bucket (alertas):", resposta);
-    const conteudo = resposta.Body.toString("utf-8");
-    const registros = filtrarPorPeriodo(filtrarLinhasDoServidor(conteudo, mac, linhas, montarRegistroDaLinha), filtros);
-    const resultado = montarResultado(mac, registros, true);
+    const registrosFiltrados = filtrarPorPeriodo(todosOsRegistros, filtros);
+    registrosFiltrados.sort((a, b) => {
+        const dataA = dataDoRegistro(a);
+        const dataB = dataDoRegistro(b);
+        if (!dataA || !dataB) return 0;
+        return dataB - dataA;
+    });
+
+    const resultado = montarResultadoAlertasPorMac(mac, registrosFiltrados, macsBusca, linhas);
 
     alertasPorServidor[mac] = resultado;
     return resultado;

@@ -1496,7 +1496,21 @@
         };
     }
 
-    function registrosDaRespostaS3(dadosS3) {
+    function normalizarMacComparacao(mac) {
+        return String(mac || '').trim().toLowerCase().replace(/-/g, ':');
+    }
+
+    function registrosDaRespostaS3(dadosS3, mac) {
+        const macNormalizado = normalizarMacComparacao(mac);
+
+        if (macNormalizado) {
+            const registrosPorMac = dadosS3?.registrosPorMac || {};
+            const porMac = dadosS3?.porMac || {};
+
+            if (Array.isArray(registrosPorMac[macNormalizado])) return registrosPorMac[macNormalizado];
+            if (Array.isArray(porMac[macNormalizado]?.registros)) return porMac[macNormalizado].registros;
+        }
+
         if (Array.isArray(dadosS3)) return dadosS3;
         if (Array.isArray(dadosS3?.registros)) return dadosS3.registros;
         if (Array.isArray(dadosS3?.dados)) return dadosS3.dados;
@@ -1510,8 +1524,8 @@
         return registros.map(montarLeituraDoCsvClient).filter(Boolean);
     }
 
-    function montarPainelComAlertasS3(nomeServidor, respostaS3) {
-        const registros = registrosDaRespostaS3(respostaS3);
+    function montarPainelComAlertasS3(nomeServidor, respostaS3, mac) {
+        const registros = registrosDaRespostaS3(respostaS3, mac);
         const alertas = montarListaAlertasDoPeriodo(registros);
         const totalDeAlertas = alertas.length;
 
@@ -1552,8 +1566,8 @@
         }, { hardware: 0, cyber: 0 });
     }
 
-    function atualizarMetricasDoServidor(nomeServidor, respostaS3) {
-        const contagem = contarAlertasDoServidor(registrosDaRespostaS3(respostaS3));
+    function atualizarMetricasDoServidor(nomeServidor, respostaS3, mac) {
+        const contagem = contarAlertasDoServidor(registrosDaRespostaS3(respostaS3, mac));
         const status = contagem.cyber > 0 ? 'CRÍTICO' : (contagem.hardware > 0 ? 'ATENÇÃO' : 'NORMAL');
 
         metricasDosServidores[nomeServidor] = {
@@ -1589,8 +1603,8 @@
 
         try {
             const dadosS3 = await buscarJson('/alertasS3/buscar_registros_alertas', { MacServer: mac });
-            montarPainelComAlertasS3(nomeServidor, dadosS3);
-            atualizarMetricasDoServidor(nomeServidor, dadosS3);
+            montarPainelComAlertasS3(nomeServidor, dadosS3, mac);
+            atualizarMetricasDoServidor(nomeServidor, dadosS3, mac);
             return dadosS3;
         } catch (erro) {
             console.warn('Não foi possível buscar alertas no S3:', erro);
