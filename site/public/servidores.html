@@ -128,7 +128,7 @@
                                 "Content-Type": "application/json",
                             },
                             body: JSON.stringify({
-                                MacServer: "4c:44:5b:f2:74:61",
+                                MacServer: server.endereco_mac,
                                 QtdLinhas: 1
                             })
                         });
@@ -166,7 +166,6 @@
                     server.limites.splice(3, 2);
 
                     console.log(server)
-                    console.log(serv.limites)
 
                     if (server.limites[0].limite_componente <= server.ultimoRegistro[3]) {
 
