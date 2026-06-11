@@ -90,31 +90,20 @@ async function atualizarLimitesPorMac(mac, componentes) {
 
         const exibir = limparBooleano(item.exibir);
         const instrucaoSql = `
-            UPDATE componente_servidor cs
-            INNER JOIN servidor s ON s.id_servidor = cs.id_servidor
-            SET
-                cs.limite_componente = ${limite},
-                cs.exibir = ${exibir}
+            INSERT INTO componente_servidor(id_servidor, id_componente, limite_componente, exibir)
+            SELECT
+                s.id_servidor,
+                ${componente.id},
+                ${limite},
+                ${exibir}
+            FROM servidor s
             WHERE s.endereco_mac = '${macLimpo}'
-              AND cs.id_componente = ${componente.id};
+            ON DUPLICATE KEY UPDATE
+                limite_componente = VALUES(limite_componente),
+                exibir = VALUES(exibir);
         `;
 
-        const resultado = await database.executar(instrucaoSql);
-
-        if (resultado.affectedRows === 0) {
-            const instrucaoInsert = `
-                INSERT INTO componente_servidor(id_servidor, id_componente, limite_componente, exibir)
-                SELECT
-                    s.id_servidor,
-                    ${componente.id},
-                    ${limite},
-                    ${exibir}
-                FROM servidor s
-                WHERE s.endereco_mac = '${macLimpo}';
-            `;
-
-            await database.executar(instrucaoInsert);
-        }
+        await database.executar(instrucaoSql);
     }
 
     return buscarLimitesPorMac(mac);
@@ -140,7 +129,10 @@ async function inserirLimitesPorMac(mac, componentes) {
                 ${limite},
                 ${exibir}
             FROM servidor s
-            WHERE s.endereco_mac = '${macLimpo}';
+            WHERE s.endereco_mac = '${macLimpo}'
+            ON DUPLICATE KEY UPDATE
+                limite_componente = VALUES(limite_componente),
+                exibir = VALUES(exibir);
         `;
 
         await database.executar(instrucaoSql);

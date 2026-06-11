@@ -150,7 +150,7 @@
                             </div>
                             <div class="limiar-item">
                                 <label>Processos <span class="limiar-valor" id="val-processos">--</span></label>
-                                <input type="range" min="0" max="3000" class="limiar-range" data-limite-componente="Processos" oninput="atualizarLimiar('val-processos', this.value)">
+                                <input type="range" min="0" max="4000" class="limiar-range" data-limite-componente="Processos" oninput="atualizarLimiar('val-processos', this.value)">
                             </div>
                             <div class="limiar-item">
                                 <label>RAM <span class="limiar-valor" id="val-ram">--</span></label>
@@ -763,12 +763,10 @@
         botao.textContent = 'Salvando...';
 
         try {
-            const rota = servidorEmEdicao.existiaLimite ? '/limitesComponentes/atualizar' : '/limitesComponentes/inserir';
-            const metodo = servidorEmEdicao.existiaLimite ? 'PUT' : 'POST';
-            const dadosAtualizados = await buscarJson(rota, {
+            const dadosAtualizados = await buscarJson('/limitesComponentes/atualizar', {
                 mac: servidorEmEdicao.mac,
                 componentes
-            }, metodo);
+            }, 'PUT');
             servidorEmEdicao.existiaLimite = true;
             (dadosAtualizados.componentes || []).forEach(aplicarLimiteNoModal);
             botao.textContent = '✓ Salvo!';
