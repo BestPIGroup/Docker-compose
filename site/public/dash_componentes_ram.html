@@ -209,7 +209,7 @@
         document.getElementById("percentual-ram").innerHTML = ultimo.virtualMemoryUsage.toFixed(2) + "%";
 
         document.getElementById("legenda-uso").innerHTML = "Em uso — " + ultimo.virtualMemoryUsage.toFixed(2) + "%";
-        document.getElementById("legenda-livre").innerHTML = "Livre — " + (100 - ultimo.virtualMemoryUsage.toFixed(2)) + "%";
+        document.getElementById("legenda-livre").innerHTML = "Livre — " + Math.round((100 - ultimo.virtualMemoryUsage),2) + "%";
 
         document.querySelector(".kpi-detecta p").innerHTML =
             "Coleta detectada às " + coletaMaior.timestamp;
