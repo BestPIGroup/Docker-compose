@@ -162,6 +162,7 @@ function extrairMensagens(mensagensTexto) {
 
 function montarRegistro(dadosLinha) {
     const { data, hora } = separarDataHora(dadosLinha.timestamp);
+    if (!data || !hora) return null;
 
     return {
         timestamp: dadosLinha.timestamp,
@@ -364,8 +365,35 @@ function normalizarDataArquivoAlertas(valor) {
 
 function montarChaveAlertas(mac, filtros) {
     const data = normalizarDataArquivoAlertas(filtros?.dataInicio || filtros?.dataFim || filtros?.data);
+    return montarChaveAlertasPorData(mac, data);
+}
+
+function montarChaveAlertasPorData(mac, data) {
     const dataFormatada = formatarDataArquivoAlertas(data);
     return `logAlertas/${dataFormatada}_${String(mac || "").trim()}.csv`;
+}
+
+function subtrairDias(data, dias) {
+    const novaData = new Date(data);
+    novaData.setDate(novaData.getDate() - dias);
+    return novaData;
+}
+
+function filtroTemDataAlertas(filtros) {
+    return Boolean(
+        filtros?.dataInicio ||
+        filtros?.dataFim ||
+        filtros?.data ||
+        Number(filtros?.ultimosMinutos) > 0
+    );
+}
+
+function listarDatasBuscaAlertas(filtros) {
+    const dataBase = normalizarDataArquivoAlertas(filtros?.dataInicio || filtros?.dataFim || filtros?.data);
+
+    if (filtroTemDataAlertas(filtros)) return [dataBase];
+
+    return Array.from({ length: 8 }, (_, indice) => subtrairDias(dataBase, indice));
 }
 
 function normalizarMac(mac) {
@@ -434,23 +462,32 @@ async function buscarRegistrosAlertas(mac, linhas, filtros) {
     const s3 = configurarS3();
     const bucket = process.env.AWS_BUCKET_ALERTS_NAME;
     const macsBusca = listarMacsBuscaAlertas(mac);
+    const datasBusca = listarDatasBuscaAlertas(filtros);
+    const buscaTemDataExplicita = filtroTemDataAlertas(filtros);
     let todosOsRegistros = [];
 
-    for (const macArquivo of macsBusca) {
-        const key = montarChaveAlertas(macArquivo, filtros);
-        const resposta = await buscarObjetoS3SeExistir(s3, bucket, key);
+    for (const dataArquivo of datasBusca) {
+        let registrosDaData = [];
 
-        console.log("Arquivo de alertas buscado:", key, resposta ? "encontrado" : "nao encontrado");
+        for (const macArquivo of macsBusca) {
+            const key = montarChaveAlertasPorData(macArquivo, dataArquivo);
+            const resposta = await buscarObjetoS3SeExistir(s3, bucket, key);
 
-        if (!resposta) continue;
+            console.log("Arquivo de alertas buscado:", key, resposta ? "encontrado" : "nao encontrado");
 
-        const conteudoArquivo = resposta.Body.toString("utf-8");
-        const registrosArquivo = String(conteudoArquivo || "")
-            .split(/\r?\n/)
-            .map(montarRegistroDaLinha)
-            .filter(Boolean);
+            if (!resposta) continue;
 
-        todosOsRegistros = todosOsRegistros.concat(registrosArquivo);
+            const conteudoArquivo = resposta.Body.toString("utf-8");
+            const registrosArquivo = String(conteudoArquivo || "")
+                .split(/\r?\n/)
+                .map(montarRegistroDaLinha)
+                .filter(Boolean);
+
+            registrosDaData = registrosDaData.concat(registrosArquivo);
+        }
+
+        todosOsRegistros = todosOsRegistros.concat(registrosDaData);
+        if (!buscaTemDataExplicita && registrosDaData.length > 0) break;
     }
 
     console.log("MAC buscado:", mac);

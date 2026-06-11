@@ -890,6 +890,25 @@
         });
     }
 
+    function dataMaisRecenteDosRegistros(...listas) {
+        return listas.flatMap(lista => Array.isArray(lista) ? lista : []).reduce((maisRecente, registro) => {
+            const data = dataDoRegistro(registro);
+            if (!data) return maisRecente;
+            return !maisRecente || data > maisRecente ? data : maisRecente;
+        }, null);
+    }
+
+    function periodoDoDiaComDados(data) {
+        const dia = inicioDoDia(data);
+
+        return {
+            inicio: dia,
+            fim: somarDias(dia, 1),
+            tipo: 'dia',
+            titulo: `Alertas por ${nomeDiaCompleto(dia)}`
+        };
+    }
+
     function textoNormalizado(valor) {
         return String(valor || '')
             .normalize('NFD')
@@ -1209,9 +1228,17 @@
     }
 
     function montarDadosFiltrados(nomeServidor, registros, periodoAtual, metricas, leituras) {
-        const periodo = periodoSelecionado(periodoAtual);
-        const registrosFiltrados = registrosDoPeriodo(registros, periodo);
-        const leiturasFiltradas = registrosDoPeriodo(leituras, periodo);
+        let periodo = periodoSelecionado(periodoAtual);
+        let registrosFiltrados = registrosDoPeriodo(registros, periodo);
+        let leiturasFiltradas = registrosDoPeriodo(leituras, periodo);
+        const dataMaisRecente = dataMaisRecenteDosRegistros(registros, leituras);
+
+        if (dataMaisRecente && registrosFiltrados.length === 0 && leiturasFiltradas.length === 0) {
+            periodo = periodoDoDiaComDados(dataMaisRecente);
+            registrosFiltrados = registrosDoPeriodo(registros, periodo);
+            leiturasFiltradas = registrosDoPeriodo(leituras, periodo);
+        }
+
         const temAlertas = Array.isArray(registros) && registros.length > 0;
         const temLeituras = Array.isArray(leituras) && leituras.length > 0;
         const totalDeLeituras = temLeituras ? leiturasFiltradas.length : null;
@@ -1500,15 +1527,21 @@
         return String(mac || '').trim().toLowerCase().replace(/-/g, ':');
     }
 
+    function pegarEntradaPorMac(objeto, macNormalizado) {
+        return Object.entries(objeto || {}).find(([mac]) => normalizarMacComparacao(mac) === macNormalizado)?.[1];
+    }
+
     function registrosDaRespostaS3(dadosS3, mac) {
         const macNormalizado = normalizarMacComparacao(mac);
 
         if (macNormalizado) {
             const registrosPorMac = dadosS3?.registrosPorMac || {};
             const porMac = dadosS3?.porMac || {};
+            const registrosDoMac = pegarEntradaPorMac(registrosPorMac, macNormalizado);
+            const resumoDoMac = pegarEntradaPorMac(porMac, macNormalizado);
 
-            if (Array.isArray(registrosPorMac[macNormalizado])) return registrosPorMac[macNormalizado];
-            if (Array.isArray(porMac[macNormalizado]?.registros)) return porMac[macNormalizado].registros;
+            if (Array.isArray(registrosDoMac)) return registrosDoMac;
+            if (Array.isArray(resumoDoMac?.registros)) return resumoDoMac.registros;
         }
 
         if (Array.isArray(dadosS3)) return dadosS3;
@@ -1570,13 +1603,18 @@
         const contagem = contarAlertasDoServidor(registrosDaRespostaS3(respostaS3, mac));
         const status = contagem.cyber > 0 ? 'CRÍTICO' : (contagem.hardware > 0 ? 'ATENÇÃO' : 'NORMAL');
 
-        metricasDosServidores[nomeServidor] = {
+        const metricasAtualizadas = {
             ...(metricasDosServidores[nomeServidor] || {}),
+            mac,
             hardware: contagem.hardware,
             cyber: contagem.cyber,
             status,
             seguranca: contagem.cyber > 0 ? 'Desprotegido' : 'Íntegro'
         };
+
+        metricasDosServidores[nomeServidor] = metricasAtualizadas;
+        if (!dadosPainelAlertas.servidores[nomeServidor]) dadosPainelAlertas.servidores[nomeServidor] = {};
+        dadosPainelAlertas.servidores[nomeServidor].metricas = metricasAtualizadas;
     }
 
     async function buscarLeiturasS3DoServidor(nomeServidor, mac) {
